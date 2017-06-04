@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package>
+	<name>System.Data.SQLite</name>
+	<license>Public Domain</license>
+	<files>
+		<file name="bin/System.Data.SQLite.dll"/>
+		<file name="bin/System.Data.SQLite.dll.config"/>
+		<file name="bin/System.Data.SQLite.dll.xml"/>
+		<file name="bin/platform-libs/windows/32/SQLite.Interop.dll"/>
+		<file name="bin/platform-libs/windows/32/sqlite3.dll"/>
+		<file name="bin/platform-libs/windows/64/SQLite.Interop.dll"/>
+		<file name="bin/platform-libs/windows/64/sqlite3.dll"/>
+	</files>
+</package>
