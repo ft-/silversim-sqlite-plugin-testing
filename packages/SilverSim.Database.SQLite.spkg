@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Database.SQLite</name>
+	<default-configuration>
+		<source>SilverSim.Database.SQLite:PackageConfig.ini</source>
+	</default-configuration>
+	<files>
+		<file name="bin/plugins/SilverSim.Database.SQLite.dll"/>
+	</files>
+</package>
