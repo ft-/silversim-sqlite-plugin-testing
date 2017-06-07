@@ -96,12 +96,12 @@ namespace SilverSim.Database.SQLite.Maptile
                         if (reader.Read())
                         {
                             data = new MaptileData();
-                            data.Location.X = (uint)(int)reader["LocX"];
-                            data.Location.Y = (uint)(int)reader["LocY"];
+                            data.Location.X = (uint)(long)reader["LocX"];
+                            data.Location.Y = (uint)(long)reader["LocY"];
                             data.ScopeID = reader.GetUUID("ScopeID");
                             data.LastUpdate = reader.GetDate("LastUpdate");
                             data.ContentType = (string)reader["ContentType"];
-                            data.ZoomLevel = (int)reader["ZoomLevel"];
+                            data.ZoomLevel = (int)(long)reader["ZoomLevel"];
                             data.Data = reader.GetBytes("Data");
                             return true;
                         }

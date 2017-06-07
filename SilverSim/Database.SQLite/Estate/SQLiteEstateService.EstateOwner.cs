@@ -62,7 +62,7 @@ namespace SilverSim.Database.SQLite.Estate
                 using (var conn = new SQLiteConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new SQLiteCommand("SELECT ID, Owner FROM estates WHERE Owner LIKE '" + owner.ID.ToString() + "%'", conn))
+                    using (var cmd = new SQLiteCommand("SELECT ID, Owner FROM estates WHERE Owner LIKE \"" + owner.ID.ToString() + "%\"", conn))
                     {
                         cmd.Parameters.AddParameter("@id", owner.ID);
                         using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -72,7 +72,7 @@ namespace SilverSim.Database.SQLite.Estate
                                 UUI uui = reader.GetUUI("Owner");
                                 if (uui.EqualsGrid(owner))
                                 {
-                                    estates.Add((uint)(int)reader["ID"]);
+                                    estates.Add((uint)(long)reader["ID"]);
                                 }
                             }
                             return estates;

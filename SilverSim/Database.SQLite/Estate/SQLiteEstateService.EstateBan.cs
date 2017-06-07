@@ -80,7 +80,7 @@ namespace SilverSim.Database.SQLite.Estate
             set
             {
                 string query = value ?
-                    "INSERT INTO estate_bans (\"EstateID\", \"UserID\") VALUES (@estateid, @userid)" :
+                    "INSERT INTO estate_bans (EstateID, UserID) VALUES (@estateid, @userid)" :
                     "DELETE FROM estate_bans WHERE EstateID = @estateid AND UserID LIKE '" + agent.ID.ToString() + "%'";
 
                 using (var conn = new SQLiteConnection(m_ConnectionString))

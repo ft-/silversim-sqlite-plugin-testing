@@ -84,7 +84,7 @@ namespace SilverSim.Database.SQLite.OfflineIM
                                 IMSessionID = reader.GetUUID("IMSessionID"),
                                 Position = reader.GetVector3("Position"),
                                 BinaryBucket = reader.GetBytes("BinaryBucket"),
-                                ParentEstateID = (uint)(int)reader["ParentEstateID"],
+                                ParentEstateID = (uint)(long)reader["ParentEstateID"],
                                 RegionID = reader.GetUUID("RegionID"),
                                 Timestamp = reader.GetDate("Timestamp"),
                                 IsOffline = true
