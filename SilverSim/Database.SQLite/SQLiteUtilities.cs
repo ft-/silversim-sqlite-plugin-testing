@@ -22,35 +22,54 @@
 using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.Types;
+using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data.SQLite;
-using System.Runtime.Serialization;
-using SilverSim.Scene.Types.SceneEnvironment;
 using System.IO;
-using SilverSim.Types.StructuredData.Llsd;
-using System.Globalization;
+using System.Runtime.Serialization;
+using System.Text;
 
 namespace SilverSim.Database.SQLite
 {
     public static class SQLiteUtilities
     {
+        public static string ToSQLiteQuoted(this string s)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("'");
+            foreach(char c in s)
+            {
+                if(c == '\'')
+                {
+                    sb.Append("''");
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+            sb.Append("'");
+            return sb.ToString();
+        }
+
         #region Connection String Creator
         public static string BuildConnectionString(IConfig config, ILog log)
         {
             string configName = config.Name;
-            if (!config.Contains("DataSource"))
+            bool containsDataSource = config.Contains("DataSource");
+            if (!containsDataSource && !config.Contains("DataSourceDefault"))
             {
-                log.FatalFormat("[MYSQL CONFIG]: Parameter 'Datasource' missing in [{0}]", configName);
+                log.FatalFormat("[SQLITE CONFIG]: Parameter 'DataSource' missing in [{0}]", configName);
                 throw new ConfigurationLoader.ConfigurationErrorException();
             }
-            SQLiteConnectionStringBuilder sb = new SQLiteConnectionStringBuilder();
-            sb.DataSource = config.GetString("DataSource");
-            sb.Password = config.GetString("Password", string.Empty);
+            SQLiteConnectionStringBuilder sb = new SQLiteConnectionStringBuilder()
+            {
+                DataSource = config.GetString(containsDataSource ? "DataSource" : "DataSourceDefault"),
+                Password = config.GetString("Password", string.Empty)
+            };
             return sb.ToString();
         }
         #endregion
@@ -251,6 +270,7 @@ namespace SilverSim.Database.SQLite
         #region Common REPLACE INTO/INSERT INTO helper
         public static void AnyInto(this SQLiteConnection connection, string cmd, string tablename, Dictionary<string, object> vals)
         {
+            SQLiteCommandBuilder sb = new SQLiteCommandBuilder();
             var q = new List<string>();
             foreach (KeyValuePair<string, object> kvp in vals)
             {
@@ -261,41 +281,41 @@ namespace SilverSim.Database.SQLite
 
                 if (t == typeof(Vector3))
                 {
-                    q.Add(key + "X");
-                    q.Add(key + "Y");
-                    q.Add(key + "Z");
+                    q.Add(sb.QuoteIdentifier(key + "X"));
+                    q.Add(sb.QuoteIdentifier(key + "Y"));
+                    q.Add(sb.QuoteIdentifier(key + "Z"));
                 }
                 else if (t == typeof(GridVector) || t == typeof(EnvironmentController.WLVector2))
                 {
-                    q.Add(key + "X");
-                    q.Add(key + "Y");
+                    q.Add(sb.QuoteIdentifier(key + "X"));
+                    q.Add(sb.QuoteIdentifier(key + "Y"));
                 }
                 else if (t == typeof(Quaternion))
                 {
-                    q.Add(key + "X");
-                    q.Add(key + "Y");
-                    q.Add(key + "Z");
-                    q.Add(key + "W");
+                    q.Add(sb.QuoteIdentifier(key + "X"));
+                    q.Add(sb.QuoteIdentifier(key + "Y"));
+                    q.Add(sb.QuoteIdentifier(key + "Z"));
+                    q.Add(sb.QuoteIdentifier(key + "W"));
                 }
                 else if (t == typeof(Color))
                 {
-                    q.Add(key + "Red");
-                    q.Add(key + "Green");
-                    q.Add(key + "Blue");
+                    q.Add(sb.QuoteIdentifier(key + "Red"));
+                    q.Add(sb.QuoteIdentifier(key + "Green"));
+                    q.Add(sb.QuoteIdentifier(key + "Blue"));
                 }
                 else if (t == typeof(EnvironmentController.WLVector4))
                 {
-                    q.Add(key + "Red");
-                    q.Add(key + "Green");
-                    q.Add(key + "Blue");
-                    q.Add(key + "Value");
+                    q.Add(sb.QuoteIdentifier(key + "Red"));
+                    q.Add(sb.QuoteIdentifier(key + "Green"));
+                    q.Add(sb.QuoteIdentifier(key + "Blue"));
+                    q.Add(sb.QuoteIdentifier(key + "Value"));
                 }
                 else if (t == typeof(ColorAlpha))
                 {
-                    q.Add(key + "Red");
-                    q.Add(key + "Green");
-                    q.Add(key + "Blue");
-                    q.Add(key + "Alpha");
+                    q.Add(sb.QuoteIdentifier(key + "Red"));
+                    q.Add(sb.QuoteIdentifier(key + "Green"));
+                    q.Add(sb.QuoteIdentifier(key + "Blue"));
+                    q.Add(sb.QuoteIdentifier(key + "Alpha"));
                 }
                 else if (value == null)
                 {
@@ -323,9 +343,7 @@ namespace SilverSim.Database.SQLite
                     q2.Append(",");
                 }
                 first = false;
-                q1.Append("`");
-                q1.Append(p);
-                q1.Append("`");
+                q1.Append(sb.QuoteIdentifier(p));
                 q2.Append("@v_");
                 q2.Append(p);
             }
@@ -357,7 +375,7 @@ namespace SilverSim.Database.SQLite
         #endregion
 
         #region UPDATE SET helper
-        private static List<string> UpdateSetFromVals(Dictionary<string, object> vals)
+        private static List<string> UpdateSetFromVals(SQLiteCommandBuilder sb, Dictionary<string, object> vals)
         {
             var updates = new List<string>();
 
@@ -369,41 +387,41 @@ namespace SilverSim.Database.SQLite
 
                 if (t == typeof(Vector3))
                 {
-                    updates.Add("`" + key + "X` = @v_" + key + "X");
-                    updates.Add("`" + key + "Y` = @v_" + key + "Y");
-                    updates.Add("`" + key + "Z` = @v_" + key + "Z");
+                    updates.Add(sb.QuoteIdentifier(key + "X") + " = @v_" + key + "X");
+                    updates.Add(sb.QuoteIdentifier(key + "Y") + " = @v_" + key + "Y");
+                    updates.Add(sb.QuoteIdentifier(key + "Z") + " = @v_" + key + "Z");
                 }
                 else if (t == typeof(GridVector) || t == typeof(EnvironmentController.WLVector2))
                 {
-                    updates.Add("`" + key + "X` = @v_" + key + "X");
-                    updates.Add("`" + key + "Y` = @v_" + key + "Y");
+                    updates.Add(sb.QuoteIdentifier(key + "X") + " = @v_" + key + "X");
+                    updates.Add(sb.QuoteIdentifier(key + "Y") + " = @v_" + key + "Y");
                 }
                 else if (t == typeof(Quaternion))
                 {
-                    updates.Add("`" + key + "X` = @v_" + key + "X");
-                    updates.Add("`" + key + "Y` = @v_" + key + "Y");
-                    updates.Add("`" + key + "Z` = @v_" + key + "Z");
-                    updates.Add("`" + key + "W` = @v_" + key + "W");
+                    updates.Add(sb.QuoteIdentifier(key + "X") + " = @v_" + key + "X");
+                    updates.Add(sb.QuoteIdentifier(key + "Y") + " = @v_" + key + "Y");
+                    updates.Add(sb.QuoteIdentifier(key + "Z") + " = @v_" + key + "Z");
+                    updates.Add(sb.QuoteIdentifier(key + "W") + " = @v_" + key + "W");
                 }
                 else if (t == typeof(Color))
                 {
-                    updates.Add("`" + key + "Red` = @v_" + key + "Red");
-                    updates.Add("`" + key + "Green` = @v_" + key + "Green");
-                    updates.Add("`" + key + "Blue` = @v_" + key + "Blue");
+                    updates.Add(sb.QuoteIdentifier(key + "Red") + " = @v_" + key + "Red");
+                    updates.Add(sb.QuoteIdentifier(key + "Green") + " = @v_" + key + "Green");
+                    updates.Add(sb.QuoteIdentifier(key + "Blue") + " = @v_" + key + "Blue");
                 }
                 else if (t == typeof(EnvironmentController.WLVector4))
                 {
-                    updates.Add("`" + key + "Red` = @v_" + key + "Red");
-                    updates.Add("`" + key + "Green` = @v_" + key + "Green");
-                    updates.Add("`" + key + "Blue` = @v_" + key + "Blue");
-                    updates.Add("`" + key + "Value` = @v_" + key + "Value");
+                    updates.Add(sb.QuoteIdentifier(key + "Red") + " = @v_" + key + "Red");
+                    updates.Add(sb.QuoteIdentifier(key + "Green") + " = @v_" + key + "Green");
+                    updates.Add(sb.QuoteIdentifier(key + "Blue") + " = @v_" + key + "Blue");
+                    updates.Add(sb.QuoteIdentifier(key + "Value") + " = @v_" + key + "Value");
                 }
                 else if (t == typeof(ColorAlpha))
                 {
-                    updates.Add("`" + key + "Red` = @v_" + key + "Red");
-                    updates.Add("`" + key + "Green` = @v_" + key + "Green");
-                    updates.Add("`" + key + "Blue` = @v_" + key + "Blue");
-                    updates.Add("`" + key + "Alpha` = @v_" + key + "Alpha");
+                    updates.Add(sb.QuoteIdentifier(key + "Red") + " = @v_" + key + "Red");
+                    updates.Add(sb.QuoteIdentifier(key + "Green") + " = @v_" + key + "Green");
+                    updates.Add(sb.QuoteIdentifier(key + "Blue") + " = @v_" + key + "Blue");
+                    updates.Add(sb.QuoteIdentifier(key + "Alpha") + " = @v_" + key + "Alpha");
                 }
                 else if (value == null)
                 {
@@ -411,7 +429,7 @@ namespace SilverSim.Database.SQLite
                 }
                 else
                 {
-                    updates.Add("`" + key + "` = @v_" + key);
+                    updates.Add(sb.QuoteIdentifier(key) + " = @v_" + key);
                 }
             }
             return updates;
@@ -419,9 +437,10 @@ namespace SilverSim.Database.SQLite
 
         public static void UpdateSet(this SQLiteConnection connection, string tablename, Dictionary<string, object> vals, string where)
         {
+            SQLiteCommandBuilder sb = new SQLiteCommandBuilder();
             string q1 = "UPDATE " + tablename + " SET ";
 
-            q1 += string.Join(",", UpdateSetFromVals(vals));
+            q1 += string.Join(",", UpdateSetFromVals(sb, vals));
 
             using (var command = new SQLiteCommand(q1 + " WHERE " + where, connection))
             {
@@ -435,9 +454,10 @@ namespace SilverSim.Database.SQLite
 
         public static void UpdateSet(this SQLiteConnection connection, string tablename, Dictionary<string, object> vals, Dictionary<string, object> where)
         {
+            SQLiteCommandBuilder sb = new SQLiteCommandBuilder();
             string q1 = "UPDATE " + tablename + " SET ";
 
-            q1 += string.Join(",", UpdateSetFromVals(vals));
+            q1 += string.Join(",", UpdateSetFromVals(sb, vals));
 
             var wherestr = new StringBuilder();
             foreach (KeyValuePair<string, object> w in where)
@@ -446,7 +466,7 @@ namespace SilverSim.Database.SQLite
                 {
                     wherestr.Append(" AND ");
                 }
-                wherestr.AppendFormat("{0} = @w_{0}", w.Key);
+                wherestr.AppendFormat("{0} = @w_{1}", sb.QuoteIdentifier(w.Key), w.Key);
             }
 
             using (var command = new SQLiteCommand(q1 + " WHERE " + wherestr, connection))
@@ -454,7 +474,7 @@ namespace SilverSim.Database.SQLite
                 AddParameters(command.Parameters, vals);
                 foreach (KeyValuePair<string, object> w in where)
                 {
-                    command.Parameters.AddWithValue("@w_" + w.Key, w.Value);
+                    command.Parameters.AddParameter("@w_" + w.Key, w.Value);
                 }
                 if (command.ExecuteNonQuery() < 1)
                 {
@@ -475,7 +495,7 @@ namespace SilverSim.Database.SQLite
         public static T GetEnum<T>(this SQLiteDataReader dbreader, string prefix)
         {
             var enumType = typeof(T).GetEnumUnderlyingType();
-            object v = dbreader[prefix];
+            long v = (long)dbreader[prefix];
             return (T)Convert.ChangeType(v, enumType);
         }
 
@@ -532,12 +552,7 @@ namespace SilverSim.Database.SQLite
 
         public static Date GetDate(this SQLiteDataReader dbReader, string prefix)
         {
-            ulong v;
-            if (!ulong.TryParse(dbReader[prefix].ToString(), out v))
-            {
-                throw new InvalidCastException("GetDate could not convert value for " + prefix);
-            }
-            return Date.UnixTimeToDateTime(v);
+            return Date.UnixTimeToDateTime((ulong)(long)dbReader[prefix]);
         }
 
         public static EnvironmentController.WLVector2 GetWLVector2(this SQLiteDataReader dbReader, string prefix) =>
@@ -575,21 +590,9 @@ namespace SilverSim.Database.SQLite
         {
             object o = dbReader[prefix];
             var t = o?.GetType();
-            if (t == typeof(uint))
+            if (t == typeof(long))
             {
-                return (uint)o != 0;
-            }
-            else if (t == typeof(int))
-            {
-                return (int)o != 0;
-            }
-            else if (t == typeof(sbyte))
-            {
-                return (sbyte)o != 0;
-            }
-            else if (t == typeof(byte))
-            {
-                return (byte)o != 0;
+                return (long)o != 0;
             }
             else
             {
@@ -625,25 +628,24 @@ namespace SilverSim.Database.SQLite
         }
 
         public static GridVector GetGridVector(this SQLiteDataReader dbReader, string prefix) =>
-            new GridVector((uint)dbReader[prefix + "X"], (uint)dbReader[prefix + "Y"]);
+            new GridVector((uint)(long)dbReader[prefix + "X"], (uint)(long)dbReader[prefix + "Y"]);
         #endregion
 
         #region Migrations helper
         public static uint GetTableRevision(this SQLiteConnection connection, string name)
         {
-            using (var cmd = new SQLiteCommand("SHOW TABLE STATUS WHERE name=@name", connection))
+            using (var cmd = new SQLiteCommand("CREATE TABLE IF NOT EXISTS migrations (tablename text, revision integer, primary key(tablename))", connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+            using (var cmd = new SQLiteCommand("SELECT revision FROM migrations WHERE tablename=@name", connection))
             {
                 cmd.Parameters.AddWithValue("@name", name);
                 using (SQLiteDataReader dbReader = cmd.ExecuteReader())
                 {
                     if (dbReader.Read())
                     {
-                        uint u;
-                        if (!uint.TryParse((string)dbReader["Comment"], out u))
-                        {
-                            throw new InvalidDataException("Comment is not a parseable number");
-                        }
-                        return u;
+                        return (uint)(long)dbReader["revision"];
                     }
                 }
             }

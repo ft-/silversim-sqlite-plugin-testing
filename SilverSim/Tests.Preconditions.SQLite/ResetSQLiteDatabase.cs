@@ -25,6 +25,7 @@ using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Database;
 using System.Collections.Generic;
+using System.IO;
 
 namespace SilverSim.Tests.Preconditions.SQLite
 {
@@ -32,19 +33,40 @@ namespace SilverSim.Tests.Preconditions.SQLite
     public class ResetSQLiteDatabase : IPlugin, IDBServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("SQLITE DATABASE RESET");
-        string m_ConnectionString;
+        private readonly List<SQLiteConnectionStringBuilder> m_ConnectionStrings = new List<SQLiteConnectionStringBuilder>();
 
-        public ResetSQLiteDatabase(IConfig config)
+        public ResetSQLiteDatabase(ConfigurationLoader loader, IConfig config)
         {
-            SQLiteConnectionStringBuilder sb = new SQLiteConnectionStringBuilder();
-            if (!config.Contains("DataSource"))
+            var processedDataSources = new List<string>();
+            foreach (string service in config.GetString("Services").Split(','))
             {
-                m_Log.FatalFormat("[SQLITE CONFIG]: Parameter 'DataSource' missing in [{0}]", config.Name);
+                IConfig cfg = loader.Config.Configs[service.Trim()];
+                if (cfg != null)
+                {
+                    SQLiteConnectionStringBuilder cfgString = BuildConnectionString(cfg, m_Log);
+                    if (!processedDataSources.Contains(cfgString.DataSource))
+                    {
+                        m_ConnectionStrings.Add(cfgString);
+                        processedDataSources.Add(cfgString.DataSource);
+                    }
+                }
+            }
+        }
+
+        private static SQLiteConnectionStringBuilder BuildConnectionString(IConfig config, ILog log)
+        {
+            string configName = config.Name;
+            bool containsDataSource = config.Contains("DataSource");
+            if (!containsDataSource && !config.Contains("DataSourceDefault"))
+            {
+                log.FatalFormat("[SQLITE CONFIG]: Parameter 'DataSource' missing in [{0}]", configName);
                 throw new ConfigurationLoader.ConfigurationErrorException();
             }
-            sb.DataSource = config.GetString("DataSource");
-            sb.Password = config.GetString("Password", string.Empty);
-            m_ConnectionString = sb.ToString();
+            return new SQLiteConnectionStringBuilder()
+            {
+                DataSource = config.GetString(containsDataSource ? "DataSource" : "DataSourceDefault"),
+                Password = config.GetString("Password", string.Empty)
+            };
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -53,30 +75,33 @@ namespace SilverSim.Tests.Preconditions.SQLite
 
         public void VerifyConnection()
         {
-            var tables = new List<string>();
-
-            using (var connection = new SQLiteConnection(m_ConnectionString))
+            foreach (SQLiteConnectionStringBuilder connStr in m_ConnectionStrings)
             {
-                connection.Open();
-                m_Log.Info("Executing reset database");
-                using(var cmd = new SQLiteCommand("SELECT name FROM my_db.sqlite_master WHERE type='table';", connection))
+                var tables = new List<string>();
+
+                using (var connection = new SQLiteConnection(connStr.ToString()))
                 {
-                    using(SQLiteDataReader reader = cmd.ExecuteReader())
+                    connection.Open();
+                    m_Log.Info("Executing reset database");
+                    using (var cmd = new SQLiteCommand("SELECT name FROM sqlite_master WHERE type='table'", connection))
                     {
-                        while(reader.Read())
+                        using (SQLiteDataReader reader = cmd.ExecuteReader())
                         {
-                            tables.Add((string)reader.GetValue(0));
+                            while (reader.Read())
+                            {
+                                tables.Add((string)reader.GetValue(0));
+                            }
                         }
                     }
-                }
 
-                m_Log.InfoFormat("Deleting {0} tables", tables.Count);
-                foreach (string table in tables)
-                {
-                    m_Log.InfoFormat("Deleting table {0}", table);
-                    using (SQLiteCommand cmd = new SQLiteCommand(string.Format("DROP TABLE {0}", table), connection))
+                    m_Log.InfoFormat("Deleting {0} tables", tables.Count);
+                    foreach (string table in tables)
                     {
-                        cmd.ExecuteNonQuery();
+                        m_Log.InfoFormat("Deleting table {0}", table);
+                        using (SQLiteCommand cmd = new SQLiteCommand(string.Format("DROP TABLE {0}", table), connection))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
                     }
                 }
             }
