@@ -61,7 +61,7 @@ namespace SilverSim.Database.SQLite.Avatar
                     connection.Open();
                     using (var cmd = new SQLiteCommand("SELECT Name,Value FROM avatars WHERE PrincipalID = @principalid", connection))
                     {
-                        cmd.Parameters.AddParameter("@principalid", (Guid)avatarID);
+                        cmd.Parameters.AddParameter("@principalid", avatarID);
                         using (SQLiteDataReader dbReader = cmd.ExecuteReader())
                         {
                             while (dbReader.Read())
