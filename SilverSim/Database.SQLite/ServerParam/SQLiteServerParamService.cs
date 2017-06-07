@@ -27,7 +27,6 @@ using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Threading;
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.SQLite;
