@@ -93,7 +93,7 @@ namespace SilverSim.Database.SQLite.Inventory
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND \"ID\" = @folderid", connection))
+                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ID = @folderid", connection))
                 {
                     cmd.Parameters.AddParameter("@ownerid", principalID);
                     cmd.Parameters.AddParameter("@folderid", key);
@@ -117,7 +117,7 @@ namespace SilverSim.Database.SQLite.Inventory
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("SELECT ID FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND \"ID\" = @folderid", connection))
+                using (var cmd = new SQLiteCommand("SELECT ID FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ID = @folderid", connection))
                 {
                     cmd.Parameters.AddParameter("@ownerid", principalID);
                     cmd.Parameters.AddParameter("@folderid", key);
@@ -170,7 +170,7 @@ namespace SilverSim.Database.SQLite.Inventory
                 else
                 {
                     using (var cmd = new SQLiteCommand("SELECT ID FROM " + m_InventoryFolderTable + " AS A WHERE OwnerID = @ownerid AND InventoryType = @type AND " +
-                            "EXISTS (SELECT 1 FROM " + m_InventoryFolderTable + " AS B WHERE B.ParentFolderID = @rootparent AND B.FolderID = A.ParentFolderID)", connection))
+                            "EXISTS (SELECT 1 FROM " + m_InventoryFolderTable + " AS B WHERE B.ParentFolderID = @rootparent AND B.ID = A.ParentFolderID)", connection))
                     {
                         cmd.Parameters.AddParameter("@ownerid", principalID);
                         cmd.Parameters.AddParameter("@type", type);
@@ -213,7 +213,7 @@ namespace SilverSim.Database.SQLite.Inventory
                 else
                 {
                     using (var cmd = new SQLiteCommand("SELECT * FROM " + m_InventoryFolderTable + " AS A WHERE OwnerID = @ownerid AND InventoryType = @type AND " +
-                            "EXISTS (SELECT 1 FROM " + m_InventoryFolderTable + " AS B WHERE B.ParentFolderID = @rootparent AND B.FolderID = A.ParentFolderID)", connection))
+                            "EXISTS (SELECT 1 FROM " + m_InventoryFolderTable + " AS B WHERE B.ParentFolderID = @rootparent AND B.ID = A.ParentFolderID)", connection))
                     {
                         cmd.Parameters.AddParameter("@ownerid", principalID);
                         cmd.Parameters.AddParameter("@type", type);
@@ -355,8 +355,8 @@ namespace SilverSim.Database.SQLite.Inventory
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand(string.Format("BEGIN; IF EXISTS (SELECT NULL FROM " + m_InventoryFolderTable + " WHERE \"ID\" = '{0}')" +
-                    "UPDATE " + m_InventoryFolderTable + " SET ParentFolderID = '{0}' WHERE \"ID\" = '{1}'; COMMIT", toFolderID, folderID),
+                using (var cmd = new SQLiteCommand(string.Format("BEGIN; IF EXISTS (SELECT NULL FROM " + m_InventoryFolderTable + " WHERE ID = '{0}')" +
+                    "UPDATE " + m_InventoryFolderTable + " SET ParentFolderID = '{0}' WHERE ID = '{1}'; COMMIT", toFolderID, folderID),
                     connection))
                 {
                     if (cmd.ExecuteNonQuery() < 1)

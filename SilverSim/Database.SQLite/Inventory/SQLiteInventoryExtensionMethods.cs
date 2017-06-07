@@ -35,7 +35,7 @@ namespace SilverSim.Database.SQLite.Inventory
             Name = (string)reader["Name"],
             InventoryType = reader.GetEnum<InventoryType>("InventoryType"),
             Owner = new UUI(reader.GetUUID("OwnerID")),
-            Version = (int)reader["Version"]
+            Version = (int)(long)reader["Version"]
         };
 
         public static Dictionary<string, object> ToDictionary(this InventoryFolder folder) => new Dictionary<string, object>
@@ -73,7 +73,7 @@ namespace SilverSim.Database.SQLite.Inventory
             item.Permissions.EveryOne = reader.GetEnum<InventoryPermissionsMask>("EveryOnePermissionsMask");
             item.Permissions.NextOwner = reader.GetEnum<InventoryPermissionsMask>("NextOwnerPermissionsMask");
             item.Permissions.Group = reader.GetEnum<InventoryPermissionsMask>("GroupPermissionsMask");
-            item.SaleInfo.Price = (int)reader["SalePrice"];
+            item.SaleInfo.Price = (int)(long)reader["SalePrice"];
             item.SaleInfo.Type = reader.GetEnum<InventoryItem.SaleInfoData.SaleType>("SaleType");
             item.SaleInfo.PermMask = reader.GetEnum<InventoryPermissionsMask>("SalePermissionsMask");
 
