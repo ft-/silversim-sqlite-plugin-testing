@@ -283,7 +283,7 @@ namespace SilverSim.Database.SQLite.ServerParam
                 connection.Open();
                 using (var cmd = new SQLiteCommand("DELETE FROM serverparams WHERE regionid = @regionid AND parametername = @parametername", connection))
                 {
-                    cmd.Parameters.AddParameter("@regionid", (Guid)regionID);
+                    cmd.Parameters.AddParameter("@regionid", regionID);
                     cmd.Parameters.AddParameter("@parametername", parameter);
                     if (cmd.ExecuteNonQuery() >= 1)
                     {
