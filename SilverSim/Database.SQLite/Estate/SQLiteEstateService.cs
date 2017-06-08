@@ -133,6 +133,8 @@ namespace SilverSim.Database.SQLite.Estate
             new NamedKeyInfo("Name", "Name") { IsUnique = true },
             new NamedKeyInfo("Owner", "Owner"),
             new NamedKeyInfo("ID_Owner", "ID", "Owner"),
+            new TableRevision(2),
+            new AddColumn<uint>("ParentEstateID") { IsNullAllowed = false, Default = (uint)0 }
             #endregion
         };
 
@@ -236,7 +238,8 @@ namespace SilverSim.Database.SQLite.Estate
                 ["AbuseEmail"] = estateInfo.AbuseEmail,
                 ["CovenantID"] = estateInfo.CovenantID,
                 ["CovenantTimestamp"] = estateInfo.CovenantTimestamp,
-                ["UseGlobalTime"] = estateInfo.UseGlobalTime
+                ["UseGlobalTime"] = estateInfo.UseGlobalTime,
+                ["ParentEstateID"] = estateInfo.ParentEstateID
             };
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -295,7 +298,8 @@ namespace SilverSim.Database.SQLite.Estate
                         ["AbuseEmail"] = value.AbuseEmail,
                         ["CovenantID"] = value.CovenantID,
                         ["CovenantTimestamp"] = value.CovenantTimestamp,
-                        ["UseGlobalTime"] = value.UseGlobalTime
+                        ["UseGlobalTime"] = value.UseGlobalTime,
+                        ["ParentEstateID"] = value.ParentEstateID
                     };
                     using (var conn = new SQLiteConnection(m_ConnectionString))
                     {

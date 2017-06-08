@@ -38,7 +38,8 @@ namespace SilverSim.Database.SQLite.Estate
             AbuseEmail = (string)reader["AbuseEmail"],
             CovenantID = reader.GetUUID("CovenantID"),
             CovenantTimestamp = reader.GetDate("CovenantTimestamp"),
-            UseGlobalTime = reader.GetBool("UseGlobalTime")
+            UseGlobalTime = reader.GetBool("UseGlobalTime"),
+            ParentEstateID = (uint)(long)reader["ParentEstateID"]
         };
     }
 }
