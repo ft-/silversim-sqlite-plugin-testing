@@ -140,78 +140,80 @@ namespace SilverSim.Database.SQLite.Presence
 
         public override PresenceInfo this[UUID sessionID, UUID userID]
         {
-            get { throw new NotSupportedException(); }
-
-            set /* setting null means logout, != null not allowed */
+            get
             {
-                if (value != null)
+                using (var conn = new SQLiteConnection(m_ConnectionString))
                 {
-                    throw new ArgumentException("setting value != null is not allowed without reportType");
+                    conn.Open();
+                    using (var cmd = new SQLiteCommand("SELECT * FROM presence WHERE SessionID = @sessionID", conn))
+                    {
+                        cmd.Parameters.AddParameter("@sessionID", sessionID);
+                        using (SQLiteDataReader reader = cmd.ExecuteReader())
+                        {
+                            var pi = new PresenceInfo();
+                            pi.UserID.ID = reader.GetUUID("UserID");
+                            pi.RegionID = reader.GetUUID("RegionID");
+                            pi.SessionID = reader.GetUUID("SessionID");
+                            pi.SecureSessionID = reader.GetUUID("SecureSessionID");
+                            return pi;
+                        }
+                    }
                 }
-                this[sessionID, userID, SetType.Report] = null;
+                throw new PresenceNotFoundException();
             }
         }
 
-        public override PresenceInfo this[UUID sessionID, UUID userID, SetType reportType]
+        public override void Logout(UUID sessionID, UUID userID)
         {
-            /* setting null means logout, != null login message */
-            set
+            using (var conn = new SQLiteConnection(m_ConnectionString))
             {
-                if (value == null)
+                conn.Open();
+                using (var cmd = new SQLiteCommand("DELETE FROM presence WHERE SessionID = @sessionID", conn))
                 {
-                    using (var conn = new SQLiteConnection(m_ConnectionString))
+                    cmd.Parameters.AddParameter("@sessionID", sessionID);
+                    if (cmd.ExecuteNonQuery() < 1)
                     {
-                        conn.Open();
-                        using (var cmd = new SQLiteCommand("DELETE FROM presence WHERE SessionID = @sessionID", conn))
-                        {
-                            cmd.Parameters.AddParameter("@sessionID", sessionID);
-                            if (cmd.ExecuteNonQuery() < 1)
-                            {
-                                throw new PresenceUpdateFailedException();
-                            }
-                        }
+                        throw new PresenceUpdateFailedException();
                     }
                 }
-                else if (reportType == SetType.Login)
+            }
+        }
+
+        public override void Login(PresenceInfo pInfo)
+        {
+            var post = new Dictionary<string, object>
+            {
+                ["UserID"] = pInfo.UserID.ID,
+                ["SessionID"] = pInfo.SessionID,
+                ["SecureSessionID"] = pInfo.SecureSessionID,
+                ["RegionID"] = UUID.Zero,
+                ["LastSeen"] = Date.Now
+            };
+            using (var conn = new SQLiteConnection(m_ConnectionString))
+            {
+                conn.Open();
+                try
                 {
-                    var post = new Dictionary<string, object>
-                    {
-                        ["UserID"] = value.UserID.ID,
-                        ["SessionID"] = value.SessionID,
-                        ["SecureSessionID"] = value.SecureSessionID,
-                        ["RegionID"] = UUID.Zero,
-                        ["LastSeen"] = Date.Now
-                    };
-                    using (var conn = new SQLiteConnection(m_ConnectionString))
-                    {
-                        conn.Open();
-                        try
-                        {
-                            conn.InsertInto("presence", post);
-                        }
-                        catch (Exception e)
-                        {
-                            m_Log.Debug("Presence update failed", e);
-                            throw new PresenceUpdateFailedException();
-                        }
-                    }
+                    conn.InsertInto("presence", post);
                 }
-                else if (reportType == SetType.Report)
+                catch (Exception e)
                 {
-                    using (var conn = new SQLiteConnection(m_ConnectionString))
-                    {
-                        conn.Open();
-                        using (var cmd = new SQLiteCommand("UPDATE presence SET RegionID = @regionID WHERE SessionID = @sessionID", conn))
-                        {
-                            cmd.Parameters.AddParameter("@regionID", value.RegionID);
-                            cmd.Parameters.AddParameter("@sessionID", value.SessionID);
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
+                    m_Log.Debug("Presence update failed", e);
+                    throw new PresenceUpdateFailedException();
                 }
-                else
+            }
+        }
+
+        public override void Report(PresenceInfo pInfo)
+        {
+            using (var conn = new SQLiteConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (var cmd = new SQLiteCommand("UPDATE presence SET RegionID = @regionID WHERE SessionID = @sessionID", conn))
                 {
-                    throw new ArgumentException("Invalid reportType specified");
+                    cmd.Parameters.AddParameter("@regionID", pInfo.RegionID);
+                    cmd.Parameters.AddParameter("@sessionID", pInfo.SessionID);
+                    cmd.ExecuteNonQuery();
                 }
             }
         }
