@@ -56,7 +56,7 @@ namespace SilverSim.Database.SQLite.Inventory
                 Name = (string)reader["Name"],
                 Description = (string)reader["Description"],
                 InventoryType = reader.GetEnum<InventoryType>("InventoryType"),
-                Flags = reader.GetEnum<InventoryFlags>("InventoryFlags"),
+                Flags = reader.GetEnum<InventoryFlags>("Flags"),
                 CreationDate = reader.GetDate("CreationDate"),
                 IsGroupOwned = reader.GetBool("IsGroupOwned"),
                 AssetID = reader.GetUUID("AssetID"),

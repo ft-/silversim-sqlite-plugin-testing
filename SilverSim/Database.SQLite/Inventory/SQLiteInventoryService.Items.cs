@@ -198,7 +198,7 @@ namespace SilverSim.Database.SQLite.Inventory
                 connection.Open();
                 var newVals = new Dictionary<string, object>
                 {
-                    ["AssetID"] = item.AssetID.ToString(),
+                    ["AssetID"] = item.AssetID,
                     ["Name"] = item.Name,
                     ["Description"] = item.Description,
                     ["BasePermissionsMask"] = item.Permissions.Base,
@@ -257,13 +257,26 @@ namespace SilverSim.Database.SQLite.Inventory
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand(string.Format("BEGIN; IF EXISTS (SELECT NULL FROM " + m_InventoryFolderTable + " WHERE ID = '{0}' AND OwnerID = '{2}')" +
-                    "UPDATE " + m_InventoryItemTable + " SET ParentFolderID = '{0}' WHERE ID = '{1}'; COMMIT", toFolderID, id, principalID),
-                    connection))
+                using (var cmd = new SQLiteCommand("SELECT NULL FROM " + m_InventoryFolderTable + " WHERE ID = @folderid AND OwnerID = @ownerid", connection))
                 {
+                    cmd.Parameters.AddParameter("@folderid", toFolderID);
+                    cmd.Parameters.AddParameter("@ownerid", principalID);
+                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (!reader.Read())
+                        {
+                            throw new InventoryItemNotStoredException(id);
+                        }
+                    }
+                }
+                using (var cmd = new SQLiteCommand("UPDATE " + m_InventoryItemTable + " SET ParentFolderID = @folderid WHERE ID = @itemid AND OwnerID = @ownerid", connection))
+                {
+                    cmd.Parameters.AddParameter("@folderid", toFolderID);
+                    cmd.Parameters.AddParameter("@ownerid", principalID);
+                    cmd.Parameters.AddParameter("@itemid", id);
                     if (cmd.ExecuteNonQuery() < 1)
                     {
-                        throw new InventoryFolderNotStoredException(id);
+                        throw new InventoryItemNotFoundException(id);
                     }
                 }
             }
