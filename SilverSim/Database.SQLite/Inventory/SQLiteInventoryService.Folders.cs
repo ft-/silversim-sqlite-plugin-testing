@@ -442,10 +442,10 @@ namespace SilverSim.Database.SQLite.Inventory
 
                 foreach (UUID folder in folders)
                 {
-                    using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ID = @folderid", connection))
+                    using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @folderid", connection))
                     {
                         cmd.Parameters.AddParameter("@ownerid", principalID);
-                        cmd.Parameters.AddParameter("@folderid", folderID);
+                        cmd.Parameters.AddParameter("@folderid", folder);
                         try
                         {
                             cmd.ExecuteNonQuery();
@@ -455,7 +455,24 @@ namespace SilverSim.Database.SQLite.Inventory
                             /* nothing to do here */
                         }
                     }
-                    using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @folderid", connection))
+                    using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ID = @folderid", connection))
+                    {
+                        cmd.Parameters.AddParameter("@ownerid", principalID);
+                        cmd.Parameters.AddParameter("@folderid", folder);
+                        try
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                        catch
+                        {
+                            /* nothing to do here */
+                        }
+                    }
+                }
+
+                if (!deleteFolder)
+                {
+                    using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ID = @folderid", connection))
                     {
                         cmd.Parameters.AddParameter("@ownerid", principalID);
                         cmd.Parameters.AddParameter("@folderid", folderID);
