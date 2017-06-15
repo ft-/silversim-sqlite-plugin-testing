@@ -154,7 +154,7 @@ namespace SilverSim.Database.SQLite._Migration
             {
                 typeSql = "text";
             }
-            else if (f == typeof(UUID))
+            else if (f == typeof(UUID) || f == typeof(ParcelID))
             {
                 typeSql = "text";
             }

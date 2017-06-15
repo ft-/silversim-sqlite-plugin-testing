@@ -90,7 +90,7 @@ namespace SilverSim.Database.SQLite.Profile
                             pick.Enabled = reader.GetBool("enabled");
                             pick.Name = (string)reader["name"];
                             pick.OriginalName = (string)reader["originalname"];
-                            pick.ParcelID = reader.GetUUID("parceluuid");
+                            pick.ParcelID = reader.GetParcelID("parceluuid");
                             pick.PickID = reader.GetUUID("pickuuid");
                             pick.SimName = (string)reader["simname"];
                             pick.SnapshotID = reader.GetUUID("snapshotuuid");

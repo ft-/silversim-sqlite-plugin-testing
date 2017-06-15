@@ -74,7 +74,7 @@ namespace SilverSim.Database.SQLite.Profile
                                 Flags = (byte)(long)reader["classifiedflags"],
                                 GlobalPos = reader.GetVector3("posglobal"),
                                 Name = (string)reader["name"],
-                                ParcelID = reader.GetUUID("parceluuid"),
+                                ParcelID = reader.GetParcelID("parceluuid"),
                                 ParcelName = (string)reader["parcelname"],
                                 ParentEstate = (int)(long)reader["parentestate"],
                                 Price = (int)(long)reader["priceforlisting"],

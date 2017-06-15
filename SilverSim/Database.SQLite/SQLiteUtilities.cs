@@ -233,6 +233,11 @@ namespace SilverSim.Database.SQLite
             {
                 mysqlparam.AddWithValue(key, value.ToString());
             }
+            else if(t == typeof(ParcelID))
+            {
+                UUID id = new UUID(((ParcelID)value).GetBytes(), 0);
+                mysqlparam.AddWithValue(key, id.ToString());
+            }
             else if (t == typeof(AnArray))
             {
                 using (var stream = new MemoryStream())
@@ -497,6 +502,12 @@ namespace SilverSim.Database.SQLite
             var enumType = typeof(T).GetEnumUnderlyingType();
             long v = (long)dbreader[prefix];
             return (T)Convert.ChangeType(v, enumType);
+        }
+
+        public static ParcelID GetParcelID(this SQLiteDataReader dbReader, string prefix)
+        {
+            UUID id = dbReader.GetUUID(prefix);
+            return new ParcelID(id.GetBytes(), 0);
         }
 
         public static UUID GetUUID(this SQLiteDataReader dbReader, string prefix)
