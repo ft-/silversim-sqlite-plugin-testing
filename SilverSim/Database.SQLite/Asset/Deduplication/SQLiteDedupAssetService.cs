@@ -38,20 +38,20 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
 {
     [Description("SQLite Deduplication Asset Backend")]
     [PluginName("DedupAssets")]
-    public sealed class PostgreSQLDedupAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface
+    public sealed partial class SQLiteDedupAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("SQLITE DEDUP ASSET SERVICE");
 
         private readonly string m_ConnectionString;
-        private readonly DefaultAssetReferencesService m_ReferencesService;
+        private readonly SQLiteAssetReferencesService m_ReferencesService;
         private readonly bool m_EnableOnConflict;
 
         #region Constructor
-        public PostgreSQLDedupAssetService(ConfigurationLoader loader, IConfig ownSection)
+        public SQLiteDedupAssetService(ConfigurationLoader loader, IConfig ownSection)
         {
             m_ConnectionString = SQLiteUtilities.BuildConnectionString(ownSection, m_Log);
             m_EnableOnConflict = ownSection.GetBoolean("EnableOnConflict", true);
-            m_ReferencesService = new DefaultAssetReferencesService(this);
+            m_ReferencesService = new SQLiteAssetReferencesService(this);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -61,8 +61,8 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
         #endregion
 
         public override bool IsSameServer(AssetServiceInterface other) =>
-            other.GetType() == typeof(PostgreSQLDedupAssetService) &&
-                (m_ConnectionString == ((PostgreSQLDedupAssetService)other).m_ConnectionString);
+            other.GetType() == typeof(SQLiteDedupAssetService) &&
+                (m_ConnectionString == ((SQLiteDedupAssetService)other).m_ConnectionString);
 
         #region Exists methods
         public override bool Exists(UUID key)
@@ -262,6 +262,60 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
         #endregion
 
         #region References interface
+        public sealed class SQLiteAssetReferencesService : AssetReferencesServiceInterface
+        {
+            private readonly SQLiteDedupAssetService m_AssetService;
+
+            internal SQLiteAssetReferencesService(SQLiteDedupAssetService assetService)
+            {
+                m_AssetService = assetService;
+            }
+
+            public override List<UUID> this[UUID key] => m_AssetService.GetAssetRefs(key);
+        }
+
+        internal List<UUID> GetAssetRefs(UUID key)
+        {
+            List<UUID> references = new List<UUID>();
+            using (var conn = new SQLiteConnection(m_ConnectionString))
+            {
+                bool processed;
+                conn.Open();
+                using (var cmd = new SQLiteCommand("SELECT usesprocessed FROM assetrefs WHERE id = @id", conn))
+                {
+                    cmd.Parameters.AddParameter("@id", key);
+                    using (SQLiteDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        processed = dbReader.Read() && dbReader.GetBool("usesprocessed");
+                    }
+                }
+
+                AssetData data;
+                if (processed)
+                {
+                    using (var cmd = new SQLiteCommand("SELECT usesid FROM assetsinuse WHERE id = @id", conn))
+                    {
+                        cmd.Parameters.AddParameter("@id", key);
+                        using (SQLiteDataReader dbReader = cmd.ExecuteReader())
+                        {
+                            while (dbReader.Read())
+                            {
+                                references.Add(dbReader.GetUUID("usesid"));
+                            }
+                        }
+                    }
+                }
+                else if (TryGetValue(key, out data))
+                {
+                    references = data.References;
+                    references.Remove(UUID.Zero);
+                    references.Remove(data.ID);
+                }
+
+                return references;
+            }
+        }
+
         public override AssetReferencesServiceInterface References => m_ReferencesService;
         #endregion
 
@@ -370,6 +424,7 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
                     });
                 }
             }
+            EnqueueAsset(asset.ID);
         }
         #endregion
 
@@ -425,6 +480,15 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
             new AddColumn<UUI>("CreatorID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<byte[]>("hash") { IsFixed = true, IsNullAllowed = false, Cardinality = 20 },
             new PrimaryKeyInfo("id"),
+            new TableRevision(2),
+            new AddColumn<bool>("usesprocessed") { IsNullAllowed = false, Default = false },
+
+            new SqlTable("assetsinuse"),
+            new AddColumn<UUID>("id") { IsNullAllowed = false },
+            new AddColumn<UUID>("usesid") { IsNullAllowed = false },
+            new PrimaryKeyInfo("id", "usesid"),
+            new NamedKeyInfo("id", "id"),
+            new NamedKeyInfo("usesid", "usesid")
         };
         #endregion
 

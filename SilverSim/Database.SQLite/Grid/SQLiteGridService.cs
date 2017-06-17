@@ -38,7 +38,7 @@ namespace SilverSim.Database.SQLite.Grid
     [PluginName("Grid")]
     [ServerParam("DeleteOnUnregister", Type = ServerParamType.GlobalOnly, ParameterType = typeof(bool), DefaultValue = false)]
     [ServerParam("AllowDuplicateRegionNames", Type = ServerParamType.GlobalOnly, ParameterType = typeof(bool), DefaultValue = false)]
-    public sealed class SQLiteGridService : GridServiceInterface, IDBServiceInterface, IPlugin, IServerParamListener
+    public sealed partial class SQLiteGridService : GridServiceInterface, IDBServiceInterface, IPlugin, IServerParamListener
     {
         private readonly string m_ConnectionString;
         private readonly string m_TableName;
