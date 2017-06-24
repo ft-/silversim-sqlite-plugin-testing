@@ -169,6 +169,12 @@ namespace SilverSim.Database.SQLite.SimulationData
             new AddColumn<PathfindingType>("PathfindingType") {IsNullAllowed = false, Default = PathfindingType.LegacyLinkset },
             new TableRevision(12),
             new AddColumn<byte[]>("ProjectionData"),
+            new TableRevision(13),
+            new AddColumn<bool>("IsBlockGrab") { IsNullAllowed = false, Default = false },
+            new AddColumn<bool>("IsSandbox") { IsNullAllowed = false, Default = false },
+            new AddColumn<bool>("IsDieAtEdge") { IsNullAllowed = false, Default = false },
+            new AddColumn<bool>("IsReturnAtEdge") { IsNullAllowed = false, Default = false },
+            new AddColumn<bool>("IsBlockGrabObject"){IsNullAllowed = false, Default = false },
             #endregion
 
             #region Table primitems

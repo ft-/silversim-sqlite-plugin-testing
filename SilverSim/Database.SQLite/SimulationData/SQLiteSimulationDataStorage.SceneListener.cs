@@ -624,7 +624,12 @@ namespace SilverSim.Database.SQLite.SimulationData
                     ["IsRotateZEnabled"] = objpart.IsRotateZEnabled,
                     ["IsVolumeDetect"] = objpart.IsVolumeDetect,
                     ["IsPhantom"] = objpart.IsPhantom,
-                    ["IsPhysics"] = objpart.IsPhysics
+                    ["IsPhysics"] = objpart.IsPhysics,
+                    ["IsSandbox"] = objpart.IsSandbox,
+                    ["IsBlockGrab"] = objpart.IsBlockGrab,
+                    ["IsDieAtEdge"] = objpart.IsDieAtEdge,
+                    ["IsReturnAtEdge"] = objpart.IsReturnAtEdge,
+                    ["IsBlockGrabObject"] = objpart.IsBlockGrabObject
                 };
                 using (var ms = new MemoryStream())
                 {
