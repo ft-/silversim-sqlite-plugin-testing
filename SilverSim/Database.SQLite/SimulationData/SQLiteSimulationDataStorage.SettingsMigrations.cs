@@ -166,6 +166,8 @@ namespace SilverSim.Database.SQLite.SimulationData
             new TableRevision(4),
             new AddColumn<bool>("AllowDirectTeleport") { IsNullAllowed = false, Default = false },
             new AddColumn<bool>("AllowLandmark") { IsNullAllowed = false, Default = false },
+            new TableRevision(5),
+            new AddColumn<int>("MaxBasePrims") { IsNullAllowed = false, Default = 45000 }
             #endregion
         };
     }
