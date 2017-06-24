@@ -25,6 +25,7 @@ using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.SQLite;
@@ -38,6 +39,7 @@ namespace SilverSim.Database.SQLite.UserAccounts
         private static readonly ILog m_Log = LogManager.GetLogger("SQLITE USERACCOUNTNAME SERVICE");
 
         private readonly string m_ConnectionString;
+        private Uri m_HomeURI;
 
         public SQLiteUserAccountNameService(IConfig ownSection)
         {
@@ -126,17 +128,18 @@ namespace SilverSim.Database.SQLite.UserAccounts
             return list;
         }
 
-        private static UUI GetUUIFromReader(SQLiteDataReader reader) => new UUI()
+        private UUI GetUUIFromReader(SQLiteDataReader reader) => new UUI()
         {
             FirstName = (string)reader["FirstName"],
             LastName = (string)reader["LastName"],
             ID = reader.GetUUID("ID"),
+            HomeURI = m_HomeURI,
             IsAuthoritative = true
         };
 
         public void Startup(ConfigurationLoader loader)
         {
-            /* intentionally left empty */
+            m_HomeURI = new Uri(loader.HomeURI);
         }
 
         public override bool TryGetValue(UUID key, out UUI uui)

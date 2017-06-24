@@ -20,20 +20,21 @@
 // exception statement from your version.
 
 using SilverSim.Types.Account;
+using System;
 using System.Data.SQLite;
 
 namespace SilverSim.Database.SQLite.UserAccounts
 {
     public static class SQLiteUserAccountExtensionMethods
     {
-        public static UserAccount ToUserAccount(this SQLiteDataReader reader)
+        public static UserAccount ToUserAccount(this SQLiteDataReader reader, Uri homeURI)
         {
             var info = new UserAccount();
 
             info.Principal.ID = reader.GetUUID("ID");
             info.Principal.FirstName = (string)reader["FirstName"];
             info.Principal.LastName = (string)reader["LastName"];
-            info.Principal.HomeURI = null;
+            info.Principal.HomeURI = homeURI;
             info.Principal.IsAuthoritative = true;
             info.ScopeID = reader.GetUUID("ScopeID");
             info.Email = (string)reader["Email"];

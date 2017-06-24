@@ -27,6 +27,7 @@ using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
 using SilverSim.Types.Account;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.SQLite;
@@ -38,6 +39,7 @@ namespace SilverSim.Database.SQLite.UserAccounts
     public sealed class SQLiteUserAccountService : UserAccountServiceInterface, IDBServiceInterface, IPlugin
     {
         private readonly string m_ConnectionString;
+        private Uri m_HomeURI;
         private static readonly ILog m_Log = LogManager.GetLogger("SQLITE USERACCOUNT SERVICE");
 
         #region Constructor
@@ -48,7 +50,7 @@ namespace SilverSim.Database.SQLite.UserAccounts
 
         public void Startup(ConfigurationLoader loader)
         {
-            /* intentionally left empty */
+            m_HomeURI = new Uri(loader.HomeURI);
         }
         #endregion
 
@@ -143,7 +145,7 @@ namespace SilverSim.Database.SQLite.UserAccounts
                         {
                             if (reader.Read())
                             {
-                                account = reader.ToUserAccount();
+                                account = reader.ToUserAccount(m_HomeURI);
                                 return true;
                             }
                         }
@@ -158,7 +160,7 @@ namespace SilverSim.Database.SQLite.UserAccounts
                         {
                             if (reader.Read())
                             {
-                                account = reader.ToUserAccount();
+                                account = reader.ToUserAccount(m_HomeURI);
                                 return true;
                             }
                         }
@@ -218,7 +220,7 @@ namespace SilverSim.Database.SQLite.UserAccounts
                     {
                         if (reader.Read())
                         {
-                            account = reader.ToUserAccount();
+                            account = reader.ToUserAccount(m_HomeURI);
                             return true;
                         }
                     }
@@ -299,7 +301,7 @@ namespace SilverSim.Database.SQLite.UserAccounts
                         {
                             if (reader.Read())
                             {
-                                account = reader.ToUserAccount();
+                                account = reader.ToUserAccount(m_HomeURI);
                                 return true;
                             }
                         }
@@ -315,7 +317,7 @@ namespace SilverSim.Database.SQLite.UserAccounts
                         {
                             if (reader.Read())
                             {
-                                account = reader.ToUserAccount();
+                                account = reader.ToUserAccount(m_HomeURI);
                                 return true;
                             }
                         }
@@ -356,7 +358,7 @@ namespace SilverSim.Database.SQLite.UserAccounts
                         {
                             while (dbreader.Read())
                             {
-                                accounts.Add(dbreader.ToUserAccount());
+                                accounts.Add(dbreader.ToUserAccount(m_HomeURI));
                             }
                         }
                     }
@@ -383,7 +385,7 @@ namespace SilverSim.Database.SQLite.UserAccounts
                     {
                         while (dbreader.Read())
                         {
-                            accounts.Add(dbreader.ToUserAccount());
+                            accounts.Add(dbreader.ToUserAccount(m_HomeURI));
                         }
                     }
                 }
