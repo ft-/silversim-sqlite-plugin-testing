@@ -194,7 +194,8 @@ namespace SilverSim.Database.SQLite.SimulationData
                 IsBlockGrab = dbReader.GetBool("IsBlockGrab"),
                 IsDieAtEdge = dbReader.GetBool("IsDieAtEdge"),
                 IsReturnAtEdge = dbReader.GetBool("IsReturnAtEdge"),
-                IsBlockGrabObject = dbReader.GetBool("IsBlockGrabObject")
+                IsBlockGrabObject = dbReader.GetBool("IsBlockGrabObject"),
+                SandboxOrigin = dbReader.GetVector3("SandboxOrigin")
             };
 
             using (var ms = new MemoryStream(dbReader.GetBytes("DynAttrs")))
