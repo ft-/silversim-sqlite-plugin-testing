@@ -630,7 +630,8 @@ namespace SilverSim.Database.SQLite.SimulationData
                     ["IsDieAtEdge"] = objpart.IsDieAtEdge,
                     ["IsReturnAtEdge"] = objpart.IsReturnAtEdge,
                     ["IsBlockGrabObject"] = objpart.IsBlockGrabObject,
-                    ["SandboxOrigin"] = objpart.SandboxOrigin
+                    ["SandboxOrigin"] = objpart.SandboxOrigin,
+                    ["ExtendedMeshData"] = objpart.ExtendedMesh.DbSerialization
                 };
                 using (var ms = new MemoryStream())
                 {

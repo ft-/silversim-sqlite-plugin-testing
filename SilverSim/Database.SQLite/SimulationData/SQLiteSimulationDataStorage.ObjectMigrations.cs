@@ -177,6 +177,8 @@ namespace SilverSim.Database.SQLite.SimulationData
             new AddColumn<bool>("IsBlockGrabObject") { IsNullAllowed = false, Default = false },
             new TableRevision(14),
             new AddColumn<Vector3>("SandboxOrigin") { IsNullAllowed = false, Default = Vector3.Zero },
+            new TableRevision(15),
+            new AddColumn<byte[]>("ExtendedMeshData"),
             #endregion
 
             #region Table primitems
