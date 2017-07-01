@@ -106,9 +106,8 @@ namespace SilverSim.Database.SQLite.SimulationData
 
         private ObjectPart ObjectPartFromDbReader(SQLiteDataReader dbReader)
         {
-            var objpart = new ObjectPart()
+            var objpart = new ObjectPart(dbReader.GetUUID("ID"))
             {
-                ID = dbReader.GetUUID("ID"),
                 LoadedLinkNumber = (int)(long)dbReader["LinkNumber"],
                 Position = dbReader.GetVector3("Position"),
                 Rotation = dbReader.GetQuaternion("Rotation"),
@@ -212,7 +211,7 @@ namespace SilverSim.Database.SQLite.SimulationData
 
         private ObjectPartInventoryItem ObjectPartInventoryItemFromDbReader(SQLiteDataReader dbReader)
         {
-            var item = new ObjectPartInventoryItem()
+            var item = new ObjectPartInventoryItem(dbReader.GetUUID("InventoryID"))
             {
                 AssetID = dbReader.GetUUID("AssetID"),
                 AssetType = dbReader.GetEnum<AssetType>("AssetType"),
@@ -222,7 +221,6 @@ namespace SilverSim.Database.SQLite.SimulationData
                 Flags = dbReader.GetEnum<InventoryFlags>("Flags"),
                 Group = dbReader.GetUGI("Group"),
                 IsGroupOwned = dbReader.GetBool("GroupOwned"),
-                ID = dbReader.GetUUID("InventoryID"),
                 InventoryType = dbReader.GetEnum<InventoryType>("InventoryType"),
                 LastOwner = dbReader.GetUUI("LastOwner"),
                 Name = (string)dbReader["Name"],
