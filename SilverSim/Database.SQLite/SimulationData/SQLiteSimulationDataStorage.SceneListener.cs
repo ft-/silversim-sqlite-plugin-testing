@@ -56,7 +56,7 @@ namespace SilverSim.Database.SQLite.SimulationData
 
             private int m_ProcessedPrims;
 
-            public struct PrimKey : IEquatable<PrimKey>
+            public struct PrimKey : IEquatable<PrimKey>, IComparable<PrimKey>
             {
                 public UUID PartID;
                 public UUID ItemID;
@@ -65,6 +65,13 @@ namespace SilverSim.Database.SQLite.SimulationData
                 {
                     PartID = info.PartID;
                     ItemID = info.ItemID;
+                }
+
+                public int CompareTo(PrimKey other)
+                {
+                    int i = PartID.CompareTo(other.PartID);
+                    if (i == 0) i = ItemID.CompareTo(other.ItemID);
+                    return i;
                 }
 
                 public bool Equals(PrimKey other)
