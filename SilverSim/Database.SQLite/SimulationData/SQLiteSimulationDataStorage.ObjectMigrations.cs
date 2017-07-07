@@ -223,7 +223,9 @@ namespace SilverSim.Database.SQLite.SimulationData
             new TableRevision(6),
             new AddColumn<UUID>("NextOwnerAssetID") { IsNullAllowed = false, Default = UUID.Zero },
             new TableRevision(7),
-            new AddColumn<int>("SalePrice") { IsNullAllowed = false, Default = 10 }
+            new AddColumn<int>("SalePrice") { IsNullAllowed = false, Default = 10 },
+            new TableRevision(8),
+            new AddColumn<UUID>("ExperienceID") { IsNullAllowed = false, Default = UUID.Zero }
             #endregion
         };
     }

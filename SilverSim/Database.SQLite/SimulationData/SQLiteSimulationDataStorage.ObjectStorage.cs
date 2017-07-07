@@ -226,7 +226,8 @@ namespace SilverSim.Database.SQLite.SimulationData
                 Name = (string)dbReader["Name"],
                 Owner = dbReader.GetUUI("Owner"),
                 ParentFolderID = dbReader.GetUUID("ParentFolderID"),
-                NextOwnerAssetID = dbReader.GetUUID("NextOwnerAssetID")
+                NextOwnerAssetID = dbReader.GetUUID("NextOwnerAssetID"),
+                ExperienceID = dbReader.GetUUID("ExperienceID")
             };
             item.Permissions.Base = dbReader.GetEnum<InventoryPermissionsMask>("BasePermissions");
             item.Permissions.Current = dbReader.GetEnum<InventoryPermissionsMask>("CurrentPermissions");
