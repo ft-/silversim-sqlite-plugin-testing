@@ -167,7 +167,15 @@ namespace SilverSim.Database.SQLite.SimulationData
             new AddColumn<bool>("AllowDirectTeleport") { IsNullAllowed = false, Default = false },
             new AddColumn<bool>("AllowLandmark") { IsNullAllowed = false, Default = false },
             new TableRevision(5),
-            new AddColumn<int>("MaxBasePrims") { IsNullAllowed = false, Default = 45000 }
+            new AddColumn<int>("MaxBasePrims") { IsNullAllowed = false, Default = 45000 },
+            #endregion
+
+            #region Table regionexperiences
+            new SqlTable("regionexperiences"),
+            new AddColumn<UUID>("RegionID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UUID>("ExperienceID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<bool>("IsAllowed") { IsNullAllowed = false, Default = false },
+            new AddColumn<bool>("IsTrusted") { IsNullAllowed = false, Default = false }
             #endregion
         };
     }

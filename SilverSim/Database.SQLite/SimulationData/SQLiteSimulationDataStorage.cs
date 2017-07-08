@@ -29,6 +29,7 @@ using SilverSim.Types;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.SQLite;
+using System;
 
 namespace SilverSim.Database.SQLite.SimulationData
 {
@@ -72,6 +73,8 @@ namespace SilverSim.Database.SQLite.SimulationData
         public override ISimulationDataTerrainStorageInterface Terrains => this;
 
         public override ISimulationDataRegionSettingsStorageInterface RegionSettings => this;
+
+        public override ISimulationDataRegionExperiencesStorageInterface RegionExperiences => this;
         #endregion
 
         #region IDBServiceInterface
@@ -96,7 +99,9 @@ namespace SilverSim.Database.SQLite.SimulationData
             "environmentcontroller",
             "regionsettings",
             "lightshare",
-            "spawnpoints"
+            "spawnpoints",
+            "regionexperiences",
+            "parcelexperiences"
         };
 
         public override void RemoveRegion(UUID regionID)
