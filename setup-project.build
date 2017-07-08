@@ -42,7 +42,7 @@
 	</target>
 	
 	<target name="nuget-updates" description="Updates packages from nuget">
-		<setenv name="PATH" path="${environment::get-variable('PATH')}:${project::get-base-directory()}/windows" if="${platform::is-windows()}"/>
+		<setenv name="PATH" path="${environment::get-variable('PATH')}:${project::get-base-directory()}/nuget" if="${platform::is-windows()}"/>
 	
 		<property name="silversim-nuget.packages" value="C5,log4net"/>
 		<property name="silversim.packages" value="${silversim-nuget.packages},Nini"/>
@@ -58,7 +58,17 @@
 			<if test="${property::exists('silversim-nuget.'+package+'.version')}">
 				<property name="package-version" value="${property::get-value('silversim-nuget.'+package+'.version')}" overwrite="true"/>
 			</if>
-			<exec program="nuget">
+			<exec program="mono" unless="${platform::is-windows()}">
+				<arg value="nuget/nuget.exe"/>
+				<arg value="install"/>
+				<arg value="${package}"/>
+				<arg value="-o"/>
+				<arg path="libraries"/>
+				<arg value="-ExcludeVersion"/>
+				<arg value="-Version" if="${property::exists('silversim-nuget.'+package+'.version')}"/>
+				<arg value="${package-version}" if="${property::exists('silversim-nuget.'+package+'.version')}"/>
+			</exec>
+			<exec program="nuget" if="${platform::is-windows()}">
 				<arg value="install"/>
 				<arg value="${package}"/>
 				<arg value="-o"/>
