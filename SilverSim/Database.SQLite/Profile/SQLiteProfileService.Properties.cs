@@ -65,7 +65,14 @@ namespace SilverSim.Database.SQLite.Profile
                             {
                                 return new ProfileProperties()
                                 {
-                                    User = user
+                                    User = user,
+                                    Partner = UUI.Unknown,
+                                    WebUrl = string.Empty,
+                                    WantToText = string.Empty,
+                                    SkillsText = string.Empty,
+                                    Language = string.Empty,
+                                    AboutText = string.Empty,
+                                    FirstLifeText = string.Empty
                                 };
                             }
                         }
