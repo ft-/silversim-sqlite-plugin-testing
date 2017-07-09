@@ -47,6 +47,10 @@ namespace SilverSim.Database.SQLite.Estate
             m_ConnectionString = SQLiteUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
+        protected SQLiteEstateService()
+        {
+        }
+
         public void Startup(ConfigurationLoader loader)
         {
             /* intentionally left empty */
@@ -272,11 +276,30 @@ namespace SilverSim.Database.SQLite.Estate
             }
         }
 
+        public static readonly string[] EstateRemoveTables =
+        {
+            "estate_regionmap",
+            "estate_managers",
+            "estate_groups",
+            "estate_users",
+            "estate_bans",
+            "estateexperiences",
+            "estatetrustedexperiences",
+        };
+
         public override bool Remove(uint estateID)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
+                foreach (string table in EstateRemoveTables)
+                {
+                    using (var cmd = new SQLiteCommand("DELETE FROM " + table + " WHERE EstateID = @id", conn))
+                    {
+                        cmd.Parameters.AddParameter("@id", estateID);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
                 using (var cmd = new SQLiteCommand("DELETE FROM estates WHERE ID = @id", conn))
                 {
                     cmd.Parameters.AddParameter("@id", estateID);
@@ -367,5 +390,9 @@ namespace SilverSim.Database.SQLite.Estate
         public override IEstateGroupsServiceInterface EstateGroup => this;
 
         public override IEstateRegionMapServiceInterface RegionMap => this;
+
+        public override IEstateExperienceServiceInterface Experiences => this;
+
+        public override IEstateTrustedExperienceServiceInterface TrustedExperiences => this;
     }
 }

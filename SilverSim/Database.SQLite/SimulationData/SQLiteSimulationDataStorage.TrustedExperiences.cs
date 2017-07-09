@@ -22,35 +22,33 @@
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
-using SilverSim.Types.Experience;
+using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace SilverSim.Database.SQLite.SimulationData
 {
-    public sealed partial class SQLiteSimulationDataStorage : ISimulationDataRegionExperiencesStorageInterface
+    public sealed partial class SQLiteSimulationDataStorage : ISimulationDataRegionTrustedExperiencesStorageInterface
     {
-        List<RegionExperienceInfo> IRegionExperienceList.this[UUID regionID]
+        List<UUID> IRegionTrustedExperienceList.this[UUID regionID]
         {
             get
             {
-                List<RegionExperienceInfo> result = new List<RegionExperienceInfo>();
+                var result = new List<UUID>();
                 using (var conn = new SQLiteConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new SQLiteCommand("SELECT * FROM regionexperiences WHERE RegionID = @regionid", conn))
+                    using (var cmd = new SQLiteCommand("SELECT ExperienceID FROM regiontrustedexperiences WHERE RegionID = @regionid", conn))
                     {
                         cmd.Parameters.AddParameter("@regionid", regionID);
                         using (SQLiteDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                result.Add(new RegionExperienceInfo
-                                {
-                                    ExperienceID = reader.GetUUID("ExperienceID"),
-                                    RegionID = reader.GetUUID("RegionID"),
-                                    IsAllowed = reader.GetBool("IsAllowed")
-                                });
+                                result.Add(reader.GetUUID("ExperienceID"));
                             }
                         }
                     }
@@ -59,25 +57,55 @@ namespace SilverSim.Database.SQLite.SimulationData
             }
         }
 
-        RegionExperienceInfo IRegionExperienceList.this[UUID regionID, UUID experienceID]
+        bool IRegionTrustedExperienceList.this[UUID regionID, UUID experienceID]
         {
             get
             {
-                RegionExperienceInfo info;
-                if (!RegionExperiences.TryGetValue(regionID, experienceID, out info))
+                using (var conn = new SQLiteConnection(m_ConnectionString))
                 {
-                    throw new KeyNotFoundException();
+                    conn.Open();
+                    using (var cmd = new SQLiteCommand("SELECT NULL FROM regiontrustedexperiences WHERE RegionID = @regionid AND ExperienceID = @experienceid", conn))
+                    {
+                        cmd.Parameters.AddParameter("@regionid", regionID);
+                        cmd.Parameters.AddParameter("@experienceid", experienceID);
+                        using (SQLiteDataReader reader = cmd.ExecuteReader())
+                        {
+                            return reader.Read();
+                        }
+                    }
                 }
-                return info;
+            }
+            set
+            {
+                using (var conn = new SQLiteConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    if (value)
+                    {
+                        Dictionary<string, object> vals = new Dictionary<string, object>();
+                        vals.Add("RegionID", regionID);
+                        vals.Add("ExperienceID", experienceID);
+                        conn.ReplaceInto("regiontrustedexperiences", vals);
+                    }
+                    else
+                    {
+                        using (var cmd = new SQLiteCommand("DELETE FROM regiontrustedexperiences WHERE RegionID = @regionid AND ExperienceID = @experienceid", conn))
+                        {
+                            cmd.Parameters.AddParameter("@regionid", regionID);
+                            cmd.Parameters.AddParameter("@experienceid", experienceID);
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                }
             }
         }
 
-        bool IRegionExperienceList.Remove(UUID regionID, UUID experienceID)
+        bool IRegionTrustedExperienceList.Remove(UUID regionID, UUID experienceID)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("DELETE FROM regionexperiences WHERE RegionID = @regionid AND ExperienceID = @experienceid", conn))
+                using (var cmd = new SQLiteCommand("DELETE FROM regiontrustedexperiences WHERE RegionID = @regionid AND ExperienceID = @experienceid", conn))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     cmd.Parameters.AddParameter("@experienceid", experienceID);
@@ -86,12 +114,12 @@ namespace SilverSim.Database.SQLite.SimulationData
             }
         }
 
-        void ISimulationDataRegionExperiencesStorageInterface.RemoveRegion(UUID regionID)
+        void ISimulationDataRegionTrustedExperiencesStorageInterface.RemoveRegion(UUID regionID)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("DELETE FROM regionexperiences WHERE RegionID = @regionid", conn))
+                using (var cmd = new SQLiteCommand("DELETE FROM regiontrustedexperiences WHERE RegionID = @regionid", conn))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     cmd.ExecuteNonQuery();
@@ -99,47 +127,23 @@ namespace SilverSim.Database.SQLite.SimulationData
             }
         }
 
-        void IRegionExperienceList.Store(RegionExperienceInfo info)
-        {
-            var vals = new Dictionary<string, object>
-            {
-                ["RegionID"] = info.RegionID,
-                ["ExperienceID"] = info.ExperienceID,
-                ["IsAllowed"] = info.IsAllowed
-            };
-            using (var conn = new SQLiteConnection(m_ConnectionString))
-            {
-                conn.Open();
-                conn.ReplaceInto("regionexperiences", vals);
-            }
-        }
-
-        bool IRegionExperienceList.TryGetValue(UUID regionID, UUID experienceID, out RegionExperienceInfo info)
+        bool IRegionTrustedExperienceList.TryGetValue(UUID regionID, UUID experienceID, out bool trusted)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM regionexperiences WHERE RegionID = @regionid AND ExperienceID = @experienceid", conn))
+                using (var cmd = new SQLiteCommand("SELECT NULL FROM regiontrustedexperiences WHERE RegionID = @regionid AND ExperienceID = @experienceid", conn))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     cmd.Parameters.AddParameter("@experienceid", experienceID);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
                     {
-                        if (reader.Read())
-                        {
-                            info = new RegionExperienceInfo
-                            {
-                                ExperienceID = reader.GetUUID("ExperienceID"),
-                                RegionID = reader.GetUUID("RegionID"),
-                                IsAllowed = reader.GetBool("IsAllowed"),
-                            };
-                            return true;
-                        }
+                        trusted = reader.Read();
                     }
                 }
             }
-            info = default(RegionExperienceInfo);
-            return false;
+
+            return true;
         }
     }
 }
