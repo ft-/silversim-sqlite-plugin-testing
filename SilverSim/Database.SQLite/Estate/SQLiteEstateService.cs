@@ -47,10 +47,6 @@ namespace SilverSim.Database.SQLite.Estate
             m_ConnectionString = SQLiteUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
-        protected SQLiteEstateService()
-        {
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             /* intentionally left empty */
