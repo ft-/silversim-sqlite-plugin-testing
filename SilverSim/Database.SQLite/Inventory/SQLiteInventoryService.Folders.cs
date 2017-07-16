@@ -304,17 +304,27 @@ namespace SilverSim.Database.SQLite.Inventory
                 ["InventoryType"] = folder.InventoryType,
                 ["Version"] = folder.Version
             };
+
+
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                try
+                connection.InsideTransaction(() =>
                 {
-                    connection.InsertInto(m_InventoryFolderTable, newVals);
-                }
-                catch
-                {
-                    throw new InventoryFolderNotStoredException(folder.ID);
-                }
+                    if (!IsParentFolderIdValid(connection, folder.Owner.ID, folder.ParentFolderID, UUID.Zero))
+                    {
+                        throw new InvalidParentFolderIdException(string.Format("Invalid parent folder {0} for folder {1}", folder.ParentFolderID, folder.ID));
+                    }
+
+                    try
+                    {
+                        connection.InsertInto(m_InventoryFolderTable, newVals);
+                    }
+                    catch
+                    {
+                        throw new InventoryFolderNotStoredException(folder.ID);
+                    }
+                });
             }
 
             if (folder.ParentFolderID != UUID.Zero)
@@ -352,11 +362,17 @@ namespace SilverSim.Database.SQLite.Inventory
             {
                 throw new ArgumentException("folderID != toFolderID");
             }
+
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.InsideTransaction(() =>
                 {
+                    if (!IsParentFolderIdValid(connection, principalID, toFolderID, folderID))
+                    {
+                        throw new InvalidParentFolderIdException(string.Format("Invalid parent folder {0} for folder {1}", toFolderID, folderID));
+                    }
+
                     using (var cmd = new SQLiteCommand("SELECT NULL FROM " + m_InventoryFolderTable + " WHERE ID = @folderid AND OwnerID = @ownerid", connection))
                     {
                         cmd.Parameters.AddParameter("@folderid", toFolderID);
