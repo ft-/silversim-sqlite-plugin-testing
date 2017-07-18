@@ -204,6 +204,8 @@ namespace SilverSim.Database.SQLite.Inventory
                         /* this is a good one, it ends at the root folder */
                         return true;
                     }
+
+                    checkFolderID = actParentFolderID;
                 }
 
                 /* folder missing */
