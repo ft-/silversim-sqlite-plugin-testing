@@ -551,12 +551,9 @@ namespace SilverSim.Database.SQLite.Grid
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_TableName + " WHERE (" +
-                        "(locX >= @xmin AND locY >= @ymin AND locX <= @xmax AND locY <= @ymax) OR " +
-                        "(locX + sizeX >= @xmin AND locY+sizeY >= @ymin AND locX + sizeX <= @xmax AND locY + sizeY <= @ymax) OR " +
-                        "(locX >= @xmin AND locY >= @ymin AND locX + sizeX > @xmin AND locY + sizeY > @ymin) OR " +
-                        "(locX >= @xmax AND locY >= @ymax AND locX + sizeX > @xmax AND locY + sizeY > @ymax)" +
-                        ") AND ScopeID = @scopeid", connection))
+                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_TableName + " WHERE " +
+                        "locX+sizeX > @xmin AND locX <= @xmax AND locY+sizeY > @ymin AND locY <= @ymax " +
+                        " AND ScopeID = @scopeid", connection))
                 {
                     cmd.Parameters.AddParameter("@scopeid", scopeID);
                     cmd.Parameters.AddParameter("@xmin", min.X);
