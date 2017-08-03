@@ -126,6 +126,7 @@ namespace SilverSim.Database.SQLite.SimulationData
 
                 PhysicsShapeType = dbReader.GetEnum<PrimitivePhysicsShapeType>("PhysicsShapeType"),
                 PathfindingType = dbReader.GetEnum<PathfindingType>("PathfindingType"),
+                WalkableCoefficientAvatar = (double)dbReader["WalkableCoefficientAvatar"],
                 WalkableCoefficientA = (double)dbReader["WalkableCoefficientA"],
                 WalkableCoefficientB = (double)dbReader["WalkableCoefficientB"],
                 WalkableCoefficientC = (double)dbReader["WalkableCoefficientC"],

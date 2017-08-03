@@ -444,6 +444,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                     ["SitTargetOrientation"] = objpart.SitTargetOrientation,
                     ["PhysicsShapeType"] = objpart.PhysicsShapeType,
                     ["PathfindingType"] = objpart.PathfindingType,
+                    ["WalkableCoefficientAvatar"] = objpart.WalkableCoefficientAvatar,
                     ["WalkableCoefficientA"] = objpart.WalkableCoefficientA,
                     ["WalkableCoefficientB"] = objpart.WalkableCoefficientB,
                     ["WalkableCoefficientC"] = objpart.WalkableCoefficientC,
