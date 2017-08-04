@@ -67,7 +67,8 @@ namespace SilverSim.Database.SQLite.SimulationData
             ResetHomeOnTeleport = reader.GetBool("ResetHomeOnTeleport"),
             AllowLandmark = reader.GetBool("AllowLandmark"),
             AllowDirectTeleport = reader.GetBool("AllowDirectTeleport"),
-            MaxBasePrims = (int)(long)reader["MaxBasePrims"]
+            MaxBasePrims = (int)(long)reader["MaxBasePrims"],
+            WalkableCoefficientsSerialization = reader.GetBytes("WalkableCoefficientsData")
         };
 
         RegionSettings ISimulationDataRegionSettingsStorageInterface.this[UUID regionID]
@@ -125,7 +126,8 @@ namespace SilverSim.Database.SQLite.SimulationData
                         ["ResetHomeOnTeleport"] = value.ResetHomeOnTeleport,
                         ["AllowLandmark"] = value.AllowLandmark,
                         ["AllowDirectTeleport"] = value.AllowDirectTeleport,
-                        ["MaxBasePrims"] = value.MaxBasePrims
+                        ["MaxBasePrims"] = value.MaxBasePrims,
+                        ["WalkableCoefficientsData"] = value.WalkableCoefficientsSerialization
                     };
                     conn.ReplaceInto("regionsettings", data);
                 }
