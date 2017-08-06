@@ -230,7 +230,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                 LastOwner = dbReader.GetUUI("LastOwner"),
                 Name = (string)dbReader["Name"],
                 Owner = dbReader.GetUUI("Owner"),
-                ParentFolderID = dbReader.GetUUID("ParentFolderID"),
+                ParentFolderID = dbReader.GetUUID("PrimID"),
                 NextOwnerAssetID = dbReader.GetUUID("NextOwnerAssetID"),
                 ExperienceID = dbReader.GetUUID("ExperienceID")
             };

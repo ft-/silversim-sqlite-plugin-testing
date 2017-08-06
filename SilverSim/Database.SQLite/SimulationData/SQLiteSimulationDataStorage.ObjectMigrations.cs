@@ -232,7 +232,9 @@ namespace SilverSim.Database.SQLite.SimulationData
             new TableRevision(7),
             new AddColumn<int>("SalePrice") { IsNullAllowed = false, Default = 10 },
             new TableRevision(8),
-            new AddColumn<UUID>("ExperienceID") { IsNullAllowed = false, Default = UUID.Zero }
+            new AddColumn<UUID>("ExperienceID") { IsNullAllowed = false, Default = UUID.Zero },
+            new TableRevision(9),
+            new DropColumn("ParentFolderID")
             #endregion
         };
     }
