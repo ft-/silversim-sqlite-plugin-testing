@@ -190,6 +190,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                             m_PrimItemDeletions.Remove(r);
                         }
                         sb.Clear();
+                        removedItems.Clear();
                     }
                 }
 
@@ -248,6 +249,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                         }
                         sb.Clear();
                         sb2.Clear();
+                        removedItems.Clear();
                     }
                 }
 
@@ -300,6 +302,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                             m_GroupDeletions.Remove(r);
                         }
                         sb.Clear();
+                        removedItems.Clear();
                     }
                 }
 
