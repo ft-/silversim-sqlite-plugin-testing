@@ -356,12 +356,12 @@ namespace SilverSim.Database.SQLite.SimulationData
                 {
                     conn.Open();
 
+                    ProcessPrimItemUpdates(conn);
                     ProcessPrimItemDeletions(conn);
                     ProcessPrimDeletions(conn);
                     ProcessGroupDeletions(conn);
                     ProcessPrimUpdates(conn);
                     ProcessGroupUpdates(conn);
-                    ProcessPrimItemUpdates(conn);
                 }
             }
 
