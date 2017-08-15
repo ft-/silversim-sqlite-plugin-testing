@@ -119,6 +119,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                 SitTargetOrientation = dbReader.GetQuaternion("SitTargetOrientation"),
                 Creator = dbReader.GetUUI("Creator"),
                 CreationDate = dbReader.GetDate("CreationDate"),
+                RezDate = dbReader.GetDate("RezDate"),
                 Flags = dbReader.GetEnum<PrimitiveFlags>("Flags"),
 
                 CameraAtOffset = dbReader.GetVector3("CameraAtOffset"),

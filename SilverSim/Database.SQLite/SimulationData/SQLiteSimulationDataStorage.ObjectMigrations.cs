@@ -186,6 +186,8 @@ namespace SilverSim.Database.SQLite.SimulationData
             new AddColumn<double>("WalkableCoefficientD") { IsNullAllowed = false, Default = 1.0 },
             new TableRevision(17),
             new AddColumn<double>("WalkableCoefficientAvatar") { IsNullAllowed = false, Default = 1.0 },
+            new TableRevision(18),
+            new AddColumn<Date>("RezDate") { IsNullAllowed = false },
             #endregion
 
             #region Table primitems
