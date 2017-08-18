@@ -486,7 +486,7 @@ namespace SilverSim.Database.SQLite.Inventory
                     }
                 }
 
-                if (!deleteFolder)
+                if (deleteFolder)
                 {
                     using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ID = @folderid", connection))
                     {
