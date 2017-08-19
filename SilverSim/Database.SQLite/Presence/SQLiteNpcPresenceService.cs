@@ -138,21 +138,22 @@ namespace SilverSim.Database.SQLite.Presence
             }
         }
 
-        private NpcPresenceInfo ReaderToPresenceInfo(SQLiteDataReader reader)
+        private NpcPresenceInfo ReaderToPresenceInfo(SQLiteDataReader reader) => new NpcPresenceInfo
         {
-            var presence = new NpcPresenceInfo();
-            presence.Npc.ID = reader.GetUUID("NpcID");
-            presence.Npc.FirstName = (string)reader["FirstName"];
-            presence.Npc.LastName = (string)reader["LastName"];
-            presence.Owner = reader.GetUUI("Owner");
-            presence.Group = reader.GetUGI("Group");
-            presence.Options = reader.GetEnum<NpcOptions>("Options");
-            presence.RegionID = reader.GetUUID("RegionID");
-            presence.Position = reader.GetVector3("Position");
-            presence.LookAt = reader.GetVector3("LookAt");
-            presence.SittingOnObjectID = reader.GetUUID("SittingOnObjectID");
-            return presence;
-        }
+            Npc = new UUI
+            {
+                ID = reader.GetUUID("NpcID"),
+                FirstName = (string)reader["FirstName"],
+                LastName = (string)reader["LastName"]
+            },
+            Owner = reader.GetUUI("Owner"),
+            Group = reader.GetUGI("Group"),
+            Options = reader.GetEnum<NpcOptions>("Options"),
+            RegionID = reader.GetUUID("RegionID"),
+            Position = reader.GetVector3("Position"),
+            LookAt = reader.GetVector3("LookAt"),
+            SittingOnObjectID = reader.GetUUID("SittingOnObjectID")
+        };
 
         public override bool TryGetValue(UUID regionID, string firstname, string lastname, out NpcPresenceInfo presence)
         {
