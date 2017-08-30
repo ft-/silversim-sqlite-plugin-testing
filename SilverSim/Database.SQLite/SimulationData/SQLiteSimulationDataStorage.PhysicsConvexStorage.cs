@@ -25,6 +25,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format.Mesh;
+using SilverSim.Types.Primitive;
 using System.Collections.Generic;
 using System.Data.SQLite;
 
@@ -39,6 +40,8 @@ namespace SilverSim.Database.SQLite.SimulationData
             new AddColumn<UUID>("MeshID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<byte[]>("ConvexData") { IsLong = true },
             new PrimaryKeyInfo(new string[] {"MeshID" }),
+            new TableRevision(2),
+            new AddColumn<PrimitivePhysicsShapeType>("PhysicsShape") { IsNullAllowed = false, Default = PrimitivePhysicsShapeType.Convex },
             #endregion
 
             #region Table primphysics
@@ -49,12 +52,12 @@ namespace SilverSim.Database.SQLite.SimulationData
             #endregion
         };
 
-        PhysicsConvexShape ISimulationDataPhysicsConvexStorageInterface.this[UUID meshid]
+        PhysicsConvexShape ISimulationDataPhysicsConvexStorageInterface.this[UUID meshid, PrimitivePhysicsShapeType physicsShape]
         {
             get
             {
                 PhysicsConvexShape shape;
-                if (!((ISimulationDataPhysicsConvexStorageInterface)this).TryGetValue(meshid, out shape))
+                if (!((ISimulationDataPhysicsConvexStorageInterface)this).TryGetValue(meshid, physicsShape, out shape))
                 {
                     throw new KeyNotFoundException();
                 }
@@ -68,6 +71,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                     var param = new Dictionary<string, object>
                     {
                         ["MeshID"] = meshid,
+                        ["PhysicsShape"] = physicsShape,
                         ["ConvexData"] = value.SerializedData
                     };
                     conn.ReplaceInto("sculptmeshphysics", param);
@@ -101,14 +105,15 @@ namespace SilverSim.Database.SQLite.SimulationData
             }
         }
 
-        bool ISimulationDataPhysicsConvexStorageInterface.TryGetValue(UUID meshid, out PhysicsConvexShape shape)
+        bool ISimulationDataPhysicsConvexStorageInterface.TryGetValue(UUID meshid, PrimitivePhysicsShapeType physicsShape, out PhysicsConvexShape shape)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT ConvexData FROM meshphysics WHERE MeshID=@id", conn))
+                using (var cmd = new SQLiteCommand("SELECT ConvexData FROM meshphysics WHERE MeshID=@id AND PhysicsShape=@stype", conn))
                 {
                     cmd.Parameters.AddParameter("@id", meshid);
+                    cmd.Parameters.AddParameter("@stype", physicsShape);
                     using (SQLiteDataReader dbReader = cmd.ExecuteReader())
                     {
                         if (dbReader.Read())
@@ -153,14 +158,15 @@ namespace SilverSim.Database.SQLite.SimulationData
             return false;
         }
 
-        bool ISimulationDataPhysicsConvexStorageInterface.ContainsKey(UUID sculptmeshid)
+        bool ISimulationDataPhysicsConvexStorageInterface.ContainsKey(UUID sculptmeshid, PrimitivePhysicsShapeType physicsShape)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT NULL FROM meshphysics WHERE MeshID=@id", conn))
+                using (var cmd = new SQLiteCommand("SELECT NULL FROM meshphysics WHERE MeshID=@id AND PhysicsShape=@stype", conn))
                 {
                     cmd.Parameters.AddParameter("@id", sculptmeshid);
+                    cmd.Parameters.AddParameter("@stype", physicsShape);
                     using (SQLiteDataReader dbReader = cmd.ExecuteReader())
                     {
                         return dbReader.Read();
@@ -185,14 +191,15 @@ namespace SilverSim.Database.SQLite.SimulationData
             }
         }
 
-        bool ISimulationDataPhysicsConvexStorageInterface.Remove(UUID sculptmeshid)
+        bool ISimulationDataPhysicsConvexStorageInterface.Remove(UUID sculptmeshid, PrimitivePhysicsShapeType physicsShape)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("DELETE FROM meshphysics WHERE MeshID=@id", conn))
+                using (var cmd = new SQLiteCommand("DELETE FROM meshphysics WHERE MeshID=@id AND PhysicsShape=@stype", conn))
                 {
                     cmd.Parameters.AddParameter("@id", sculptmeshid);
+                    cmd.Parameters.AddParameter("@stype", physicsShape);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
@@ -208,29 +215,6 @@ namespace SilverSim.Database.SQLite.SimulationData
                     cmd.Parameters.AddParameter("@id", primShape.Serialization);
                     return cmd.ExecuteNonQuery() > 0;
                 }
-            }
-        }
-
-        ICollection<UUID> ISimulationDataPhysicsConvexStorageInterface.KnownMeshIds
-        {
-            get
-            {
-                var sculptids = new List<UUID>();
-                using (var conn = new SQLiteConnection(m_ConnectionString))
-                {
-                    conn.Open();
-                    using (var cmd = new SQLiteCommand("SELECT MeshID FROM meshphysics", conn))
-                    {
-                        using (SQLiteDataReader dbReader = cmd.ExecuteReader())
-                        {
-                            while (dbReader.Read())
-                            {
-                                sculptids.Add(dbReader.GetUUID("MeshID"));
-                            }
-                        }
-                    }
-                }
-                return sculptids;
             }
         }
 
