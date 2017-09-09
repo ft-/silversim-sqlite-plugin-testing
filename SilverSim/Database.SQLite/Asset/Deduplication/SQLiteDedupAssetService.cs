@@ -439,7 +439,7 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
                     cmd.Parameters.AddParameter("@id", id);
                     cmd.ExecuteNonQuery();
                 }
-                using (var cmd = new SQLiteCommand("DELETE FROM assetsinuse WHERE id=@id", conn))
+                using (var cmd = new SQLiteCommand("DELETE FROM assetsinuse WHERE id=@id AND NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetrefs.id = assetsinuse.id)", conn))
                 {
                     cmd.Parameters.AddParameter("@id", id);
                     cmd.ExecuteNonQuery();
