@@ -205,36 +205,24 @@ namespace SilverSim.Database.SQLite.SimulationData
 
             private void ProcessPrimDeletions(SQLiteConnection conn)
             {
-                StringBuilder sb = new StringBuilder();
-                StringBuilder sb2 = new StringBuilder();
-
-                List<UUID> removedItems = new List<UUID>();
+                var removedItems = new List<UUID>();
 
                 foreach (UUID k in m_PrimDeletions.Keys.ToArray())
                 {
-                    if (sb.Length != 0)
-                    {
-                        sb.Append(" OR ");
-                        sb2.Append(" OR ");
-                    }
-                    else
-                    {
-                        sb.Append("DELETE FROM prims WHERE ");
-                        sb2.Append("DELETE FROM primitems WHERE ");
-                    }
-
-                    sb.AppendFormat("(RegionID = '{0}' AND ID = '{1}')",
-                        m_RegionID, k);
-                    sb2.AppendFormat("(RegionID = '{0}' AND PrimID = '{1}')",
-                        m_RegionID, k);
                     removedItems.Add(k);
                     if (removedItems.Count == 255)
                     {
-                        using (var cmd = new SQLiteCommand(sb.ToString(), conn))
+                        string c1 = string.Format("DELETE FROM prims WHERE RegionID = '{0}' AND (ID='{1}')",
+                            m_RegionID,
+                            string.Join("' OR ID='", removedItems));
+                        string c2 = string.Format("DELETE FROM primitems WHERE RegionID = '{0}' AND (PrimID='{1}')",
+                            m_RegionID,
+                            string.Join("' OR PrimID='", removedItems));
+                        using (var cmd = new SQLiteCommand(c1, conn))
                         {
                             cmd.ExecuteNonQuery();
                         }
-                        using (var cmd = new SQLiteCommand(sb2.ToString(), conn))
+                        using (var cmd = new SQLiteCommand(c2, conn))
                         {
                             cmd.ExecuteNonQuery();
                         }
@@ -243,19 +231,23 @@ namespace SilverSim.Database.SQLite.SimulationData
                             m_PrimDeletions.Remove(r);
                             Interlocked.Increment(ref m_ProcessedPrims);
                         }
-                        sb.Clear();
-                        sb2.Clear();
                         removedItems.Clear();
                     }
                 }
 
                 if (removedItems.Count != 0)
                 {
-                    using (var cmd = new SQLiteCommand(sb.ToString(), conn))
+                    string c1 = string.Format("DELETE FROM prims WHERE RegionID = '{0}' AND (ID='{1}')",
+                        m_RegionID,
+                        string.Join("' OR ID='", removedItems));
+                    string c2 = string.Format("DELETE FROM primitems WHERE RegionID = '{0}' AND (PrimID='{1}')",
+                        m_RegionID,
+                        string.Join("' OR PrimID='", removedItems));
+                    using (var cmd = new SQLiteCommand(c1, conn))
                     {
                         cmd.ExecuteNonQuery();
                     }
-                    using (var cmd = new SQLiteCommand(sb2.ToString(), conn))
+                    using (var cmd = new SQLiteCommand(c2, conn))
                     {
                         cmd.ExecuteNonQuery();
                     }
@@ -269,27 +261,16 @@ namespace SilverSim.Database.SQLite.SimulationData
 
             private void ProcessGroupDeletions(SQLiteConnection conn)
             {
-                StringBuilder sb = new StringBuilder();
-
-                List<UUID> removedItems = new List<UUID>();
+                var removedItems = new List<UUID>();
 
                 foreach (UUID k in m_GroupDeletions.Keys.ToArray())
                 {
-                    if (sb.Length != 0)
-                    {
-                        sb.Append(" OR ");
-                    }
-                    else
-                    {
-                        sb.Append("DELETE FROM objects WHERE ");
-                    }
-
-                    sb.AppendFormat("(RegionID = '{0}' AND ID = '{1}')",
-                        m_RegionID, k);
                     removedItems.Add(k);
                     if (removedItems.Count == 255)
                     {
-                        using (var cmd = new SQLiteCommand(sb.ToString(), conn))
+                        string c = string.Format("DELETE FROM objects WHERE RegionID='{0}' AND (ID='{1}')", m_RegionID,
+                            string.Join("' OR ID='", removedItems));
+                        using (var cmd = new SQLiteCommand(c, conn))
                         {
                             cmd.ExecuteNonQuery();
                         }
@@ -297,14 +278,15 @@ namespace SilverSim.Database.SQLite.SimulationData
                         {
                             m_GroupDeletions.Remove(r);
                         }
-                        sb.Clear();
                         removedItems.Clear();
                     }
                 }
 
                 if (removedItems.Count != 0)
                 {
-                    using (var cmd = new SQLiteCommand(sb.ToString(), conn))
+                    string c = string.Format("DELETE FROM objects WHERE RegionID='{0}' AND (ID='{1}')", m_RegionID,
+                        string.Join("' OR ID='", removedItems));
+                    using (var cmd = new SQLiteCommand(c, conn))
                     {
                         cmd.ExecuteNonQuery();
                     }
