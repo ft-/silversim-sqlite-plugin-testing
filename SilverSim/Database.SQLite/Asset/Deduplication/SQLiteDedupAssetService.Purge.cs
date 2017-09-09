@@ -185,14 +185,9 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
             return new QueueStat(c != 0 ? "PROCESSING" : "IDLE", c, (uint)m_Processed);
         }
 
-        IList<QueueStatAccessor> IQueueStatsAccess.QueueStats
+        IList<QueueStatAccessor> IQueueStatsAccess.QueueStats => new List<QueueStatAccessor>
         {
-            get
-            {
-                List<QueueStatAccessor> stats = new List<QueueStatAccessor>();
-                stats.Add(new QueueStatAccessor("AssetReferences", GetProcessorQueueStats));
-                return stats;
-            }
-        }
+            new QueueStatAccessor("AssetReferences", GetProcessorQueueStats)
+        };
     }
 }
