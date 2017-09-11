@@ -98,7 +98,7 @@ namespace SilverSim.Tests.Preconditions.SQLite
                     foreach (string table in tables)
                     {
                         m_Log.InfoFormat("Deleting table {0}", table);
-                        using (SQLiteCommand cmd = new SQLiteCommand(string.Format("DROP TABLE {0}", table), connection))
+                        using (var cmd = new SQLiteCommand(string.Format("DROP TABLE {0}", table), connection))
                         {
                             cmd.ExecuteNonQuery();
                         }

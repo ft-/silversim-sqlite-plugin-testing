@@ -502,6 +502,22 @@ namespace SilverSim.Database.SQLite.Inventory
                         }
                     }
                 }
+                else
+                {
+                    using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @folderid", connection))
+                    {
+                        cmd.Parameters.AddParameter("@ownerid", principalID);
+                        cmd.Parameters.AddParameter("@folderid", folderID);
+                        try
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                        catch
+                        {
+                            /* nothing to do here */
+                        }
+                    }
+                }
 
                 using (var cmd = new SQLiteCommand("UPDATE " + m_InventoryFolderTable + " SET Version = Version + 1 WHERE OwnerID = @ownerid AND ID = @folderid", connection))
                 {
