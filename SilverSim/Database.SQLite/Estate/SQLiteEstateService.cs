@@ -134,7 +134,22 @@ namespace SilverSim.Database.SQLite.Estate
             new NamedKeyInfo("Owner", "Owner"),
             new NamedKeyInfo("ID_Owner", "ID", "Owner"),
             new TableRevision(2),
-            new AddColumn<uint>("ParentEstateID") { IsNullAllowed = false, Default = (uint)0 }
+            new AddColumn<uint>("ParentEstateID") { IsNullAllowed = false, Default = (uint)0 },
+            #endregion
+
+            #region estateexperiences
+            new SqlTable("estateexperiences"),
+            new AddColumn<uint>("EstateID") { IsNullAllowed = false },
+            new AddColumn<UUID>("ExperienceID") { IsNullAllowed = false },
+            new AddColumn<bool>("IsAllowed") { IsNullAllowed = false, Default = false },
+            new AddColumn<bool>("IsTrusted") { IsNullAllowed = false, Default = false },
+            new DropColumn("IsTrusted"),
+            #endregion
+
+            #region estatetrustedexperiences
+            new SqlTable("estatetrustedexperiences"),
+            new AddColumn<uint>("EstateID") { IsNullAllowed = false },
+            new AddColumn<UUID>("ExperienceID") { IsNullAllowed = false },
             #endregion
         };
 
