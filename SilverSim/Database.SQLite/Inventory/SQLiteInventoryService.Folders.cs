@@ -445,18 +445,22 @@ namespace SilverSim.Database.SQLite.Inventory
                     folders = GetFolderIDs(principalID, folderID, connection);
                 }
 
-                for (int index = 0; index < folders.Count; ++index)
+                int index = 0;
+                while(index < folders.Count)
                 {
                     foreach (UUID folder in GetFolderIDs(principalID, folders[index], connection))
                     {
                         if (!folders.Contains(folder))
                         {
-                            folders.Insert(0, folder);
+                            folders.Add(folder);
                         }
                     }
+                    ++index;
                 }
 
-                foreach (UUID folder in folders)
+                UUID[] folderArray = folders.ToArray();
+                Array.Reverse(folderArray);
+                foreach (UUID folder in folderArray)
                 {
                     using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @folderid", connection))
                     {
