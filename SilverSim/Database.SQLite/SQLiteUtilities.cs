@@ -120,29 +120,6 @@ namespace SilverSim.Database.SQLite
             {
             }
         }
-
-        [Serializable]
-        public class SQLiteTransactionException : Exception
-        {
-            public SQLiteTransactionException()
-            {
-            }
-
-            public SQLiteTransactionException(string msg)
-                : base(msg)
-            {
-            }
-
-            protected SQLiteTransactionException(SerializationInfo info, StreamingContext context)
-                : base(info, context)
-            {
-            }
-
-            public SQLiteTransactionException(string msg, Exception inner)
-                : base(msg, inner)
-            {
-            }
-        }
         #endregion
 
         #region Transaction Helper
@@ -156,13 +133,13 @@ namespace SilverSim.Database.SQLite
             {
                 del();
             }
-            catch (Exception e)
+            catch
             {
                 using (var cmd = new SQLiteCommand("ROLLBACK", connection))
                 {
                     cmd.ExecuteNonQuery();
                 }
-                throw new SQLiteTransactionException("Transaction failed", e);
+                throw;
             }
             using (var cmd = new SQLiteCommand("COMMIT", connection))
             {
