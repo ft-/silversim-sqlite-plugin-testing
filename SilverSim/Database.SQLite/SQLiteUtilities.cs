@@ -146,6 +146,31 @@ namespace SilverSim.Database.SQLite
                 cmd.ExecuteNonQuery();
             }
         }
+        public static T InsideTransaction<T>(this SQLiteConnection connection, Func<T> del)
+        {
+            T result;
+            using (var cmd = new SQLiteCommand("BEGIN", connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+            try
+            {
+                result = del();
+            }
+            catch
+            {
+                using (var cmd = new SQLiteCommand("ROLLBACK", connection))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                throw;
+            }
+            using (var cmd = new SQLiteCommand("COMMIT", connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+            return result;
+        }
         #endregion
 
         #region Push parameters
