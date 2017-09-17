@@ -89,6 +89,7 @@ namespace SilverSim.Database.SQLite.Inventory
             ["InventoryType"] = item.InventoryType,
             ["Flags"] = item.Flags,
             ["OwnerID"] = item.Owner.ID,
+            ["LastOwnerID"] = item.LastOwner.ID,
             ["CreatorID"] = item.Creator.ID,
             ["CreationDate"] = item.CreationDate.DateTimeToUnixTime(),
             ["BasePermissionsMask"] = (uint)item.Permissions.Base,

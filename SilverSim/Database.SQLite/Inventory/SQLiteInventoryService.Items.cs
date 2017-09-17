@@ -81,7 +81,7 @@ namespace SilverSim.Database.SQLite.Inventory
                 InventoryItem item;
                 if (!Item.TryGetValue(key, out item))
                 {
-                    throw new KeyNotFoundException();
+                    throw new InventoryItemNotFoundException(key);
                 }
                 return item;
             }
@@ -175,7 +175,7 @@ namespace SilverSim.Database.SQLite.Inventory
                 InventoryItem item;
                 if (!Item.TryGetValue(principalID, key, out item))
                 {
-                    throw new KeyNotFoundException();
+                    throw new InventoryItemNotFoundException(key);
                 }
                 return item;
             }
@@ -215,7 +215,8 @@ namespace SilverSim.Database.SQLite.Inventory
                     ["NextOwnerPermissionsMask"] = item.Permissions.NextOwner,
                     ["GroupPermissionsMask"] = item.Permissions.Group,
                     ["SalePrice"] = item.SaleInfo.Price,
-                    ["SaleType"] = item.SaleInfo.Type
+                    ["SaleType"] = item.SaleInfo.Type,
+                    ["Flags"] = item.Flags
                 };
                 connection.UpdateSet(m_InventoryItemTable, newVals, string.Format("OwnerID = '{0}' AND ID = '{1}'", item.Owner.ID, item.ID));
             }
