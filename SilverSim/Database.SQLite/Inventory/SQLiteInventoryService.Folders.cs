@@ -355,6 +355,9 @@ namespace SilverSim.Database.SQLite.Inventory
             IncrementVersionNoExcept(folder.Owner.ID, folder.ParentFolderID);
         }
 
+        InventoryTree IInventoryFolderServiceInterface.Copy(UUID principalID, UUID folderID, UUID toFolderID) =>
+            CopyFolder(principalID, folderID, toFolderID);
+
         void IInventoryFolderServiceInterface.Move(UUID principalID, UUID folderID, UUID toFolderID)
         {
             InventoryFolder thisfolder = Folder[principalID, folderID];
