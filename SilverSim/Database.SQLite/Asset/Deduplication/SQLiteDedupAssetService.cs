@@ -38,7 +38,7 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
 {
     [Description("SQLite Deduplication Asset Backend")]
     [PluginName("DedupAssets")]
-    public sealed partial class SQLiteDedupAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface
+    public sealed partial class SQLiteDedupAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface, IAssetMigrationSourceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("SQLITE DEDUP ASSET SERVICE");
 
@@ -444,6 +444,29 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
             }
         }
         #endregion
+
+        public List<UUID> GetAssetList(long start, long count)
+        {
+            var result = new List<UUID>();
+            using (var conn = new SQLiteConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (var cmd = new SQLiteCommand("SELECT id FROM assets ORDER BY id LIMIT @start, @count", conn))
+                {
+                    cmd.Parameters.AddParameter("start", start);
+                    cmd.Parameters.AddParameter("count", count);
+                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            result.Add(reader.GetUUID("id"));
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
 
         #region DBServiceInterface
         public void VerifyConnection()
