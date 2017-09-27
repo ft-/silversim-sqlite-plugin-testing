@@ -5,7 +5,7 @@
 	<files>
 		<file name="bin/System.Data.SQLite.dll" is-version-src="true"/>
 		<file name="bin/System.Data.SQLite.dll.config"/>
-		<file name="bin/System.Data.SQLite.dll.xml"/>
+		<file name="bin/System.Data.SQLite.xml"/>
 		<file name="bin/platform-libs/windows/32/SQLite.Interop.dll"/>
 		<file name="bin/platform-libs/windows/32/sqlite3.dll"/>
 		<file name="bin/platform-libs/windows/64/SQLite.Interop.dll"/>
