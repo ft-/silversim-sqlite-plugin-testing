@@ -80,7 +80,7 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
                         {
                             return false;
                         }
-                        updaterequired = dbReader.GetDate("access_time") - DateTime.UtcNow > TimeSpan.FromHours(1);
+                        updaterequired = DateTime.UtcNow - dbReader.GetDate("access_time") > TimeSpan.FromHours(1);
                     }
                 }
                 if(updaterequired)
@@ -124,7 +124,7 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
                         {
                             UUID id = dbReader.GetUUID("id");
                             res[id] = true;
-                            if (dbReader.GetDate("access_time") - DateTime.UtcNow > TimeSpan.FromHours(1))
+                            if (DateTime.UtcNow - dbReader.GetDate("access_time") > TimeSpan.FromHours(1))
                             {
                                 updaterequired.Add(id);
                             }
@@ -193,7 +193,7 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
                     }
                 }
 
-                if (asset.AccessTime - DateTime.UtcNow > TimeSpan.FromHours(1))
+                if (DateTime.UtcNow - asset.AccessTime > TimeSpan.FromHours(1))
                 {
                     /* update access_time */
                     using (var cmd = new SQLiteCommand("UPDATE assetrefs SET access_time = @access WHERE id = @id", conn))
