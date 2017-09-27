@@ -5,6 +5,6 @@
 		<source>SilverSim.Database.SQLite:PackageConfig.ini</source>
 	</default-configuration>
 	<files>
-		<file name="bin/plugins/SilverSim.Database.SQLite.dll"/>
+		<file name="bin/plugins/SilverSim.Database.SQLite.dll" is-version-src="true"/>
 	</files>
 </package>
