@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Tests.Preconditions.SQLite</name>
+	<skip-delivery>true</skip-delivery>
+	<files>
+		<file name="bin/plugins/SilverSim.Tests.Preconditions.SQLite.dll" is-version-src="true"/>
+	</files>
+</package>

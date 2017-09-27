@@ -10,5 +10,7 @@
 		<file name="bin/platform-libs/windows/32/sqlite3.dll"/>
 		<file name="bin/platform-libs/windows/64/SQLite.Interop.dll"/>
 		<file name="bin/platform-libs/windows/64/sqlite3.dll"/>
+		<file name="bin/platform-libs/linux/32/libSQLite.Interop.so"/>
+		<file name="bin/platform-libs/linux/64/libSQLite.Interop.so"/>
 	</files>
 </package>
