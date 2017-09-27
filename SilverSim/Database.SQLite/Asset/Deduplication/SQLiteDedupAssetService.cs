@@ -67,6 +67,7 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
         #region Exists methods
         public override bool Exists(UUID key)
         {
+            bool updaterequired = false;
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
@@ -75,28 +76,24 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
                     cmd.Parameters.AddParameter("@id", key);
                     using (SQLiteDataReader dbReader = cmd.ExecuteReader())
                     {
-                        if (dbReader.Read())
+                        if (!dbReader.Read())
                         {
-                            if (dbReader.GetDate("access_time") - DateTime.UtcNow > TimeSpan.FromHours(1))
-                            {
-                                /* update access_time */
-                                using (var uconn = new SQLiteConnection(m_ConnectionString))
-                                {
-                                    uconn.Open();
-                                    using (var ucmd = new SQLiteCommand("UPDATE assets SET access_time = @access WHERE id = @id", uconn))
-                                    {
-                                        ucmd.Parameters.AddParameter("@access", Date.GetUnixTime());
-                                        ucmd.Parameters.AddParameter("@id", key);
-                                        ucmd.ExecuteNonQuery();
-                                    }
-                                }
-                            }
-                            return true;
+                            return false;
                         }
+                        updaterequired = dbReader.GetDate("access_time") - DateTime.UtcNow > TimeSpan.FromHours(1);
                     }
                 }
+                if(updaterequired)
+                {
+                    using (var cmd = new SQLiteCommand("UPDATE assets SET access_time = @access WHERE id = @id", conn))
+                    {
+                        cmd.Parameters.AddParameter("@access", Date.GetUnixTime());
+                        cmd.Parameters.AddParameter("@id", key);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                return true;
             }
-            return false;
         }
 
         public override Dictionary<UUID, bool> Exists(List<UUID> assets)
@@ -113,7 +110,8 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
             }
 
             string ids = "'" + string.Join("','", assets) + "'";
-            string sql = string.Format("SELECT id, access_time FROM assetrefs WHERE id IN ({0})", ids);
+            string sql = $"SELECT id, access_time FROM assetrefs WHERE id IN ({ids})";
+            var updaterequired = new List<UUID>();
 
             using (var dbcon = new SQLiteConnection(m_ConnectionString))
             {
@@ -128,19 +126,21 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
                             res[id] = true;
                             if (dbReader.GetDate("access_time") - DateTime.UtcNow > TimeSpan.FromHours(1))
                             {
-                                /* update access_time */
-                                using (SQLiteConnection uconn = new SQLiteConnection(m_ConnectionString))
-                                {
-                                    uconn.Open();
-                                    using (SQLiteCommand ucmd = new SQLiteCommand("UPDATE assetrefs SET access_time = @access WHERE id = @id", uconn))
-                                    {
-                                        ucmd.Parameters.AddParameter("@access", Date.GetUnixTime());
-                                        ucmd.Parameters.AddParameter("@id", id);
-                                        ucmd.ExecuteNonQuery();
-                                    }
-                                }
+                                updaterequired.Add(id);
                             }
                         }
+                    }
+                }
+
+                if(updaterequired.Count > 0)
+                {
+                    ids = "'" + string.Join("','", updaterequired) + "'";
+                    sql = $"UPDATE assetrefs SET access_time = @access WHERE id IN ({ids})";
+
+                    using (var ucmd = new SQLiteCommand(sql, dbcon))
+                    {
+                        ucmd.Parameters.AddParameter("@access", Date.GetUnixTime());
+                        ucmd.ExecuteNonQuery();
                     }
                 }
             }
@@ -165,6 +165,7 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
 
         public override bool TryGetValue(UUID key, out AssetData asset)
         {
+            asset = null;
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
@@ -173,41 +174,37 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
                     cmd.Parameters.AddParameter("@id", key);
                     using (SQLiteDataReader dbReader = cmd.ExecuteReader())
                     {
-                        if (dbReader.Read())
+                        if (!dbReader.Read())
                         {
-                            asset = new AssetData()
-                            {
-                                ID = dbReader.GetUUID("id"),
-                                Data = dbReader.GetBytes("data"),
-                                Type = dbReader.GetEnum<AssetType>("assetType"),
-                                Name = (string)dbReader["name"],
-                                CreateTime = dbReader.GetDate("create_time"),
-                                AccessTime = dbReader.GetDate("access_time"),
-                                Creator = dbReader.GetUUI("CreatorID"),
-                                Flags = dbReader.GetEnum<AssetFlags>("asset_flags"),
-                                Temporary = dbReader.GetBool("temporary")
-                            };
-                            if (asset.AccessTime - DateTime.UtcNow > TimeSpan.FromHours(1))
-                            {
-                                /* update access_time */
-                                using (var uconn = new SQLiteConnection(m_ConnectionString))
-                                {
-                                    uconn.Open();
-                                    using (var ucmd = new SQLiteCommand("UPDATE assetrefs SET access_time = @access WHERE id = @id", uconn))
-                                    {
-                                        ucmd.Parameters.AddParameter("@access", Date.GetUnixTime());
-                                        ucmd.Parameters.AddParameter("@id", key);
-                                        ucmd.ExecuteNonQuery();
-                                    }
-                                }
-                            }
-                            return true;
+                            return false;
                         }
+                        asset = new AssetData()
+                        {
+                            ID = dbReader.GetUUID("id"),
+                            Data = dbReader.GetBytes("data"),
+                            Type = dbReader.GetEnum<AssetType>("assetType"),
+                            Name = (string)dbReader["name"],
+                            CreateTime = dbReader.GetDate("create_time"),
+                            AccessTime = dbReader.GetDate("access_time"),
+                            Creator = dbReader.GetUUI("CreatorID"),
+                            Flags = dbReader.GetEnum<AssetFlags>("asset_flags"),
+                            Temporary = dbReader.GetBool("temporary")
+                        };
                     }
                 }
+
+                if (asset.AccessTime - DateTime.UtcNow > TimeSpan.FromHours(1))
+                {
+                    /* update access_time */
+                    using (var cmd = new SQLiteCommand("UPDATE assetrefs SET access_time = @access WHERE id = @id", conn))
+                    {
+                        cmd.Parameters.AddParameter("@access", Date.GetUnixTime());
+                        cmd.Parameters.AddParameter("@id", key);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                return true;
             }
-            asset = null;
-            return false;
         }
 
         #endregion
