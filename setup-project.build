@@ -29,6 +29,7 @@
 				<include name="**/*.so"/>
 				<include name="**/*.dylib"/>
 				<include name="**/*.config"/>
+				<include name="**/*.xml"/>
 			</fileset>
 		</copy>
 	</target>
