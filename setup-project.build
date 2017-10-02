@@ -120,27 +120,6 @@
 				<arg value="vs2015"/>
 			</exec>
 		</if>
-		<foreach item="Folder" in="SilverSim" property="modulefolder">
-            <property name="binpath" value="${path::combine(directory::get-parent-directory(directory::get-current-directory()),'bin')}"/>
-            <echo message="Writing debug config ${modulefolder}/SilverSim.${path::get-file-name(modulefolder)}.csproj.user"/>
-            <echo file="${modulefolder}/SilverSim.${path::get-file-name(modulefolder)}.csproj.user" message="&lt;Project xmlns=&quot;http://schemas.microsoft.com/developer/msbuild/2003&quot;&gt;
-  &lt;PropertyGroup&gt;
-    &lt;Configuration Condition=&quot; '$(Configuration)' == '' &quot;&gt;Debug&lt;/Configuration&gt;
-    &lt;Platform Condition=&quot; '$(Platform)' == '' &quot;&gt;AnyCPU&lt;/Platform&gt;
-    &lt;ReferencePath&gt;${modulefolder}\bin&lt;/ReferencePath&gt;
-    &lt;LastOpenVersion&gt;14.0.23107.0&lt;/LastOpenVersion&gt;
-    &lt;ProjectView&gt;ProjectFiles&lt;/ProjectView&gt;
-    &lt;ProjectTrust&gt;0&lt;/ProjectTrust&gt;
-  &lt;/PropertyGroup&gt;
-  &lt;PropertyGroup Condition=&quot; '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' &quot;&gt;
-    &lt;StartAction&gt;Program&lt;/StartAction&gt;
-    &lt;StartProgram&gt;${path::combine(binpath, 'SilverSim.Main.exe')}&lt;/StartProgram&gt;
-    &lt;StartWorkingDirectory&gt;${binpath}&lt;/StartWorkingDirectory&gt;
-  &lt;/PropertyGroup&gt;
-  &lt;PropertyGroup Condition=&quot; '$(Configuration)|$(Platform)' == 'DebugRel|AnyCPU' &quot; /&gt;
-  &lt;PropertyGroup Condition=&quot; '$(Configuration)|$(Platform)' == 'Release|AnyCPU' &quot; /&gt;
-&lt;/Project&gt;"/>
-		</foreach>
 	</target>
 	
 	<target name="sonar-project" description="Creates sonar-project">
