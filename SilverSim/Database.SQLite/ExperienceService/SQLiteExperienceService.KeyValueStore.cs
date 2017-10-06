@@ -89,7 +89,6 @@ namespace SilverSim.Database.SQLite.ExperienceService
 
         bool IExperienceKeyValueInterface.Remove(UUID experienceID, string key)
         {
-            var result = new List<string>();
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
