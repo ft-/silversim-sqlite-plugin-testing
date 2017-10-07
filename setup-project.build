@@ -4,7 +4,6 @@
 		<call target="setup-workspace" unless="${directory::exists('bin')}"/>
 		<call target="additional-bin"/>
 		<call target="packages"/>
-		<call target="nuget-updates" unless="${file::exists('bin/.nuget-done')}"/>
 		<call target="exe.config"/>
 		<call target="prebuild"/>
 	</target>
@@ -40,55 +39,6 @@
 				<include name="**/*.spkg"/>
 			</fileset>
 		</copy>
-	</target>
-	
-	<target name="nuget-updates" description="Updates packages from nuget">
-		<setenv name="PATH" path="${environment::get-variable('PATH')}:${project::get-base-directory()}/nuget" if="${platform::is-windows()}"/>
-	
-		<property name="silversim-nuget.packages" value="C5,log4net"/>
-		<property name="silversim.packages" value="${silversim-nuget.packages},Nini"/>
-		
-		<property name="silversim.package.C5.path" value="net45"/>
-		<property name="silversim.package.log4net.path" value="net45-full"/>
-		<property name="silversim-nuget.log4net.version" value="2.0.5"/>
-		<property name="silversim.package.Nini.path" value="net40"/>
-		
-		<foreach item="String" in="${silversim-nuget.packages}" delim="," property="package">
-			<property name="package-version" value="" overwrite="true"/>
-			<delete dir="libraries/${package}"/>
-			<if test="${property::exists('silversim-nuget.'+package+'.version')}">
-				<property name="package-version" value="${property::get-value('silversim-nuget.'+package+'.version')}" overwrite="true"/>
-			</if>
-			<exec program="mono" unless="${platform::is-windows()}">
-				<arg value="nuget/nuget.exe"/>
-				<arg value="install"/>
-				<arg value="${package}"/>
-				<arg value="-o"/>
-				<arg path="libraries"/>
-				<arg value="-ExcludeVersion"/>
-				<arg value="-Version" if="${property::exists('silversim-nuget.'+package+'.version')}"/>
-				<arg value="${package-version}" if="${property::exists('silversim-nuget.'+package+'.version')}"/>
-			</exec>
-			<exec program="nuget" if="${platform::is-windows()}">
-				<arg value="install"/>
-				<arg value="${package}"/>
-				<arg value="-o"/>
-				<arg path="libraries"/>
-				<arg value="-ExcludeVersion"/>
-				<arg value="-Version" if="${property::exists('silversim-nuget.'+package+'.version')}"/>
-				<arg value="${package-version}" if="${property::exists('silversim-nuget.'+package+'.version')}"/>
-			</exec>
-		</foreach>
-
-		<foreach item="String" in="${silversim.packages}" delim="," property="package">
-			<echo message="Copying ${package} into bin"/>
-			<copy todir="bin">
-				<fileset basedir="libraries/${package}/lib/${property::get-value('silversim.package.'+package+'.path')}">
-					<include name="*.dll"/>
-				</fileset>
-			</copy>
-		</foreach>
-		<echo message="nuget-updates processed" file="bin/.nuget-done"/>
 	</target>
 	
 	<target name="exe.config" description="Installs exe.config files">
