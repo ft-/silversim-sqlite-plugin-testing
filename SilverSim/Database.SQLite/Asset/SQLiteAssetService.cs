@@ -34,20 +34,20 @@ using System.ComponentModel;
 using System.IO;
 using System.Security.Cryptography;
 
-namespace SilverSim.Database.SQLite.Asset.Deduplication
+namespace SilverSim.Database.SQLite.Asset
 {
-    [Description("SQLite Deduplication Asset Backend")]
-    [PluginName("DedupAssets")]
-    public sealed partial class SQLiteDedupAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface, IAssetMigrationSourceInterface
+    [Description("SQLite Asset Backend")]
+    [PluginName("Assets")]
+    public sealed partial class SQLiteAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface, IAssetMigrationSourceInterface
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("SQLITE DEDUP ASSET SERVICE");
+        private static readonly ILog m_Log = LogManager.GetLogger("SQLITE ASSET SERVICE");
 
         private readonly string m_ConnectionString;
         private readonly SQLiteAssetReferencesService m_ReferencesService;
         private readonly bool m_EnableOnConflict;
 
         #region Constructor
-        public SQLiteDedupAssetService(ConfigurationLoader loader, IConfig ownSection)
+        public SQLiteAssetService(ConfigurationLoader loader, IConfig ownSection)
         {
             m_ConnectionString = SQLiteUtilities.BuildConnectionString(ownSection, m_Log);
             m_EnableOnConflict = ownSection.GetBoolean("EnableOnConflict", true);
@@ -61,8 +61,8 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
         #endregion
 
         public override bool IsSameServer(AssetServiceInterface other) =>
-            other.GetType() == typeof(SQLiteDedupAssetService) &&
-                (m_ConnectionString == ((SQLiteDedupAssetService)other).m_ConnectionString);
+            other.GetType() == typeof(SQLiteAssetService) &&
+                (m_ConnectionString == ((SQLiteAssetService)other).m_ConnectionString);
 
         #region Exists methods
         public override bool Exists(UUID key)
@@ -259,9 +259,9 @@ namespace SilverSim.Database.SQLite.Asset.Deduplication
         #region References interface
         public sealed class SQLiteAssetReferencesService : AssetReferencesServiceInterface
         {
-            private readonly SQLiteDedupAssetService m_AssetService;
+            private readonly SQLiteAssetService m_AssetService;
 
-            internal SQLiteAssetReferencesService(SQLiteDedupAssetService assetService)
+            internal SQLiteAssetReferencesService(SQLiteAssetService assetService)
             {
                 m_AssetService = assetService;
             }
