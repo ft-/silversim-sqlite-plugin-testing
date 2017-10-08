@@ -24,9 +24,6 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SilverSim.Database.SQLite._Migration
 {
@@ -61,7 +58,7 @@ namespace SilverSim.Database.SQLite._Migration
 
         public string FieldSql()
         {
-            SQLiteCommandBuilder b = new SQLiteCommandBuilder();
+            var b = new SQLiteCommandBuilder();
             var fieldNames = new List<string>();
             foreach (string fName in FieldNames)
             {
@@ -92,7 +89,7 @@ namespace SilverSim.Database.SQLite._Migration
 
         private string FieldSql()
         {
-            SQLiteCommandBuilder b = new SQLiteCommandBuilder();
+            var b = new SQLiteCommandBuilder();
             var fieldNames = new List<string>();
             foreach (string fName in FieldNames)
             {
@@ -103,8 +100,8 @@ namespace SilverSim.Database.SQLite._Migration
 
         public string Sql(string tableName)
         {
-            SQLiteCommandBuilder b = new SQLiteCommandBuilder();
-            return "CREATE " + (IsUnique ? " UNIQUE " : "") + b.QuoteIdentifier(tableName + "_" + Name) + " ON " + b.QuoteIdentifier(tableName) + " " + FieldSql() + ";";
+            var b = new SQLiteCommandBuilder();
+            return "CREATE " + (IsUnique ? "UNIQUE " : "") + "INDEX " + b.QuoteIdentifier(tableName + "_" + Name) + " ON " + b.QuoteIdentifier(tableName) + " " + FieldSql() + ";";
         }
     }
 
