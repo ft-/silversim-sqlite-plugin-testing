@@ -74,7 +74,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                         ["PhysicsShape"] = physicsShape,
                         ["ConvexData"] = value.SerializedData
                     };
-                    conn.ReplaceInto("sculptmeshphysics", param);
+                    conn.ReplaceInto("meshphysics", param);
                 }
             }
         }
