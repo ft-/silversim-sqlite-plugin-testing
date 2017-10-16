@@ -93,10 +93,13 @@ namespace SilverSim.Database.SQLite.Grid
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsideTransaction(() =>
+                connection.InsideTransaction((transaction) =>
                 {
                     bool haveEntry = false;
-                    using (var cmd = new SQLiteCommand("SELECT * FROM regiondefaults WHERE uuid = @id", connection))
+                    using (var cmd = new SQLiteCommand("SELECT * FROM regiondefaults WHERE uuid = @id", connection)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@id", regionId);
                         using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -107,14 +110,20 @@ namespace SilverSim.Database.SQLite.Grid
 
                     if (haveEntry)
                     {
-                        using (var cmd = new SQLiteCommand("UPDATE regiondefaults SET flags = (flags & @remove) | @add WHERE uuid = @id", connection))
+                        using (var cmd = new SQLiteCommand("UPDATE regiondefaults SET flags = (flags & @remove) | @add WHERE uuid = @id", connection)
+                        {
+                            Transaction = transaction
+                        })
                         {
                             cmd.Parameters.AddParameter("@remove", ~removeFlags);
                             cmd.Parameters.AddParameter("@add", addFlags);
                             cmd.Parameters.AddParameter("@id", regionId);
                             cmd.ExecuteNonQuery();
                         }
-                        using (var cmd = new SQLiteCommand("DELETE FROM regiondefaults WHERE flags = 0 AND uuid = @id", connection))
+                        using (var cmd = new SQLiteCommand("DELETE FROM regiondefaults WHERE flags = 0 AND uuid = @id", connection)
+                        {
+                            Transaction = transaction
+                        })
                         {
                             cmd.Parameters.AddParameter("@id", regionId);
                             cmd.ExecuteNonQuery();

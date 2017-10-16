@@ -55,9 +55,12 @@ namespace SilverSim.Database.SQLite.SimulationData
                 using (var conn = new SQLiteConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    conn.InsideTransaction(() =>
+                    conn.InsideTransaction((transaction) =>
                     {
-                        using (var cmd = new SQLiteCommand("DELETE FROM spawnpoints WHERE RegionID = @regionid", conn))
+                        using (var cmd = new SQLiteCommand("DELETE FROM spawnpoints WHERE RegionID = @regionid", conn)
+                        {
+                            Transaction = transaction
+                        })
                         {
                             cmd.Parameters.AddParameter("@regionid", regionID);
                             cmd.ExecuteNonQuery();
@@ -70,7 +73,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                         foreach (Vector3 v in value)
                         {
                             data["Distance"] = v;
-                            conn.InsertInto("spawnpoints", data);
+                            conn.InsertInto("spawnpoints", data, transaction);
                         }
                     });
                 }

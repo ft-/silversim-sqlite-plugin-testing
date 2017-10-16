@@ -171,7 +171,7 @@ namespace SilverSim.Database.SQLite.Inventory
             return false;
         }
 
-        public bool IsParentFolderIdValid(SQLiteConnection conn, UUID principalID, UUID parentFolderID, UUID expectedFolderID)
+        public bool IsParentFolderIdValid(SQLiteConnection conn, UUID principalID, UUID parentFolderID, UUID expectedFolderID, SQLiteTransaction transaction = null)
         {
             if(parentFolderID == UUID.Zero)
             {
@@ -213,7 +213,7 @@ namespace SilverSim.Database.SQLite.Inventory
 
         public override bool IsParentFolderIdValid(UUID principalID, UUID parentFolderID, UUID expectedFolderID)
         {
-            using (SQLiteConnection conn = new SQLiteConnection(m_ConnectionString))
+            using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
 
@@ -251,14 +251,20 @@ namespace SilverSim.Database.SQLite.Inventory
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsideTransaction(() =>
+                connection.InsideTransaction((transaction) =>
                 {
-                    using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid", connection))
+                    using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid", connection)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@ownerid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
-                    using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid", connection))
+                    using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid", connection)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@ownerid", userAccount);
                         cmd.ExecuteNonQuery();

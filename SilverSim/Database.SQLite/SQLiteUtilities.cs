@@ -27,6 +27,7 @@ using SilverSim.Types;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SQLite;
 using System.IO;
 using System.Runtime.Serialization;
@@ -123,52 +124,41 @@ namespace SilverSim.Database.SQLite
         #endregion
 
         #region Transaction Helper
-        public static void InsideTransaction(this SQLiteConnection connection, Action del)
+        public static void InsideTransaction(this SQLiteConnection connection, Action<SQLiteTransaction> del) =>
+            InsideTransaction(connection, IsolationLevel.Serializable, del);
+
+        public static void InsideTransaction(this SQLiteConnection connection, IsolationLevel level, Action<SQLiteTransaction> del)
         {
-            using (var cmd = new SQLiteCommand("BEGIN", connection))
-            {
-                cmd.ExecuteNonQuery();
-            }
+            SQLiteTransaction transaction = connection.BeginTransaction(level);
             try
             {
-                del();
+                del(transaction);
             }
             catch
             {
-                using (var cmd = new SQLiteCommand("ROLLBACK", connection))
-                {
-                    cmd.ExecuteNonQuery();
-                }
+                transaction.Rollback();
                 throw;
             }
-            using (var cmd = new SQLiteCommand("COMMIT", connection))
-            {
-                cmd.ExecuteNonQuery();
-            }
+            transaction.Commit();
         }
-        public static T InsideTransaction<T>(this SQLiteConnection connection, Func<T> del)
+
+        public static T InsideTransaction<T>(this SQLiteConnection connection, Func<SQLiteTransaction, T> del) =>
+            InsideTransaction(connection, IsolationLevel.Serializable, del);
+
+        public static T InsideTransaction<T>(this SQLiteConnection connection, IsolationLevel level, Func<SQLiteTransaction, T> del)
         {
             T result;
-            using (var cmd = new SQLiteCommand("BEGIN", connection))
-            {
-                cmd.ExecuteNonQuery();
-            }
+            SQLiteTransaction transaction = connection.BeginTransaction(level);
             try
             {
-                result = del();
+                result = del(transaction);
             }
             catch
             {
-                using (var cmd = new SQLiteCommand("ROLLBACK", connection))
-                {
-                    cmd.ExecuteNonQuery();
-                }
+                transaction.Rollback();
                 throw;
             }
-            using (var cmd = new SQLiteCommand("COMMIT", connection))
-            {
-                cmd.ExecuteNonQuery();
-            }
+            transaction.Commit();
             return result;
         }
         #endregion
@@ -262,22 +252,22 @@ namespace SilverSim.Database.SQLite
             }
         }
 
-        private static void AddParameters(this SQLiteParameterCollection mysqlparam, Dictionary<string, object> vals)
+        private static void AddParameters(this SQLiteParameterCollection sqliteparams, Dictionary<string, object> vals)
         {
             foreach (KeyValuePair<string, object> kvp in vals)
             {
                 if (kvp.Value != null)
                 {
-                    AddParameter(mysqlparam, "@v_" + kvp.Key, kvp.Value);
+                    AddParameter(sqliteparams, "@v_" + kvp.Key, kvp.Value);
                 }
             }
         }
         #endregion
 
         #region Common REPLACE INTO/INSERT INTO helper
-        public static void AnyInto(this SQLiteConnection connection, string cmd, string tablename, Dictionary<string, object> vals)
+        public static void AnyInto(this SQLiteConnection connection, string cmd, string tablename, Dictionary<string, object> vals, SQLiteTransaction transaction = null)
         {
-            SQLiteCommandBuilder sb = new SQLiteCommandBuilder();
+            var sb = new SQLiteCommandBuilder();
             var q = new List<string>();
             foreach (KeyValuePair<string, object> kvp in vals)
             {
@@ -288,41 +278,41 @@ namespace SilverSim.Database.SQLite
 
                 if (t == typeof(Vector3))
                 {
-                    q.Add(sb.QuoteIdentifier(key + "X"));
-                    q.Add(sb.QuoteIdentifier(key + "Y"));
-                    q.Add(sb.QuoteIdentifier(key + "Z"));
+                    q.Add(key + "X");
+                    q.Add(key + "Y");
+                    q.Add(key + "Z");
                 }
                 else if (t == typeof(GridVector) || t == typeof(EnvironmentController.WLVector2))
                 {
-                    q.Add(sb.QuoteIdentifier(key + "X"));
-                    q.Add(sb.QuoteIdentifier(key + "Y"));
+                    q.Add(key + "X");
+                    q.Add(key + "Y");
                 }
                 else if (t == typeof(Quaternion))
                 {
-                    q.Add(sb.QuoteIdentifier(key + "X"));
-                    q.Add(sb.QuoteIdentifier(key + "Y"));
-                    q.Add(sb.QuoteIdentifier(key + "Z"));
-                    q.Add(sb.QuoteIdentifier(key + "W"));
+                    q.Add(key + "X");
+                    q.Add(key + "Y");
+                    q.Add(key + "Z");
+                    q.Add(key + "W");
                 }
                 else if (t == typeof(Color))
                 {
-                    q.Add(sb.QuoteIdentifier(key + "Red"));
-                    q.Add(sb.QuoteIdentifier(key + "Green"));
-                    q.Add(sb.QuoteIdentifier(key + "Blue"));
+                    q.Add(key + "Red");
+                    q.Add(key + "Green");
+                    q.Add(key + "Blue");
                 }
                 else if (t == typeof(EnvironmentController.WLVector4))
                 {
-                    q.Add(sb.QuoteIdentifier(key + "Red"));
-                    q.Add(sb.QuoteIdentifier(key + "Green"));
-                    q.Add(sb.QuoteIdentifier(key + "Blue"));
-                    q.Add(sb.QuoteIdentifier(key + "Value"));
+                    q.Add(key + "Red");
+                    q.Add(key + "Green");
+                    q.Add(key + "Blue");
+                    q.Add(key + "Value");
                 }
                 else if (t == typeof(ColorAlpha))
                 {
-                    q.Add(sb.QuoteIdentifier(key + "Red"));
-                    q.Add(sb.QuoteIdentifier(key + "Green"));
-                    q.Add(sb.QuoteIdentifier(key + "Blue"));
-                    q.Add(sb.QuoteIdentifier(key + "Alpha"));
+                    q.Add(key + "Red");
+                    q.Add(key + "Green");
+                    q.Add(key + "Blue");
+                    q.Add(key + "Alpha");
                 }
                 else if (value == null)
                 {
@@ -337,9 +327,9 @@ namespace SilverSim.Database.SQLite
             var q1 = new StringBuilder();
             var q2 = new StringBuilder();
             q1.Append(cmd);
-            q1.Append(" INTO `");
+            q1.Append(" INTO ");
             q1.Append(tablename);
-            q1.Append("` (");
+            q1.Append(" (");
             q2.Append(") VALUES (");
             bool first = true;
             foreach (string p in q)
@@ -356,7 +346,10 @@ namespace SilverSim.Database.SQLite
             }
             q1.Append(q2);
             q1.Append(")");
-            using (var command = new SQLiteCommand(q1.ToString(), connection))
+            using (var command = new SQLiteCommand(q1.ToString(), connection)
+            {
+                Transaction = transaction
+            })
             {
                 AddParameters(command.Parameters, vals);
                 if (command.ExecuteNonQuery() < 1)
@@ -368,16 +361,16 @@ namespace SilverSim.Database.SQLite
         #endregion
 
         #region REPLACE INSERT INTO helper
-        public static void ReplaceInto(this SQLiteConnection connection, string tablename, Dictionary<string, object> vals)
+        public static void ReplaceInto(this SQLiteConnection connection, string tablename, Dictionary<string, object> vals, SQLiteTransaction transaction = null)
         {
-            connection.AnyInto("REPLACE", tablename, vals);
+            connection.AnyInto("REPLACE", tablename, vals, transaction);
         }
         #endregion
 
         #region INSERT INTO helper
-        public static void InsertInto(this SQLiteConnection connection, string tablename, Dictionary<string, object> vals)
+        public static void InsertInto(this SQLiteConnection connection, string tablename, Dictionary<string, object> vals, SQLiteTransaction transaction = null)
         {
-            connection.AnyInto("INSERT", tablename, vals);
+            connection.AnyInto("INSERT", tablename, vals, transaction);
         }
         #endregion
 
@@ -442,14 +435,17 @@ namespace SilverSim.Database.SQLite
             return updates;
         }
 
-        public static void UpdateSet(this SQLiteConnection connection, string tablename, Dictionary<string, object> vals, string where)
+        public static void UpdateSet(this SQLiteConnection connection, string tablename, Dictionary<string, object> vals, string where, SQLiteTransaction transaction = null)
         {
-            SQLiteCommandBuilder sb = new SQLiteCommandBuilder();
+            var sb = new SQLiteCommandBuilder();
             string q1 = "UPDATE " + tablename + " SET ";
 
             q1 += string.Join(",", UpdateSetFromVals(sb, vals));
 
-            using (var command = new SQLiteCommand(q1 + " WHERE " + where, connection))
+            using (var command = new SQLiteCommand(q1 + " WHERE " + where, connection)
+            {
+                Transaction = transaction
+            })
             {
                 AddParameters(command.Parameters, vals);
                 if (command.ExecuteNonQuery() < 1)
@@ -459,7 +455,7 @@ namespace SilverSim.Database.SQLite
             }
         }
 
-        public static void UpdateSet(this SQLiteConnection connection, string tablename, Dictionary<string, object> vals, Dictionary<string, object> where)
+        public static void UpdateSet(this SQLiteConnection connection, string tablename, Dictionary<string, object> vals, Dictionary<string, object> where, SQLiteTransaction transaction = null)
         {
             SQLiteCommandBuilder sb = new SQLiteCommandBuilder();
             string q1 = "UPDATE " + tablename + " SET ";
@@ -476,7 +472,10 @@ namespace SilverSim.Database.SQLite
                 wherestr.AppendFormat("{0} = @w_{1}", sb.QuoteIdentifier(w.Key), w.Key);
             }
 
-            using (var command = new SQLiteCommand(q1 + " WHERE " + wherestr, connection))
+            using (var command = new SQLiteCommand(q1 + " WHERE " + wherestr, connection)
+            {
+                Transaction = transaction
+            })
             {
                 AddParameters(command.Parameters, vals);
                 foreach (KeyValuePair<string, object> w in where)

@@ -89,9 +89,12 @@ namespace SilverSim.Database.SQLite.Avatar
                     }
                     else
                     {
-                        connection.InsideTransaction(() =>
+                        connection.InsideTransaction((transaction) =>
                         {
-                            using (var cmd = new SQLiteCommand("DELETE FROM avatars WHERE PrincipalID = @principalid", connection))
+                            using (var cmd = new SQLiteCommand("DELETE FROM avatars WHERE PrincipalID = @principalid", connection)
+                            {
+                                Transaction = transaction
+                            })
                             {
                                 cmd.Parameters.AddParameter("@principalid", avatarID);
                                 cmd.ExecuteNonQuery();
@@ -105,7 +108,7 @@ namespace SilverSim.Database.SQLite.Avatar
                             {
                                 vals["Name"] = kvp.Key;
                                 vals["Value"] = kvp.Value;
-                                connection.InsertInto("avatars", vals);
+                                connection.InsertInto("avatars", vals, transaction);
                             }
                         });
                     }
@@ -122,11 +125,14 @@ namespace SilverSim.Database.SQLite.Avatar
                 {
                     connection.Open();
 
-                    connection.InsideTransaction(() =>
+                    connection.InsideTransaction((transaction) =>
                     {
                         foreach (string key in itemKeys)
                         {
-                            using (var cmd = new SQLiteCommand("SELECT Value FROM avatars WHERE PrincipalID = @principalid AND Name = @name", connection))
+                            using (var cmd = new SQLiteCommand("SELECT Value FROM avatars WHERE PrincipalID = @principalid AND Name = @name", connection)
+                            {
+                                Transaction = transaction
+                            })
                             {
                                 cmd.Parameters.AddParameter("@principalid", avatarID);
                                 cmd.Parameters.AddParameter("@name", key);
@@ -164,13 +170,13 @@ namespace SilverSim.Database.SQLite.Avatar
                     {
                         ["PrincipalID"] = avatarID
                     };
-                    connection.InsideTransaction(() =>
+                    connection.InsideTransaction((transaction) =>
                     {
                         for (int i = 0; i < itemKeys.Count; ++i)
                         {
                             vals["Name"] = itemKeys[i];
                             vals["Value"] = value[i];
-                            connection.ReplaceInto("avatars", vals);
+                            connection.ReplaceInto("avatars", vals, transaction);
                         }
                     });
                 }
@@ -233,11 +239,14 @@ namespace SilverSim.Database.SQLite.Avatar
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsideTransaction(() =>
+                connection.InsideTransaction((transaction) =>
                 {
                     foreach (string name in nameList)
                     {
-                        using (var cmd = new SQLiteCommand("DELETE FROM avatars WHERE PrincipalID = @principalid AND Name = @name", connection))
+                        using (var cmd = new SQLiteCommand("DELETE FROM avatars WHERE PrincipalID = @principalid AND Name = @name", connection)
+                        {
+                            Transaction = transaction
+                        })
                         {
                             cmd.Parameters.AddParameter("@principalid", avatarID);
                             cmd.Parameters.AddParameter("@name", name);

@@ -156,21 +156,33 @@ namespace SilverSim.Database.SQLite.Groups
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                conn.InsideTransaction(() =>
+                conn.InsideTransaction((transaction) =>
                 {
-                    using (var cmd = new SQLiteCommand("DELETE FROM groupinvites WHERE PrincipalID = @id", conn))
+                    using (var cmd = new SQLiteCommand("DELETE FROM groupinvites WHERE PrincipalID = @id", conn)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@id", accountID);
                     }
-                    using (var cmd = new SQLiteCommand("DELETE FROM groupmemberships WHERE PrincipalID = @id", conn))
+                    using (var cmd = new SQLiteCommand("DELETE FROM groupmemberships WHERE PrincipalID = @id", conn)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@id", accountID);
                     }
-                    using (var cmd = new SQLiteCommand("DELETE FROM activegroup WHERE PrincipalID = @id", conn))
+                    using (var cmd = new SQLiteCommand("DELETE FROM activegroup WHERE PrincipalID = @id", conn)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@id", accountID);
                     }
-                    using (var cmd = new SQLiteCommand("DELETE FROM grouprolememberships WHERE PrincipalID = @id", conn))
+                    using (var cmd = new SQLiteCommand("DELETE FROM grouprolememberships WHERE PrincipalID = @id", conn)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@id", accountID);
                     }

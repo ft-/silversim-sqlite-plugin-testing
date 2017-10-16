@@ -174,7 +174,7 @@ namespace SilverSim.Database.SQLite.Friends
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsideTransaction(() =>
+                connection.InsideTransaction((transaction) =>
                 {
                     var vals = new Dictionary<string, object>();
                     vals.Add("UserID", fi.User.ID);
@@ -182,13 +182,13 @@ namespace SilverSim.Database.SQLite.Friends
                     vals.Add("Secret", fi.Secret);
                     vals.Add("RightsToFriend", fi.FriendGivenFlags);
 
-                    connection.ReplaceInto("friends", vals);
+                    connection.ReplaceInto("friends", vals, transaction);
 
                     vals.Add("UserID", fi.Friend.ID);
                     vals.Add("FriendID", fi.User.ID);
                     vals.Add("Secret", fi.Secret);
                     vals.Add("RightsToFriend", fi.UserGivenFlags);
-                    connection.ReplaceInto("friends", vals);
+                    connection.ReplaceInto("friends", vals, transaction);
                 });
             }
         }

@@ -29,7 +29,7 @@ namespace SilverSim.Database.SQLite.SimulationData
 {
     public sealed partial class SQLiteSimulationDataStorage : ISimulationDataRegionSettingsStorageInterface
     {
-        private RegionSettings ToRegionSettings(SQLiteDataReader reader) => new RegionSettings()
+        private RegionSettings ToRegionSettings(SQLiteDataReader reader) => new RegionSettings
         {
             BlockTerraform = reader.GetBool("BlockTerraform"),
             BlockFly = reader.GetBool("BlockFly"),

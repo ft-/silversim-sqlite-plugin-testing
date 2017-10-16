@@ -365,13 +365,15 @@ namespace SilverSim.Database.SQLite.Asset
                 {
                     conn.Open();
 
-                    conn.InsideTransaction(() =>
+                    conn.InsideTransaction((transaction) =>
                     {
-                        using (var cmd =
-                            new SQLiteCommand(
+                        using (var cmd = new SQLiteCommand(
                                 "INSERT OR IGNORE INTO assetdata (\"hash\", \"assetType\", \"data\")" +
                                 "VALUES(@hash, @assetType, @data)",
-                                conn))
+                                conn)
+                        {
+                            Transaction = transaction
+                        })
                         {
                             using (cmd)
                             {
@@ -385,12 +387,14 @@ namespace SilverSim.Database.SQLite.Asset
                             }
                         }
 
-                        using (var cmd =
-                            new SQLiteCommand(
+                        using (var cmd = new SQLiteCommand(
                                 "INSERT OR IGNORE INTO assetrefs (id, name, assetType, temporary, create_time, access_time, asset_flags, hash)" +
                                 "VALUES(@id, @name, @assetType, @temporary, @create_time, @access_time, @asset_flags, @hash);" +
                                 "UPDATE assetrefs SET create_time = @create_time WHERE id=@id",
-                                conn))
+                                conn)
+                        {
+                            Transaction = transaction
+                        })
                         {
                             string assetName = asset.Name;
                             if (asset.Name.Length > MAX_ASSET_NAME)

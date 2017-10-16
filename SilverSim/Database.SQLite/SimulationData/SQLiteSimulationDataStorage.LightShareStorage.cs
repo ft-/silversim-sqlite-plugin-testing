@@ -46,7 +46,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                             return false;
                         }
 
-                        skyData = new EnvController.WindlightSkyData()
+                        skyData = new EnvController.WindlightSkyData
                         {
                             Ambient = reader.GetWLVector4("Ambient"),
                             CloudColor = reader.GetWLVector4("CloudColor"),
@@ -72,7 +72,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                             SunMoonColor = reader.GetWLVector4("SunMoonColor"),
                             SunMoonPosition = (double)reader["SunMoonPosition"]
                         };
-                        waterData = new EnvController.WindlightWaterData()
+                        waterData = new EnvController.WindlightWaterData
                         {
                             BigWaveDirection = reader.GetWLVector2("BigWaveDirection"),
                             LittleWaveDirection = reader.GetWLVector2("LittleWaveDirection"),

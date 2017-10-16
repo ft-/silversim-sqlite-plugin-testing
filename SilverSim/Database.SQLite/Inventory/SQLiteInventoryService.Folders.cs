@@ -309,9 +309,9 @@ namespace SilverSim.Database.SQLite.Inventory
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsideTransaction(() =>
+                connection.InsideTransaction((transaction) =>
                 {
-                    if (!IsParentFolderIdValid(connection, folder.Owner.ID, folder.ParentFolderID, UUID.Zero))
+                    if (!IsParentFolderIdValid(connection, folder.Owner.ID, folder.ParentFolderID, UUID.Zero, transaction))
                     {
                         throw new InvalidParentFolderIdException(string.Format("Invalid parent folder {0} for folder {1}", folder.ParentFolderID, folder.ID));
                     }
@@ -369,14 +369,17 @@ namespace SilverSim.Database.SQLite.Inventory
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsideTransaction(() =>
+                connection.InsideTransaction((transaction) =>
                 {
-                    if (!IsParentFolderIdValid(connection, principalID, toFolderID, folderID))
+                    if (!IsParentFolderIdValid(connection, principalID, toFolderID, folderID, transaction))
                     {
                         throw new InvalidParentFolderIdException(string.Format("Invalid parent folder {0} for folder {1}", toFolderID, folderID));
                     }
 
-                    using (var cmd = new SQLiteCommand("SELECT NULL FROM " + m_InventoryFolderTable + " WHERE ID = @folderid AND OwnerID = @ownerid", connection))
+                    using (var cmd = new SQLiteCommand("SELECT NULL FROM " + m_InventoryFolderTable + " WHERE ID = @folderid AND OwnerID = @ownerid", connection)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@folderid", toFolderID);
                         cmd.Parameters.AddParameter("@ownerid", principalID);
@@ -434,7 +437,7 @@ namespace SilverSim.Database.SQLite.Inventory
             List<UUID> folders;
             InventoryFolder thisfolder = Folder[principalID, folderID];
 
-            connection.InsideTransaction(() =>
+            connection.InsideTransaction((transaction) =>
             {
                 if (deleteFolder)
                 {
@@ -445,13 +448,13 @@ namespace SilverSim.Database.SQLite.Inventory
                 }
                 else
                 {
-                    folders = GetFolderIDs(principalID, folderID, connection);
+                    folders = GetFolderIDs(principalID, folderID, connection, transaction);
                 }
 
                 int index = 0;
                 while(index < folders.Count)
                 {
-                    foreach (UUID folder in GetFolderIDs(principalID, folders[index], connection))
+                    foreach (UUID folder in GetFolderIDs(principalID, folders[index], connection, transaction))
                     {
                         if (!folders.Contains(folder))
                         {
@@ -465,7 +468,10 @@ namespace SilverSim.Database.SQLite.Inventory
                 Array.Reverse(folderArray);
                 foreach (UUID folder in folderArray)
                 {
-                    using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @folderid", connection))
+                    using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @folderid", connection)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@ownerid", principalID);
                         cmd.Parameters.AddParameter("@folderid", folder);
@@ -478,7 +484,10 @@ namespace SilverSim.Database.SQLite.Inventory
                             /* nothing to do here */
                         }
                     }
-                    using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ID = @folderid", connection))
+                    using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ID = @folderid", connection)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@ownerid", principalID);
                         cmd.Parameters.AddParameter("@folderid", folder);
@@ -495,7 +504,10 @@ namespace SilverSim.Database.SQLite.Inventory
 
                 if (deleteFolder)
                 {
-                    using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ID = @folderid", connection))
+                    using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ID = @folderid", connection)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@ownerid", principalID);
                         cmd.Parameters.AddParameter("@folderid", folderID);
@@ -511,7 +523,10 @@ namespace SilverSim.Database.SQLite.Inventory
                 }
                 else
                 {
-                    using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @folderid", connection))
+                    using (var cmd = new SQLiteCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @folderid", connection)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@ownerid", principalID);
                         cmd.Parameters.AddParameter("@folderid", folderID);
@@ -526,7 +541,10 @@ namespace SilverSim.Database.SQLite.Inventory
                     }
                 }
 
-                using (var cmd = new SQLiteCommand("UPDATE " + m_InventoryFolderTable + " SET Version = Version + 1 WHERE OwnerID = @ownerid AND ID = @folderid", connection))
+                using (var cmd = new SQLiteCommand("UPDATE " + m_InventoryFolderTable + " SET Version = Version + 1 WHERE OwnerID = @ownerid AND ID = @folderid", connection)
+                {
+                    Transaction = transaction
+                })
                 {
                     cmd.Parameters.AddParameter("@ownerid", principalID);
                     if (deleteFolder)
@@ -541,10 +559,13 @@ namespace SilverSim.Database.SQLite.Inventory
             });
         }
 
-        private List<UUID> GetFolderIDs(UUID principalID, UUID key, SQLiteConnection connection)
+        private List<UUID> GetFolderIDs(UUID principalID, UUID key, SQLiteConnection connection, SQLiteTransaction transaction = null)
         {
             var folders = new List<UUID>();
-            using (var cmd = new SQLiteCommand("SELECT ID FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @folderid", connection))
+            using (var cmd = new SQLiteCommand("SELECT ID FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @folderid", connection)
+            {
+                Transaction = transaction
+            })
             {
                 cmd.Parameters.AddParameter("@ownerid", principalID);
                 cmd.Parameters.AddParameter("@folderid", key);

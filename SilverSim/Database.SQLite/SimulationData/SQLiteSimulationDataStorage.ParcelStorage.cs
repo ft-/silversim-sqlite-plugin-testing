@@ -50,7 +50,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                                 throw new KeyNotFoundException();
                             }
 
-                            var pi = new ParcelInfo((int)dbReader["BitmapWidth"], (int)dbReader["BitmapHeight"])
+                            var pi = new ParcelInfo((int)(long)dbReader["BitmapWidth"], (int)(long)dbReader["BitmapHeight"])
                             {
                                 Area = (int)(long)dbReader["Area"],
                                 AuctionID = (uint)(long)dbReader["AuctionID"],

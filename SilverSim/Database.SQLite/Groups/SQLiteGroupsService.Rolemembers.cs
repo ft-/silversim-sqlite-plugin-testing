@@ -256,9 +256,12 @@ namespace SilverSim.Database.SQLite.Groups
                 using (var conn = new SQLiteConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    conn.InsideTransaction(() =>
+                    conn.InsideTransaction((transaction) =>
                     {
-                        using (var cmd = new SQLiteCommand("UPDATE groupmemberships SET SelectedRoleID=@zeroid WHERE SelectedRoleID = @roleid AND GroupID = @groupid AND PrincipalID = @principalid", conn))
+                        using (var cmd = new SQLiteCommand("UPDATE groupmemberships SET SelectedRoleID=@zeroid WHERE SelectedRoleID = @roleid AND GroupID = @groupid AND PrincipalID = @principalid", conn)
+                        {
+                            Transaction = transaction
+                        })
                         {
                             cmd.Parameters.AddParameter("@zeroid", UUID.Zero);
                             cmd.Parameters.AddParameter("@principalid", principal.ID);
@@ -269,7 +272,10 @@ namespace SilverSim.Database.SQLite.Groups
 
                         foreach (string table in tablenames)
                         {
-                            using (var cmd = new SQLiteCommand("DELETE FROM " + table + " WHERE GroupID = @groupid AND RoleID = @roleid AND PrincipalID = @principalid", conn))
+                            using (var cmd = new SQLiteCommand("DELETE FROM " + table + " WHERE GroupID = @groupid AND RoleID = @roleid AND PrincipalID = @principalid", conn)
+                            {
+                                Transaction = transaction
+                            })
                             {
                                 cmd.Parameters.AddParameter("@principalid", principal.ID);
                                 cmd.Parameters.AddParameter("@groupid", group.ID);
@@ -292,7 +298,7 @@ namespace SilverSim.Database.SQLite.Groups
                 if (Members.TryGetValue(requestingAgent, group, principal, out gmem) &&
                     Roles.TryGetValue(requestingAgent, group, UUID.Zero, out role))
                 {
-                    grolemem = new GroupRolemember()
+                    grolemem = new GroupRolemember
                     {
                         Powers = role.Powers,
                         Principal = ResolveName(principal),

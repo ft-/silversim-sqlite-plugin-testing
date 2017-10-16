@@ -121,9 +121,12 @@ namespace SilverSim.Database.SQLite.ExperienceService
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                return conn.InsideTransaction<bool>(() =>
+                return conn.InsideTransaction<bool>((transaction) =>
                 {
-                    using (var cmd = new SQLiteCommand("SELECT `Value` FROM experiencekeyvalues WHERE ExperienceID = @experienceid AND `Key` = @key", conn))
+                    using (var cmd = new SQLiteCommand("SELECT `Value` FROM experiencekeyvalues WHERE ExperienceID = @experienceid AND `Key` = @key", conn)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@experienceid", experienceID);
                         cmd.Parameters.AddParameter("@key", key);
@@ -145,7 +148,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                         ["Key"] = key,
                         ["Value"] = value
                     };
-                    conn.ReplaceInto("experiencekeyvalues", vals);
+                    conn.ReplaceInto("experiencekeyvalues", vals, transaction);
 
                     return true;
                 });

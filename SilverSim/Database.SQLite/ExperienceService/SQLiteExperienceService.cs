@@ -232,9 +232,12 @@ namespace SilverSim.Database.SQLite.ExperienceService
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                return conn.InsideTransaction<bool>(() =>
+                return conn.InsideTransaction((transaction) =>
                 {
-                    using (var cmd = new SQLiteCommand("SELECT Owner FROM experiences WHERE ID = @experienceid", conn))
+                    using (var cmd = new SQLiteCommand("SELECT Owner FROM experiences WHERE ID = @experienceid", conn)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@experienceid", id);
                         using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -324,10 +327,13 @@ namespace SilverSim.Database.SQLite.ExperienceService
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                conn.InsideTransaction(() =>
+                conn.InsideTransaction((transaction) =>
                 {
                     bool isallowed = false;
-                    using (var cmd = new SQLiteCommand("SELECT Admin FROM experienceadmins WHERE ExperienceID = @experienceid AND Admin LIKE @admin", conn))
+                    using (var cmd = new SQLiteCommand("SELECT Admin FROM experienceadmins WHERE ExperienceID = @experienceid AND Admin LIKE @admin", conn)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@experienceid", info.ID);
                         cmd.Parameters.AddParameter("@admin", requestingAgent.ID.ToString() + "%");
@@ -344,7 +350,10 @@ namespace SilverSim.Database.SQLite.ExperienceService
                     }
                     if (!isallowed)
                     {
-                        using (var cmd = new SQLiteCommand("SELECT Owner FROM experiences WHERE ID = @id", conn))
+                        using (var cmd = new SQLiteCommand("SELECT Owner FROM experiences WHERE ID = @id", conn)
+                        {
+                            Transaction = transaction
+                        })
                         {
                             cmd.Parameters.AddParameter("@id", info.ID);
                             using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -360,7 +369,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                     {
                         throw new InvalidOperationException("requesting agent is not allowed to edit experience");
                     }
-                    conn.UpdateSet("experiences", vals, "ID = \"" + info.ID.ToString() + "\"");
+                    conn.UpdateSet("experiences", vals, "ID = \"" + info.ID.ToString() + "\"", transaction);
                 });
             }
         }
