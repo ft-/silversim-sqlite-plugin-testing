@@ -31,6 +31,7 @@ namespace SilverSim.Database.SQLite.SimulationData
     {
         private readonly SQLiteSimulationDataParcelAccessListStorage m_WhiteListStorage;
         private readonly SQLiteSimulationDataParcelAccessListStorage m_BlackListStorage;
+        private readonly SQLiteSimulationDataParcelAccessListStorage m_LandpassListStorage;
 
         ParcelInfo ISimulationDataParcelStorageInterface.this[UUID regionID, UUID parcelID]
         {
@@ -213,6 +214,8 @@ namespace SilverSim.Database.SQLite.SimulationData
         ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.WhiteList => m_WhiteListStorage;
 
         ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.BlackList => m_BlackListStorage;
+
+        ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.LandpassList => m_LandpassListStorage;
 
         ISimulationDataParcelExperienceListStorageInterface ISimulationDataParcelStorageInterface.Experiences => this;
     }

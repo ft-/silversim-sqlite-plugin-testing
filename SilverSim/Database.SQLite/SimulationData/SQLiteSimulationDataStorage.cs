@@ -46,6 +46,7 @@ namespace SilverSim.Database.SQLite.SimulationData
             m_ConnectionString = SQLiteUtilities.BuildConnectionString(ownSection, m_Log);
             m_WhiteListStorage = new SQLiteSimulationDataParcelAccessListStorage(m_ConnectionString, "parcelaccesswhitelist");
             m_BlackListStorage = new SQLiteSimulationDataParcelAccessListStorage(m_ConnectionString, "parcelaccessblacklist");
+            m_LandpassListStorage = new SQLiteSimulationDataParcelAccessListStorage(m_ConnectionString, "parcellandpasslist");
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -104,7 +105,10 @@ namespace SilverSim.Database.SQLite.SimulationData
             "spawnpoints",
             "regionexperiences",
             "regiontrustedexperiences",
-            "parcelexperiences"
+            "parcelexperiences",
+            "parcelaccesswhitelist",
+            "parcelaccessblacklist",
+            "parcellandpasslist"
         };
 
         public override void RemoveRegion(UUID regionID)

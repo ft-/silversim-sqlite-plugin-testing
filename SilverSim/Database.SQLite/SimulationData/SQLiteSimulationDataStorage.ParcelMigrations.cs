@@ -133,6 +133,21 @@ namespace SilverSim.Database.SQLite.SimulationData
             new PrimaryKeyInfo("RegionID", "ParcelID", "Accessor"),
             #endregion
 
+            #region Table parcellandpasslist
+            new SqlTable("parcellandpasslist"),
+            new AddColumn<UUID>("ParcelID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UUI>("Accessor") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<Date>("ExpiresAt") { IsNullAllowed = false, Default = Date.UnixTimeToDateTime(0) },
+            new TableRevision(2),
+            new NamedKeyInfo("Accessor", "Accessor"),
+            new NamedKeyInfo("ExpiresAt", "ExpiresAt"),
+            new TableRevision(3),
+            new AddColumn<UUID>("RegionID") { IsNullAllowed = false, Default = UUID.Zero },
+            new NamedKeyInfo("RegionID", "RegionID"),
+            new TableRevision(4),
+            new PrimaryKeyInfo("RegionID", "ParcelID", "Accessor"),
+            #endregion
+
             #region Table parcelexperiences
             new SqlTable("parcelexperiences"),
             new AddColumn<UUID>("RegionID") { IsNullAllowed = false, Default = UUID.Zero },
