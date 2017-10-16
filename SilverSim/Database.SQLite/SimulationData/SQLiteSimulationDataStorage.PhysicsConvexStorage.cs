@@ -42,6 +42,8 @@ namespace SilverSim.Database.SQLite.SimulationData
             new PrimaryKeyInfo(new string[] {"MeshID" }),
             new TableRevision(2),
             new AddColumn<PrimitivePhysicsShapeType>("PhysicsShape") { IsNullAllowed = false, Default = PrimitivePhysicsShapeType.Convex },
+            new TableRevision(3),
+            new PrimaryKeyInfo(new string[] {"MeshID" , "PhysicsShape" }),
             #endregion
 
             #region Table primphysics
