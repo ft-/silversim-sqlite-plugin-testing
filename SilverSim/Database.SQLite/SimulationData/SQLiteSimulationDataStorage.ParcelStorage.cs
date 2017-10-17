@@ -116,17 +116,46 @@ namespace SilverSim.Database.SQLite.SimulationData
             }
         }
 
+        private static readonly string[] ParcelTables = new string[]
+        {
+            "parcelexperiences",
+            "regionexperiences",
+            "regiontrustedexperiences",
+            "parcelaccesswhitelist",
+            "parcelaccessblacklist",
+            "parcellandpasslist"
+        };
+
         bool ISimulationDataParcelStorageInterface.Remove(UUID regionID, UUID parcelID)
         {
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("DELETE FROM parcels WHERE \"RegionID\" = @regionid AND \"ParcelID\" = @parcelid", connection))
+                return connection.InsideTransaction((transaction) =>
                 {
-                    cmd.Parameters.AddParameter("@regionid", regionID);
-                    cmd.Parameters.AddParameter("@parcelid", parcelID);
-                    return cmd.ExecuteNonQuery() > 0;
-                }
+                    foreach (string table in ParcelTables)
+                    {
+                        using (var cmd = new SQLiteCommand("DELETE FROM " + table + " WHERE \"RegionID\" = @regionid AND \"ParcelID\" = @parcelid", connection)
+                        {
+                            Transaction = transaction
+                        })
+                        {
+                            cmd.Parameters.AddParameter("@regionid", regionID);
+                            cmd.Parameters.AddParameter("@parcelid", parcelID);
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+
+                    using (var cmd = new SQLiteCommand("DELETE FROM parcels WHERE \"RegionID\" = @regionid AND \"ParcelID\" = @parcelid", connection)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        cmd.Parameters.AddParameter("@regionid", regionID);
+                        cmd.Parameters.AddParameter("@parcelid", parcelID);
+                        return cmd.ExecuteNonQuery() > 0;
+                    }
+                });
             }
         }
 
