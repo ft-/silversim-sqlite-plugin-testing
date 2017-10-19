@@ -180,12 +180,16 @@ namespace SilverSim.Database.SQLite.SimulationData
             new AddColumn<bool>("IsTrusted") { IsNullAllowed = false, Default = false },
             new TableRevision(2),
             new DropColumn("IsTrusted"),
+            new TableRevision(3),
+            new PrimaryKeyInfo("RegionID", "ExperienceID"),
             #endregion
 
             #region Table regiontrustedexperiences
             new SqlTable("regiontrustedexperiences"),
             new AddColumn<UUID>("RegionID") { IsNullAllowed = false },
             new AddColumn<UUID>("ExperienceID") { IsNullAllowed = false },
+            new TableRevision(2),
+            new PrimaryKeyInfo("RegionID", "ExperienceID"),
             #endregion
         };
     }
