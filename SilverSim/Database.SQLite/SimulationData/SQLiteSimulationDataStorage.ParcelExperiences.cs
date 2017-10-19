@@ -139,7 +139,7 @@ namespace SilverSim.Database.SQLite.SimulationData
             {
                 connection.Open();
                 /* we use a specific implementation to reduce the result set here */
-                using (var cmd = new SQLiteCommand("SELECT ExperienceID FROM parcelexperiences WHERE RegionID = @regionid AND ParcelID = @parcelid AND ExperienceID LIKE @experienceid", connection))
+                using (var cmd = new SQLiteCommand("SELECT IsAllowed FROM parcelexperiences WHERE RegionID = @regionid AND ParcelID = @parcelid AND ExperienceID LIKE @experienceid", connection))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     cmd.Parameters.AddParameter("@parcelid", parcelID);
@@ -150,9 +150,9 @@ namespace SilverSim.Database.SQLite.SimulationData
                         {
                             entry = new ParcelExperienceEntry
                             {
-                                RegionID = reader.GetUUID("RegionID"),
-                                ParcelID = reader.GetUUID("ParcelID"),
-                                ExperienceID = reader.GetUUID("ExperienceID"),
+                                RegionID = regionID,
+                                ParcelID = parcelID,
+                                ExperienceID = experienceID,
                                 IsAllowed = reader.GetBool("IsAllowed")
                             };
                             return true;
