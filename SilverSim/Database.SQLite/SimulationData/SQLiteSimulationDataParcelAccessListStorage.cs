@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
 using System.Collections.Generic;
@@ -161,6 +162,59 @@ namespace SilverSim.Database.SQLite.SimulationData
             }
         }
 
+        public void ExtendExpiry(UUID regionID, UUID parcelID, UUI accessor, ulong extendseconds)
+        {
+            bool success = false;
+            using (var connection = new SQLiteConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.InsideTransaction((transaction) =>
+                {
+                    using (var cmd = new SQLiteCommand("DELETE FROM " + m_TableName + " WHERE ExpiresAt <= " + Date.GetUnixTime().ToString() + " AND ExpiresAt > 0", connection)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    using (var cmd = new SQLiteCommand("INSERT OR IGNORE INTO " + m_TableName + " (RegionID, ParcelID, Accessor, ExpiresAt) VALUES (@RegionID, @ParcelID, @Accessor, @ExpiresAt)", connection)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        cmd.Parameters.AddParameter("@RegionID", regionID);
+                        cmd.Parameters.AddParameter("@ParcelID", parcelID);
+                        cmd.Parameters.AddParameter("@Accessor", accessor);
+                        cmd.Parameters.AddParameter("@ExpiresAt", Date.Now);
+                        if (cmd.ExecuteNonQuery() > 0)
+                        {
+                            success = true;
+                        }
+                    }
+
+                    using (var cmd = new SQLiteCommand("UPDATE " + m_TableName + " SET ExpiresAt = ExpiresAt + @extendseconds WHERE RegionID = @RegionID AND ParcelID = @ParcelID AND Accessor = @Accessor AND ExpiresAt > 0", connection)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        cmd.Parameters.AddParameter("@RegionID", regionID);
+                        cmd.Parameters.AddParameter("@ParcelID", parcelID);
+                        cmd.Parameters.AddParameter("@Accessor", accessor);
+                        cmd.Parameters.AddParameter("@extendseconds", extendseconds);
+                        if (cmd.ExecuteNonQuery() > 0)
+                        {
+                            success = true;
+                        }
+                    }
+                });
+            }
+
+            if (!success)
+            {
+                throw new ExtendExpiryFailedException();
+            }
+        }
         public bool RemoveAllFromRegion(UUID regionID)
         {
             using (var connection = new SQLiteConnection(m_ConnectionString))
