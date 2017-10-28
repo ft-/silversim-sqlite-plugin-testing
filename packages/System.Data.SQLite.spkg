@@ -3,8 +3,10 @@
 	<name>System.Data.SQLite</name>
 	<license>Public Domain</license>
 	<files>
-		<file name="bin/System.Data.SQLite.dll" is-version-src="true"/>
-		<file name="bin/System.Data.SQLite.dll.config"/>
+		<file name="bin/platform-libs/windows/System.Data.SQLite.dll" is-version-src="true"/>
+		<file name="bin/platform-libs/linux/System.Data.SQLite.dll"/>
+		<file name="bin/platform-libs/windows/System.Data.SQLite.dll.config"/>
+		<file name="bin/platform-libs/linux/System.Data.SQLite.dll.config"/>
 		<file name="bin/platform-libs/windows/32/SQLite.Interop.dll"/>
 		<file name="bin/platform-libs/windows/32/sqlite3.dll"/>
 		<file name="bin/platform-libs/windows/64/SQLite.Interop.dll"/>
