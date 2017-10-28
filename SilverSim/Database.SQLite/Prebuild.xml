@@ -28,7 +28,8 @@
   <Reference name="SilverSim.Viewer.Messages" localCopy="false"/>
   <Reference name="SilverSim.Main.Common" localCopy="false"/>
   <Reference name="SilverSim.Threading" localCopy="false"/>
-  <Reference name="System.Data.SQLite" path="../../bin" localCopy="false"/>
+  <!-- windows path used for compilation only -->
+  <Reference name="System.Data.SQLite" path="../../bin/platform-libs/windows" localCopy="false"/>
   <Reference name="Nini" localCopy="false"/>
   <Files>
     <Match pattern="*.cs" recurse="true">
