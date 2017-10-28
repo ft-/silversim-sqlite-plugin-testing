@@ -40,7 +40,6 @@
     <Match pattern="*.cs" recurse="true">
       <Exclude pattern="TemporaryGeneratedFile"/>
     </Match>
-    <Match buildAction="EmbeddedResource" path="Resources" pattern="*" recurse="true"/>
     <Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
     <Match pattern="Prebuild.xml" recurse="false" buildAction="None"/>
   </Files>
