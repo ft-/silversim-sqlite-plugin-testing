@@ -30,6 +30,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -37,9 +39,48 @@ namespace SilverSim.Database.SQLite
 {
     public static class SQLiteUtilities
     {
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr LoadLibrary(string dllToLoad);
+
+        static private bool m_Inited;
+        static private readonly object m_InitLock = new object();
+
+        static SQLiteUtilities()
+        {
+            if (!m_Inited)
+            {
+                lock (m_InitLock)
+                {
+                    if (!m_Inited)
+                    {
+                        string installationBinPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                        /* preload necessary windows dll */
+                        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                        {
+                            if (Environment.Is64BitProcess)
+                            {
+                                if (IntPtr.Zero == LoadLibrary(Path.Combine(installationBinPath, "../platform-libs/windows/64/vhacd.dll")))
+                                {
+                                    throw new FileNotFoundException("missing platform-libs/windows/64/vhacd.dll");
+                                }
+                            }
+                            else
+                            {
+                                if (IntPtr.Zero == LoadLibrary(Path.Combine(installationBinPath, "../platform-libs/windows/32/vhacd.dll")))
+                                {
+                                    throw new FileNotFoundException("missing platform-libs/windows/32/vhacd.dll");
+                                }
+                            }
+                        }
+                        m_Inited = true;
+                    }
+                }
+            }
+        }
+
         public static string ToSQLiteQuoted(this string s)
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append("'");
             foreach(char c in s)
             {
@@ -66,7 +107,7 @@ namespace SilverSim.Database.SQLite
                 log.FatalFormat("[SQLITE CONFIG]: Parameter 'DataSource' missing in [{0}]", configName);
                 throw new ConfigurationLoader.ConfigurationErrorException();
             }
-            SQLiteConnectionStringBuilder sb = new SQLiteConnectionStringBuilder()
+            var sb = new SQLiteConnectionStringBuilder
             {
                 DataSource = config.GetString(containsDataSource ? "DataSource" : "DataSourceDefault"),
                 Password = config.GetString("Password", string.Empty)
