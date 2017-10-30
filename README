@@ -1,1 +1,5 @@
 To build this project checkout the workspace builder at https://github.com/ft-/silversim-workspace-testing.
+
+The actual files System.Data.SQLite.dll in additional-bin have been generated from sqlite-netFx-full-source-1.0.105.1.
+
+The linux build needed a bit of special catering for getting INTEROP_CODEC being disabled to use the linux builds of interop libraries.
