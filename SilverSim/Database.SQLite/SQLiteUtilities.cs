@@ -59,16 +59,16 @@ namespace SilverSim.Database.SQLite
                         {
                             if (Environment.Is64BitProcess)
                             {
-                                if (IntPtr.Zero == LoadLibrary(Path.Combine(installationBinPath, "../platform-libs/windows/64/vhacd.dll")))
+                                if (IntPtr.Zero == LoadLibrary(Path.Combine(installationBinPath, "../platform-libs/windows/64/SQLite.Interop.dll")))
                                 {
-                                    throw new FileNotFoundException("missing platform-libs/windows/64/vhacd.dll");
+                                    throw new FileNotFoundException("missing platform-libs/windows/64/SQLite.Interop.dll");
                                 }
                             }
                             else
                             {
-                                if (IntPtr.Zero == LoadLibrary(Path.Combine(installationBinPath, "../platform-libs/windows/32/vhacd.dll")))
+                                if (IntPtr.Zero == LoadLibrary(Path.Combine(installationBinPath, "../platform-libs/windows/32/SQLite.Interop.dll")))
                                 {
-                                    throw new FileNotFoundException("missing platform-libs/windows/32/vhacd.dll");
+                                    throw new FileNotFoundException("missing platform-libs/windows/32/SQLite.Interop.dll");
                                 }
                             }
                         }
