@@ -4,7 +4,6 @@
 		<call target="setup-workspace" unless="${directory::exists('bin')}"/>
 		<call target="additional-bin"/>
 		<call target="packages"/>
-		<call target="exe.config"/>
 		<call target="prebuild"/>
 	</target>
 	
@@ -37,14 +36,6 @@
 		<copy todir="bin/installed-packages" if="${directory::exists('packages')}" overwrite="true">
 			<fileset basedir="packages">
 				<include name="**/*.spkg"/>
-			</fileset>
-		</copy>
-	</target>
-	
-	<target name="exe.config" description="Installs exe.config files">
-		<copy todir="bin" if="${directory::exists('exe.config')}">
-			<fileset basedir="exe.config">
-				<include name="**/*.config"/>
 			</fileset>
 		</copy>
 	</target>
