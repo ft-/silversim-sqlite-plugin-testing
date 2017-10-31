@@ -57,7 +57,7 @@ namespace SilverSim.Database.SQLite.MuteList
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT FROM mutelists WHERE agentID = @agentid", conn))
+                using (var cmd = new SQLiteCommand("SELECT * FROM mutelists WHERE agentID = @agentid", conn))
                 {
                     cmd.Parameters.AddParameter("@agentid", muteListOwnerID);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -137,7 +137,7 @@ namespace SilverSim.Database.SQLite.MuteList
             new SqlTable("mutelists"),
             new AddColumn<UUID>("agentID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<UUID>("muteID") { IsNullAllowed = false, Default = UUID.Zero },
-            new AddColumn<string>("muteName") { IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<string>("muteName") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
             new AddColumn<MuteFlags>("flags") { IsNullAllowed = false, Default = MuteFlags.None },
             new AddColumn<MuteType>("type") { IsNullAllowed = false, Default = MuteType.ByAgent },
             new PrimaryKeyInfo("agentID", "muteID", "MuteName"),
