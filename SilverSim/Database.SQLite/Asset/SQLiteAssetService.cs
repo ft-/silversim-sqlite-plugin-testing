@@ -178,7 +178,7 @@ namespace SilverSim.Database.SQLite.Asset
                         {
                             return false;
                         }
-                        asset = new AssetData()
+                        asset = new AssetData
                         {
                             ID = dbReader.GetUUID("id"),
                             Data = dbReader.GetBytes("data"),
@@ -236,7 +236,7 @@ namespace SilverSim.Database.SQLite.Asset
                     {
                         if (dbReader.Read())
                         {
-                            metadata = new AssetMetadata()
+                            metadata = new AssetMetadata
                             {
                                 ID = dbReader.GetUUID("id"),
                                 Type = dbReader.GetEnum<AssetType>("assetType"),

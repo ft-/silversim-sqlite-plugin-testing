@@ -46,7 +46,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                         {
                             while (reader.Read())
                             {
-                                var entry = new ParcelExperienceEntry()
+                                var entry = new ParcelExperienceEntry
                                 {
                                     RegionID = reader.GetUUID("RegionID"),
                                     ParcelID = reader.GetUUID("ParcelID"),

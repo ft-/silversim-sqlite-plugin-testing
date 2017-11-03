@@ -72,7 +72,7 @@ namespace SilverSim.Database.SQLite.OfflineIM
                     {
                         while (reader.Read())
                         {
-                            var im = new GridInstantMessage()
+                            var im = new GridInstantMessage
                             {
                                 ID = (ulong)(long)reader["ID"],
                                 FromAgent = reader.GetUUI("FromAgent"),

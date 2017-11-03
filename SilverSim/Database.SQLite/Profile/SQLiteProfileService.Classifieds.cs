@@ -63,7 +63,7 @@ namespace SilverSim.Database.SQLite.Profile
                     {
                         if (reader.Read())
                         {
-                            classified = new ProfileClassified()
+                            classified = new ProfileClassified
                             {
                                 ClassifiedID = reader.GetUUID("classifieduuid"),
                                 Category = (int)(long)reader["category"],

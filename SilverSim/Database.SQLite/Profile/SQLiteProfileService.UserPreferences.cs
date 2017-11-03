@@ -57,7 +57,7 @@ namespace SilverSim.Database.SQLite.Profile
                     {
                         if (reader.Read())
                         {
-                            prefs = new ProfilePreferences()
+                            prefs = new ProfilePreferences
                             {
                                 User = user,
                                 IMviaEmail = (bool)reader["imviaemail"],
@@ -67,7 +67,7 @@ namespace SilverSim.Database.SQLite.Profile
                         }
                         else
                         {
-                            prefs = new ProfilePreferences()
+                            prefs = new ProfilePreferences
                             {
                                 User = user,
                                 IMviaEmail = false,
@@ -84,35 +84,9 @@ namespace SilverSim.Database.SQLite.Profile
         {
             get
             {
-                using (var conn = new SQLiteConnection(m_ConnectionString))
-                {
-                    conn.Open();
-                    using (var cmd = new SQLiteCommand("SELECT * FROM usersettings where useruuid = @uuid", conn))
-                    {
-                        cmd.Parameters.AddParameter("@uuid", user.ID);
-                        using (SQLiteDataReader reader = cmd.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                return new ProfilePreferences()
-                                {
-                                    User = user,
-                                    IMviaEmail = reader.GetBool("imviaemail"),
-                                    Visible = reader.GetBool("visible")
-                                };
-                            }
-                            else
-                            {
-                                return new ProfilePreferences()
-                                {
-                                    User = user,
-                                    IMviaEmail = false,
-                                    Visible = false
-                                };
-                            }
-                        }
-                    }
-                }
+                ProfilePreferences prefs;
+                Preferences.TryGetValue(user, out prefs);
+                return prefs;
             }
             set
             {

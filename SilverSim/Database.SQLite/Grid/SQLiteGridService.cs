@@ -321,7 +321,7 @@ namespace SilverSim.Database.SQLite.Grid
         #endregion
 
         #region dbData to RegionInfo
-        private RegionInfo ToRegionInfo(SQLiteDataReader dbReader) => new RegionInfo()
+        private RegionInfo ToRegionInfo(SQLiteDataReader dbReader) => new RegionInfo
         {
             ID = dbReader.GetUUID("uuid"),
             Name = (string)dbReader["regionName"],

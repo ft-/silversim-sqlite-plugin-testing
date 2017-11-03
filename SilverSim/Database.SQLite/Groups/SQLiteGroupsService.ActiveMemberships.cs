@@ -73,7 +73,7 @@ namespace SilverSim.Database.SQLite.Groups
                 return false;
             }
 
-            gam = new GroupActiveMembership()
+            gam = new GroupActiveMembership
             {
                 Group = group.ID,
                 SelectedRoleID = gmem.SelectedRoleID,

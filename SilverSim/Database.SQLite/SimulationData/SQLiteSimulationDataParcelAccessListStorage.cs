@@ -121,13 +121,13 @@ namespace SilverSim.Database.SQLite.SimulationData
                         {
                             while (reader.Read())
                             {
-                                var entry = new ParcelAccessEntry()
+                                var entry = new ParcelAccessEntry
                                 {
                                     RegionID = reader.GetUUID("RegionID"),
                                     ParcelID = reader.GetUUID("ParcelID"),
                                     Accessor = reader.GetUUI("Accessor")
                                 };
-                                ulong val = (ulong)(long)reader["ExpiresAt"];
+                                var val = (ulong)(long)reader["ExpiresAt"];
                                 if (val != 0)
                                 {
                                     entry.ExpiresAt = Date.UnixTimeToDateTime(val);

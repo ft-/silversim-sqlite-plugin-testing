@@ -165,7 +165,7 @@ namespace SilverSim.Database.SQLite.Maptile
                     {
                         while (reader.Read())
                         {
-                            var info = new MaptileInfo()
+                            var info = new MaptileInfo
                             {
                                 Location = new GridVector { X = (uint)(int)reader["LocX"], Y = (uint)(int)reader["LocY"] },
                                 LastUpdate = reader.GetDate("LastUpdate"),

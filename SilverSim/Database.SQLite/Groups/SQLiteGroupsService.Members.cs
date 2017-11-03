@@ -111,7 +111,7 @@ namespace SilverSim.Database.SQLite.Groups
                 conn.InsertInto("groupmemberships", vals);
             }
 
-            return new GroupMember()
+            return new GroupMember
             {
                 Principal = principal,
                 Group = group,

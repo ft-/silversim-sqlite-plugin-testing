@@ -62,7 +62,7 @@ namespace SilverSim.Tests.Preconditions.SQLite
                 log.FatalFormat("[SQLITE CONFIG]: Parameter 'DataSource' missing in [{0}]", configName);
                 throw new ConfigurationLoader.ConfigurationErrorException();
             }
-            return new SQLiteConnectionStringBuilder()
+            return new SQLiteConnectionStringBuilder
             {
                 DataSource = config.GetString(containsDataSource ? "DataSource" : "DataSourceDefault"),
                 Password = config.GetString("Password", string.Empty)

@@ -211,7 +211,7 @@ namespace SilverSim.Database.SQLite.AvatarName
             }
         }
 
-        private static UUI ToUUI(SQLiteDataReader dbreader) => new UUI()
+        private static UUI ToUUI(SQLiteDataReader dbreader) => new UUI
         {
             ID = dbreader.GetUUID("AvatarID"),
             HomeURI = dbreader.GetUri("HomeURI"),

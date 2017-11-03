@@ -29,7 +29,7 @@ namespace SilverSim.Database.SQLite.Groups
 {
     public sealed partial class SQLiteGroupsService : GroupsServiceInterface.IGroupMembershipsInterface
     {
-        private GroupMembership MembershipFromReader(SQLiteDataReader reader, UUI requestingAgent) => new GroupMembership()
+        private GroupMembership MembershipFromReader(SQLiteDataReader reader, UUI requestingAgent) => new GroupMembership
         {
             IsAcceptNotices = reader.GetBool("AcceptNotices"),
             Contribution = (int)(long)reader["Contribution"],

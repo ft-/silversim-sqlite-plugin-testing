@@ -26,7 +26,7 @@ namespace SilverSim.Database.SQLite.Estate
 {
     public static class SQLiteEstateExtensionMethods
     {
-        public static EstateInfo ToEstateInfo(this SQLiteDataReader reader) => new EstateInfo()
+        public static EstateInfo ToEstateInfo(this SQLiteDataReader reader) => new EstateInfo
         {
             ID = (uint)(long)reader["ID"],
             Name = (string)reader["Name"],

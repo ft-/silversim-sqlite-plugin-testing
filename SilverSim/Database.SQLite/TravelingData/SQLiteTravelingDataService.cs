@@ -36,7 +36,7 @@ namespace SilverSim.Database.SQLite.TravelingData
 {
     internal static class SQLiteTravelingDataExtensionMethods
     {
-        public static TravelingDataInfo ToTravelingData(this SQLiteDataReader reader) => new TravelingDataInfo()
+        public static TravelingDataInfo ToTravelingData(this SQLiteDataReader reader) => new TravelingDataInfo
         {
             SessionID = reader.GetUUID("SessionID"),
             UserID = reader.GetUUID("UserID"),

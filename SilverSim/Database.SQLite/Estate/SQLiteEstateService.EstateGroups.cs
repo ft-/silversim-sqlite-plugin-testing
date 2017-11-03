@@ -43,7 +43,7 @@ namespace SilverSim.Database.SQLite.Estate
                         {
                             while (reader.Read())
                             {
-                                var ugi = new UGI()
+                                var ugi = new UGI
                                 {
                                     ID = reader.GetUUID("GroupID")
                                 };

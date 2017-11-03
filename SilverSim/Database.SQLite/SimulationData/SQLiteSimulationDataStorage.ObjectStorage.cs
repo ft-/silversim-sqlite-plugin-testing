@@ -85,7 +85,7 @@ namespace SilverSim.Database.SQLite.SimulationData
         #endregion
 
         #region helpers
-        private ObjectGroup ObjectGroupFromDbReader(SQLiteDataReader dbReader) => new ObjectGroup()
+        private ObjectGroup ObjectGroupFromDbReader(SQLiteDataReader dbReader) => new ObjectGroup
         {
             IsTempOnRez = dbReader.GetBool("IsTempOnRez"),
             Owner = dbReader.GetUUI("Owner"),
@@ -147,23 +147,23 @@ namespace SilverSim.Database.SQLite.SimulationData
                 {
                     DbSerialization = dbReader.GetBytes("ProjectionData"),
                 },
-                Text = new ObjectPart.TextParam()
+                Text = new ObjectPart.TextParam
                 {
                     Serialization = dbReader.GetBytes("HoverTextData")
                 },
-                Flexible = new ObjectPart.FlexibleParam()
+                Flexible = new ObjectPart.FlexibleParam
                 {
                     DbSerialization = dbReader.GetBytes("FlexibleData")
                 },
-                Sound = new ObjectPart.SoundParam()
+                Sound = new ObjectPart.SoundParam
                 {
                     Serialization = dbReader.GetBytes("LoopedSoundData")
                 },
-                CollisionSound = new ObjectPart.CollisionSoundParam()
+                CollisionSound = new ObjectPart.CollisionSoundParam
                 {
                     Serialization = dbReader.GetBytes("ImpactSoundData")
                 },
-                Shape = new ObjectPart.PrimitiveShape()
+                Shape = new ObjectPart.PrimitiveShape
                 {
                     Serialization = dbReader.GetBytes("PrimitiveShapeData")
                 },

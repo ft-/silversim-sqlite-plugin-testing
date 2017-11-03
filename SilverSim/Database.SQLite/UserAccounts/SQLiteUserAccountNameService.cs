@@ -128,7 +128,7 @@ namespace SilverSim.Database.SQLite.UserAccounts
             return list;
         }
 
-        private UUI GetUUIFromReader(SQLiteDataReader reader) => new UUI()
+        private UUI GetUUIFromReader(SQLiteDataReader reader) => new UUI
         {
             FirstName = (string)reader["FirstName"],
             LastName = (string)reader["LastName"],

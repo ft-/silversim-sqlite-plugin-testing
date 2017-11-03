@@ -56,7 +56,7 @@ namespace SilverSim.Database.SQLite.Groups
 
         public static GroupRole ToGroupRole(this SQLiteDataReader reader, string prefix = "")
         {
-            var role = new GroupRole()
+            var role = new GroupRole
             {
                 Group = new UGI(reader.GetUUID("GroupID")),
                 ID = reader.GetUUID("RoleID"),
@@ -77,7 +77,7 @@ namespace SilverSim.Database.SQLite.Groups
             return role;
         }
 
-        public static GroupMember ToGroupMember(this SQLiteDataReader reader) => new GroupMember()
+        public static GroupMember ToGroupMember(this SQLiteDataReader reader) => new GroupMember
         {
             Group = new UGI(reader.GetUUID("GroupID")),
             Principal = new UUI(reader.GetUUID("PrincipalID")),
@@ -88,7 +88,7 @@ namespace SilverSim.Database.SQLite.Groups
             AccessToken = (string)reader["AccessToken"]
         };
 
-        public static GroupRolemember ToGroupRolemember(this SQLiteDataReader reader) => new GroupRolemember()
+        public static GroupRolemember ToGroupRolemember(this SQLiteDataReader reader) => new GroupRolemember
         {
             Group = new UGI(reader.GetUUID("GroupID")),
             RoleID = reader.GetUUID("RoleID"),
@@ -96,7 +96,7 @@ namespace SilverSim.Database.SQLite.Groups
             Powers = reader.GetEnum<GroupPowers>("Powers")
         };
 
-        public static GroupRolemember ToGroupRolememberEveryone(this SQLiteDataReader reader, GroupPowers powers) => new GroupRolemember()
+        public static GroupRolemember ToGroupRolememberEveryone(this SQLiteDataReader reader, GroupPowers powers) => new GroupRolemember
         {
             Group = new UGI(reader.GetUUID("GroupID")),
             RoleID = UUID.Zero,
@@ -104,7 +104,7 @@ namespace SilverSim.Database.SQLite.Groups
             Powers = powers
         };
 
-        public static GroupRolemembership ToGroupRolemembership(this SQLiteDataReader reader) => new GroupRolemembership()
+        public static GroupRolemembership ToGroupRolemembership(this SQLiteDataReader reader) => new GroupRolemembership
         {
             Group = new UGI(reader.GetUUID("GroupID")),
             RoleID = reader.GetUUID("RoleID"),
@@ -113,7 +113,7 @@ namespace SilverSim.Database.SQLite.Groups
             GroupTitle = (string)reader["Title"]
         };
 
-        public static GroupRolemembership ToGroupRolemembershipEveryone(this SQLiteDataReader reader, GroupPowers powers) => new GroupRolemembership()
+        public static GroupRolemembership ToGroupRolemembershipEveryone(this SQLiteDataReader reader, GroupPowers powers) => new GroupRolemembership
         {
             Group = new UGI(reader.GetUUID("GroupID")),
             RoleID = UUID.Zero,
@@ -121,7 +121,7 @@ namespace SilverSim.Database.SQLite.Groups
             Powers = powers
         };
 
-        public static GroupInvite ToGroupInvite(this SQLiteDataReader reader) => new GroupInvite()
+        public static GroupInvite ToGroupInvite(this SQLiteDataReader reader) => new GroupInvite
         {
             ID = reader.GetUUID("InviteID"),
             Group = new UGI(reader.GetUUID("GroupID")),
@@ -130,7 +130,7 @@ namespace SilverSim.Database.SQLite.Groups
             Timestamp = reader.GetDate("Timestamp")
         };
 
-        public static GroupNotice ToGroupNotice(this SQLiteDataReader reader) => new GroupNotice()
+        public static GroupNotice ToGroupNotice(this SQLiteDataReader reader) => new GroupNotice
         {
             Group = new UGI(reader.GetUUID("GroupID")),
             ID = reader.GetUUID("NoticeID"),

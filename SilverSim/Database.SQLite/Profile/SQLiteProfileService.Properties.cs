@@ -43,7 +43,7 @@ namespace SilverSim.Database.SQLite.Profile
                         {
                             if (reader.Read())
                             {
-                                return new ProfileProperties()
+                                return new ProfileProperties
                                 {
                                     User = user,
                                     Partner = new UUI(reader.GetUUID("profilePartner")),
@@ -63,7 +63,7 @@ namespace SilverSim.Database.SQLite.Profile
                             }
                             else
                             {
-                                return new ProfileProperties()
+                                return new ProfileProperties
                                 {
                                     User = user,
                                     Partner = UUI.Unknown,
