@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
+using System.Text;
 using SQLiteMigrationException = SilverSim.Database.SQLite.SQLiteUtilities.SQLiteMigrationException;
 
 namespace SilverSim.Database.SQLite._Migration
@@ -55,7 +56,7 @@ namespace SilverSim.Database.SQLite._Migration
             uint tableRevision,
             ILog log)
         {
-            SQLiteCommandBuilder b = new SQLiteCommandBuilder();
+            var b = new SQLiteCommandBuilder();
             log.InfoFormat("Creating table '{0}' at revision {1}", table.Name, tableRevision);
             var fieldSqls = new List<string>();
             foreach (IColumnInfo field in fields.Values)
@@ -67,15 +68,15 @@ namespace SilverSim.Database.SQLite._Migration
                 fieldSqls.Add(primaryKey.FieldSql());
             }
 
-            string cmd = "CREATE TABLE " + b.QuoteIdentifier(table.Name) + " (";
-            cmd += string.Join(",", fieldSqls);
-            cmd += ");";
+            var cmd = new StringBuilder("CREATE TABLE " + b.QuoteIdentifier(table.Name) + " (");
+            cmd.Append(string.Join(",", fieldSqls));
+            cmd.Append(");");
             foreach(NamedKeyInfo key in tableKeys.Values)
             {
-                cmd += key.Sql(table.Name);
+                cmd.Append(key.Sql(table.Name));
             }
-            cmd += string.Format("REPLACE INTO migrations (tablename, revision) VALUES ('{0}', {1});", table.Name, tableRevision);
-            ExecuteStatement(conn, cmd, log);
+            cmd.AppendFormat("REPLACE INTO migrations (tablename, revision) VALUES ('{0}', {1});", table.Name, tableRevision);
+            ExecuteStatement(conn, cmd.ToString(), log);
         }
 
         public static void MigrateTables(this SQLiteConnection conn, IMigrationElement[] processTable, ILog log)

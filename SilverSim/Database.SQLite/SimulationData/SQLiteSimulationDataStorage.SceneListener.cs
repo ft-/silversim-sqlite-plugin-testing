@@ -70,7 +70,11 @@ namespace SilverSim.Database.SQLite.SimulationData
                 public int CompareTo(PrimKey other)
                 {
                     int i = PartID.CompareTo(other.PartID);
-                    if (i == 0) i = ItemID.CompareTo(other.ItemID);
+                    if (i == 0)
+                    {
+                        i = ItemID.CompareTo(other.ItemID);
+                    }
+
                     return i;
                 }
 
@@ -157,9 +161,9 @@ namespace SilverSim.Database.SQLite.SimulationData
 
             private void ProcessPrimItemDeletions(SQLiteConnection conn)
             {
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
 
-                List<PrimKey> removedItems = new List<PrimKey>();
+                var removedItems = new List<PrimKey>();
 
                 foreach (PrimKey k in m_PrimItemDeletions.Keys.ToArray())
                 {
@@ -332,8 +336,6 @@ namespace SilverSim.Database.SQLite.SimulationData
 
             protected override void OnIdle()
             {
-                StringBuilder sb = new StringBuilder();
-
                 using (var conn = new SQLiteConnection(m_ConnectionString))
                 {
                     conn.Open();

@@ -132,12 +132,9 @@ namespace SilverSim.Database.SQLite.ExperienceService
                         cmd.Parameters.AddParameter("@key", key);
                         using (SQLiteDataReader reader = cmd.ExecuteReader())
                         {
-                            if (reader.Read())
+                            if (reader.Read() && (string)reader["Value"] != orig_value)
                             {
-                                if ((string)reader["Value"] != orig_value)
-                                {
-                                    return false;
-                                }
+                                return false;
                             }
                         }
                     }
