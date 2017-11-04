@@ -65,15 +65,31 @@ namespace SilverSim.Database.SQLite.ExperienceService
 
             set
             {
-                var vals = new Dictionary<string, object>
+                if (value)
                 {
-                    ["ExperienceID"] = experienceID,
-                    ["Admin"] = agent,
-                };
-                using (var conn = new SQLiteConnection(m_ConnectionString))
+                    var vals = new Dictionary<string, object>
+                    {
+                        ["ExperienceID"] = experienceID,
+                        ["Admin"] = agent,
+                    };
+                    using (var conn = new SQLiteConnection(m_ConnectionString))
+                    {
+                        conn.Open();
+                        conn.ReplaceInto("experienceadmins", vals);
+                    }
+                }
+                else
                 {
-                    conn.Open();
-                    conn.ReplaceInto("experienceadmins", vals);
+                    using (var conn = new SQLiteConnection(m_ConnectionString))
+                    {
+                        conn.Open();
+                        using (var cmd = new SQLiteCommand("DELETE FROM experienceadmins WHERE ExperienceID = @experienceid AND Admin LIKE @admin", conn))
+                        {
+                            cmd.Parameters.AddParameter("@experienceid", experienceID);
+                            cmd.Parameters.AddParameter("@admin", agent.ID.ToString() + "%");
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
                 }
             }
         }
