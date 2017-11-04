@@ -295,7 +295,6 @@ namespace SilverSim.Database.SQLite._Migration
                 ExecuteStatement(conn, string.Format("REPLACE INTO migrations (tablename, revision) VALUES ('{0}',{1});", b.QuoteIdentifier(table.Name), processingTableRevision), log);
                 insideTransaction.Commit();
                 insideTransaction.Dispose();
-                insideTransaction = null;
                 if (currentAtRevision != 0)
                 {
                     currentAtRevision = processingTableRevision;
