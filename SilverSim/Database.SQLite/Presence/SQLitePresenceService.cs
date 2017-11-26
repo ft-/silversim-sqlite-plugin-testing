@@ -145,12 +145,19 @@ namespace SilverSim.Database.SQLite.Presence
         {
             get
             {
+                bool isUserIdSet = userID != UUID.Zero;
                 using (var conn = new SQLiteConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new SQLiteCommand("SELECT * FROM presence WHERE SessionID = @sessionID", conn))
+                    using (var cmd = new SQLiteCommand(isUserIdSet ?
+                        "SELECT * FROM presence WHERE SessionID = @sessionID AND UserID = @userid" :
+                        "SELECT * FROM presence WHERE SessionID = @sessionID", conn))
                     {
                         cmd.Parameters.AddParameter("@sessionID", sessionID);
+                        if(isUserIdSet)
+                        {
+                            cmd.Parameters.AddParameter("@userid", userID);
+                        }
                         using (SQLiteDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
@@ -192,7 +199,7 @@ namespace SilverSim.Database.SQLite.Presence
                 ["UserID"] = pInfo.UserID.ID,
                 ["SessionID"] = pInfo.SessionID,
                 ["SecureSessionID"] = pInfo.SecureSessionID,
-                ["RegionID"] = UUID.Zero,
+                ["RegionID"] = pInfo.RegionID,
                 ["LastSeen"] = Date.Now
             };
             using (var conn = new SQLiteConnection(m_ConnectionString))
