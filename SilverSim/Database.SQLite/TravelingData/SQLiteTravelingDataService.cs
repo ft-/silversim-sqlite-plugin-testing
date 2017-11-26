@@ -246,7 +246,7 @@ namespace SilverSim.Database.SQLite.TravelingData
                 ["GridExternalName"] = data.GridExternalName,
                 ["ServiceToken"] = data.ServiceToken,
                 ["ClientIPAddress"] = data.ClientIPAddress,
-                ["Timestamp"] = Date.Now
+                ["Timestamp"] = data.Timestamp
             };
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
