@@ -117,6 +117,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                 Description = (string)dbReader["Description"],
                 SitTargetOffset = dbReader.GetVector3("SitTargetOffset"),
                 SitTargetOrientation = dbReader.GetQuaternion("SitTargetOrientation"),
+                SitAnimation = (string)dbReader["SitAnimation"],
                 Creator = dbReader.GetUUI("Creator"),
                 CreationDate = dbReader.GetDate("CreationDate"),
                 RezDate = dbReader.GetDate("RezDate"),
