@@ -202,7 +202,10 @@ namespace SilverSim.Database.SQLite.SimulationData
                 IsReturnAtEdge = dbReader.GetBool("IsReturnAtEdge"),
                 IsBlockGrabObject = dbReader.GetBool("IsBlockGrabObject"),
                 SandboxOrigin = dbReader.GetVector3("SandboxOrigin"),
-                ExtendedMesh = new ObjectPart.ExtendedMeshParams { DbSerialization = dbReader.GetBytes("ExtendedMeshData") }
+                ExtendedMesh = new ObjectPart.ExtendedMeshParams { DbSerialization = dbReader.GetBytes("ExtendedMeshData") },
+                IsSitTargetActive = dbReader.GetBool("IsSitTargetActive"),
+                IsScriptedSitOnly = dbReader.GetBool("IsScriptedSitOnly"),
+                AllowUnsit = dbReader.GetBool("AllowUnsit")
             };
 
             using (var ms = new MemoryStream(dbReader.GetBytes("DynAttrs")))
