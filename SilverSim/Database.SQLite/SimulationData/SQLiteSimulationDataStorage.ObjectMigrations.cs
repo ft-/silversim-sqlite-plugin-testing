@@ -193,7 +193,7 @@ namespace SilverSim.Database.SQLite.SimulationData
             new TableRevision(20),
             new AddColumn<bool>("IsSitTargetActive") { IsNullAllowed = false, Default = false },
             new AddColumn<bool>("IsScriptedSitOnly") { IsNullAllowed = false, Default = false },
-            new AddColumn<bool>("AllowUnsit") { IsNullAllowed = false, Default = false },
+            new AddColumn<bool>("AllowUnsit") { IsNullAllowed = false, Default = true },
             #endregion
 
             #region Table primitems
