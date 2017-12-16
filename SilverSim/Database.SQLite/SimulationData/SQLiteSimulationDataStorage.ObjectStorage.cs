@@ -205,7 +205,10 @@ namespace SilverSim.Database.SQLite.SimulationData
                 ExtendedMesh = new ObjectPart.ExtendedMeshParams { DbSerialization = dbReader.GetBytes("ExtendedMeshData") },
                 IsSitTargetActive = dbReader.GetBool("IsSitTargetActive"),
                 IsScriptedSitOnly = dbReader.GetBool("IsScriptedSitOnly"),
-                AllowUnsit = dbReader.GetBool("AllowUnsit")
+                AllowUnsit = dbReader.GetBool("AllowUnsit"),
+                IsUnSitTargetActive = dbReader.GetBool("IsUnSitTargetActive"),
+                UnSitTargetOffset = dbReader.GetVector3("UnSitTargetOffset"),
+                UnSitTargetOrientation = dbReader.GetQuaternion("UnSitTargetOrientation")
             };
 
             using (var ms = new MemoryStream(dbReader.GetBytes("DynAttrs")))
