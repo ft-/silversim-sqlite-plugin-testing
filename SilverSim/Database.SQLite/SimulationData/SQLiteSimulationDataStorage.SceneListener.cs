@@ -388,7 +388,9 @@ namespace SilverSim.Database.SQLite.SimulationData
                     ["SalePermMask"] = item.SaleInfo.PermMask,
                     ["PermsGranter"] = grantinfo.PermsGranter.ToString(),
                     ["PermsMask"] = grantinfo.PermsMask,
-                    ["NextOwnerAssetID"] = item.NextOwnerAssetID
+                    ["NextOwnerAssetID"] = item.NextOwnerAssetID,
+                    ["ExperienceID"] = item.ExperienceID,
+                    ["CollisionFilterData"] = item.CollisionFilter.DbSerialization
                 };
             }
 
@@ -495,7 +497,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                     ["AllowUnsit"] = objpart.AllowUnsit,
                     ["IsUnSitTargetActive"] = objpart.IsUnSitTargetActive,
                     ["UnSitTargetOffset"] = objpart.UnSitTargetOffset,
-                    ["UnSitTargetOrientation"] = objpart.UnSitTargetOrientation
+                    ["UnSitTargetOrientation"] = objpart.UnSitTargetOrientation,
                 };
                 using (var ms = new MemoryStream())
                 {
