@@ -443,7 +443,7 @@ namespace SilverSim.Database.SQLite.UserAccounts
                 connection.Open();
                 connection.InsideTransaction((transaction) =>
                 {
-                    connection.InsertInto("useraccounts", data);
+                    connection.InsertInto("useraccounts", data, transaction);
                     using (var cmd = new SQLiteCommand("UPDATE useraccounts_serial SET SerialNumber = SerialNumber + 1", connection)
                     {
                         Transaction = transaction
