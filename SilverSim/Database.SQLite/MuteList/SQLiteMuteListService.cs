@@ -51,7 +51,7 @@ namespace SilverSim.Database.SQLite.MuteList
             /* intentionally left empty */
         }
 
-        public override List<MuteListEntry> GetList(UUID muteListOwnerID)
+        public override List<MuteListEntry> GetList(UUID muteListOwnerID, uint crc)
         {
             var res = new List<MuteListEntry>();
             using (var conn = new SQLiteConnection(m_ConnectionString))
