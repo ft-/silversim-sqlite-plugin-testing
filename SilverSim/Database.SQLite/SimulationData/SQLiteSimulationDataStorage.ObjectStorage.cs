@@ -21,6 +21,7 @@
 
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;
@@ -140,27 +141,27 @@ namespace SilverSim.Database.SQLite.SimulationData
                 MediaURL = (string)dbReader["MediaURL"],
 
                 AngularVelocity = dbReader.GetVector3("AngularVelocity"),
-                PointLight = new ObjectPart.PointLightParam
+                PointLight = new PointLightParam
                 {
                     DbSerialization = dbReader.GetBytes("LightData")
                 },
-                Projection = new ObjectPart.ProjectionParam
+                Projection = new ProjectionParam
                 {
                     DbSerialization = dbReader.GetBytes("ProjectionData"),
                 },
-                Text = new ObjectPart.TextParam
+                Text = new TextParam
                 {
                     Serialization = dbReader.GetBytes("HoverTextData")
                 },
-                Flexible = new ObjectPart.FlexibleParam
+                Flexible = new FlexibleParam
                 {
                     DbSerialization = dbReader.GetBytes("FlexibleData")
                 },
-                Sound = new ObjectPart.SoundParam
+                Sound = new SoundParam
                 {
                     Serialization = dbReader.GetBytes("LoopedSoundData")
                 },
-                CollisionSound = new ObjectPart.CollisionSoundParam
+                CollisionSound = new CollisionSoundParam
                 {
                     Serialization = dbReader.GetBytes("ImpactSoundData")
                 },
@@ -202,7 +203,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                 IsReturnAtEdge = dbReader.GetBool("IsReturnAtEdge"),
                 IsBlockGrabObject = dbReader.GetBool("IsBlockGrabObject"),
                 SandboxOrigin = dbReader.GetVector3("SandboxOrigin"),
-                ExtendedMesh = new ObjectPart.ExtendedMeshParams { DbSerialization = dbReader.GetBytes("ExtendedMeshData") },
+                ExtendedMesh = new ExtendedMeshParams { DbSerialization = dbReader.GetBytes("ExtendedMeshData") },
                 IsSitTargetActive = dbReader.GetBool("IsSitTargetActive"),
                 IsScriptedSitOnly = dbReader.GetBool("IsScriptedSitOnly"),
                 AllowUnsit = dbReader.GetBool("AllowUnsit"),

@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.ServiceInterfaces.Purge;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
@@ -120,12 +121,12 @@ namespace SilverSim.Database.SQLite.SimulationData
                     {
                         while (dbReader.Read())
                         {
-                            ObjectPart.PrimitiveShape shape = new ObjectPart.PrimitiveShape { Serialization = dbReader.GetBytes("PrimitiveShapeData") };
-                            ParticleSystem particleSystem = new ParticleSystem(dbReader.GetBytes("ParticleSystem"), 0);
-                            TextureEntry te = new TextureEntry(dbReader.GetBytes("TextureEntryBytes"));
-                            ObjectPart.ProjectionParam proj = new ObjectPart.ProjectionParam { DbSerialization = dbReader.GetBytes("ProjectionData") };
-                            ObjectPart.SoundParam sound = new ObjectPart.SoundParam { Serialization = dbReader.GetBytes("LoopedSoundData") };
-                            ObjectPart.CollisionSoundParam colsound = new ObjectPart.CollisionSoundParam { Serialization = dbReader.GetBytes("ImpactSoundData") };
+                            var shape = new ObjectPart.PrimitiveShape { Serialization = dbReader.GetBytes("PrimitiveShapeData") };
+                            var particleSystem = new ParticleSystem(dbReader.GetBytes("ParticleSystem"), 0);
+                            var te = new TextureEntry(dbReader.GetBytes("TextureEntryBytes"));
+                            var proj = new ProjectionParam { DbSerialization = dbReader.GetBytes("ProjectionData") };
+                            var sound = new SoundParam { Serialization = dbReader.GetBytes("LoopedSoundData") };
+                            var colsound = new CollisionSoundParam { Serialization = dbReader.GetBytes("ImpactSoundData") };
                             if (shape.SculptMap != UUID.Zero)
                             {
                                 action(shape.SculptMap);
