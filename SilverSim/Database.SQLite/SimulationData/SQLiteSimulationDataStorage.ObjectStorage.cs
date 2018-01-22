@@ -209,7 +209,8 @@ namespace SilverSim.Database.SQLite.SimulationData
                 AllowUnsit = dbReader.GetBool("AllowUnsit"),
                 IsUnSitTargetActive = dbReader.GetBool("IsUnSitTargetActive"),
                 UnSitTargetOffset = dbReader.GetVector3("UnSitTargetOffset"),
-                UnSitTargetOrientation = dbReader.GetQuaternion("UnSitTargetOrientation")
+                UnSitTargetOrientation = dbReader.GetQuaternion("UnSitTargetOrientation"),
+                LocalizationSerialization = dbReader.GetBytes("LocalizationData")
             };
 
             using (var ms = new MemoryStream(dbReader.GetBytes("DynAttrs")))

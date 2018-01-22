@@ -198,6 +198,8 @@ namespace SilverSim.Database.SQLite.SimulationData
             new AddColumn<bool>("IsUnSitTargetActive") { IsNullAllowed = false, Default = false },
             new AddColumn<Vector3>("UnSitTargetOffset") { IsNullAllowed = false, Default = Vector3.Zero },
             new AddColumn<Quaternion>("UnSitTargetOrientation") { IsNullAllowed = false, Default = Quaternion.Identity },
+            new TableRevision(22),
+            new AddColumn<byte[]>("LocalizationData") { IsLong = true },
             #endregion
 
             #region Table primitems
