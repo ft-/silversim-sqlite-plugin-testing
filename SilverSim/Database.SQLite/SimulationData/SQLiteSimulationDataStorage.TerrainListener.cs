@@ -26,10 +26,8 @@ using SilverSim.Viewer.Messages.LayerData;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace SilverSim.Database.SQLite.SimulationData
 {

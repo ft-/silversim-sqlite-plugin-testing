@@ -21,7 +21,6 @@
 
 using log4net;
 using Nini.Config;
-using System.Data.SQLite;
 using SilverSim.Database.SQLite._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Asset;
@@ -31,6 +30,7 @@ using SilverSim.Types.Asset;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.SQLite;
 using System.IO;
 using System.Security.Cryptography;
 

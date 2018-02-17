@@ -22,11 +22,6 @@
 using SilverSim.Database.SQLite._Migration;
 using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SilverSim.Database.SQLite.SimulationData
 {

@@ -20,12 +20,11 @@
 // exception statement from your version.
 
 using log4net;
-using System.Data.SQLite;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Database;
 using System.Collections.Generic;
-using System.IO;
+using System.Data.SQLite;
 
 namespace SilverSim.Tests.Preconditions.SQLite
 {

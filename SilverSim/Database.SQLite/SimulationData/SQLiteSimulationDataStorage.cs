@@ -29,7 +29,6 @@ using SilverSim.Types;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.SQLite;
-using System;
 
 namespace SilverSim.Database.SQLite.SimulationData
 {
