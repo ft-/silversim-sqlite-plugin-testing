@@ -108,7 +108,7 @@ namespace SilverSim.Database.SQLite.Asset
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT id FROM assetrefs WHERE usesprocessed = 0", conn))
+                using (var cmd = new SQLiteCommand("SELECT id FROM assetrefs WHERE usesprocessed = 0 LIMIT 1000", conn))
                 {
                     using (SQLiteDataReader dbReader = cmd.ExecuteReader())
                     {
