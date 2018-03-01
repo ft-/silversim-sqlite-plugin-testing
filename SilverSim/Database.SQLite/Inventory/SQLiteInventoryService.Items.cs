@@ -35,7 +35,7 @@ namespace SilverSim.Database.SQLite.Inventory
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("SELECT ID FROM " + m_InventoryItemTable + " WHERE ID = @itemid", connection))
+                using (var cmd = new SQLiteCommand("SELECT ID FROM " + m_InventoryItemTable + " WHERE ID = @itemid LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@itemid", key);
                     using (SQLiteDataReader dbReader = cmd.ExecuteReader())
@@ -56,7 +56,7 @@ namespace SilverSim.Database.SQLite.Inventory
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE ID = @itemid", connection))
+                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE ID = @itemid LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@itemid", key);
                     using (SQLiteDataReader dbReader = cmd.ExecuteReader())
@@ -127,7 +127,7 @@ namespace SilverSim.Database.SQLite.Inventory
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("SELECT ID FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ID = @itemid", connection))
+                using (var cmd = new SQLiteCommand("SELECT ID FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ID = @itemid LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@ownerid", principalID);
                     cmd.Parameters.AddParameter("@itemid", key);
@@ -149,7 +149,7 @@ namespace SilverSim.Database.SQLite.Inventory
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ID = @itemid", connection))
+                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ID = @itemid LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@ownerid", principalID);
                     cmd.Parameters.AddParameter("@itemid", key);

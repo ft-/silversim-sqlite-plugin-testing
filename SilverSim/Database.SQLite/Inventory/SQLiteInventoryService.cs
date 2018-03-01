@@ -154,7 +154,7 @@ namespace SilverSim.Database.SQLite.Inventory
 
         private bool TryGetParentFolderId(SQLiteConnection connection, UUID principalID, UUID folderID, out UUID parentFolderID)
         {
-            using (var cmd = new SQLiteCommand("SELECT ParentFolderID FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ID = @folderid", connection))
+            using (var cmd = new SQLiteCommand("SELECT ParentFolderID FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ID = @folderid LIMIT 1", connection))
             {
                 cmd.Parameters.AddParameter("@ownerid", principalID);
                 cmd.Parameters.AddParameter("@folderid", folderID);
@@ -175,7 +175,7 @@ namespace SilverSim.Database.SQLite.Inventory
         {
             if(parentFolderID == UUID.Zero)
             {
-                using (var cmd = new SQLiteCommand("SELECT NULL FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @parentfolderid", conn))
+                using (var cmd = new SQLiteCommand("SELECT NULL FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @parentfolderid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@ownerid", principalID);
                     cmd.Parameters.AddParameter("@parentfolderid", UUID.Zero);

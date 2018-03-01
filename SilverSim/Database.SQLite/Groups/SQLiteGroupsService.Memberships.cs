@@ -99,11 +99,9 @@ namespace SilverSim.Database.SQLite.Groups
             {
                 conn.Open();
                 using (var cmd = new SQLiteCommand(
-                        "SELECT g.*, m.PrincipalID, m.SelectedRoleID AS ActiveRoleID, m.Contribution, m.ListInProfile, m.AcceptNotices, m.AccessToken, " +
-                        "r.RoleID, r.Name AS RoleName, r.Description AS RoleDescription, r.Title as RoleTitle, r.Powers as RolePowers, " +
-                        RCountQuery + "," + MCountQuery + " FROM (groupmemberships AS m INNER JOIN groups AS g ON m.GroupID = g.GroupID) " +
+                        "SELECT NULL FROM (groupmemberships AS m INNER JOIN groups AS g ON m.GroupID = g.GroupID) " +
                         "INNER JOIN grouproles AS r ON m.SelectedRoleID = r.RoleID " +
-                        "WHERE m.PrincipalID = @principalid", conn))
+                        "WHERE m.PrincipalID = @principalid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@principalid", principal.ID);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -125,7 +123,7 @@ namespace SilverSim.Database.SQLite.Groups
                         "r.RoleID, r.Name AS RoleName, r.Description AS RoleDescription, r.Title as RoleTitle, r.Powers as RolePowers, " +
                         RCountQuery + "," + MCountQuery + " FROM (groupmemberships AS m INNER JOIN groups AS g ON m.GroupID = g.GroupID) " +
                         "INNER JOIN grouproles AS r ON m.SelectedRoleID = r.RoleID " +
-                        "WHERE m.PrincipalID = @principalid", conn))
+                        "WHERE m.PrincipalID = @principalid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@principalid", principal.ID);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())

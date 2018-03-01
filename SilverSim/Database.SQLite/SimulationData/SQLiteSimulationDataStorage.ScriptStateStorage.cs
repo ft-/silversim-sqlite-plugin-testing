@@ -34,7 +34,7 @@ namespace SilverSim.Database.SQLite.SimulationData
             {
                 connection.Open();
 
-                using (var cmd = new SQLiteCommand("SELECT ScriptState FROM scriptstates WHERE RegionID = @regionid AND PrimID = @primid AND ItemID = @itemid", connection))
+                using (var cmd = new SQLiteCommand("SELECT ScriptState FROM scriptstates WHERE RegionID = @regionid AND PrimID = @primid AND ItemID = @itemid LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     cmd.Parameters.AddParameter("@primid", primID);

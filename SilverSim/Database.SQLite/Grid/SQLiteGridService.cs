@@ -121,7 +121,7 @@ namespace SilverSim.Database.SQLite.Grid
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_TableName + " WHERE uuid = @id AND ScopeID = @scopeid", connection))
+                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_TableName + " WHERE uuid = @id AND ScopeID = @scopeid LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@id", regionID);
                     cmd.Parameters.AddParameter("@scopeid", scopeID);
@@ -145,7 +145,7 @@ namespace SilverSim.Database.SQLite.Grid
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_TableName + " WHERE uuid = @id AND ScopeID = @scopeid", connection))
+                using (var cmd = new SQLiteCommand("SELECT NULL FROM " + m_TableName + " WHERE uuid = @id AND ScopeID = @scopeid LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@id", regionID);
                     cmd.Parameters.AddParameter("@scopeid", scopeID);
@@ -175,7 +175,7 @@ namespace SilverSim.Database.SQLite.Grid
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_TableName + " WHERE locX <= @x AND locY <= @y AND locX + sizeX > @x AND locY + sizeY > @y AND ScopeID = @scopeid", connection))
+                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_TableName + " WHERE locX <= @x AND locY <= @y AND locX + sizeX > @x AND locY + sizeY > @y AND ScopeID = @scopeid LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@x", gridX);
                     cmd.Parameters.AddParameter("@y", gridY);
@@ -200,7 +200,7 @@ namespace SilverSim.Database.SQLite.Grid
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_TableName + " WHERE locX <= @x AND locY <= @y AND locX + sizeX > @x AND locY + sizeY > @y AND ScopeID = @scopeid", connection))
+                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_TableName + " WHERE locX <= @x AND locY <= @y AND locX + sizeX > @x AND locY + sizeY > @y AND ScopeID = @scopeid LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@x", gridX);
                     cmd.Parameters.AddParameter("@y", gridY);
@@ -231,7 +231,7 @@ namespace SilverSim.Database.SQLite.Grid
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_TableName + " WHERE regionName = @name AND ScopeID = @scopeid", connection))
+                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_TableName + " WHERE regionName = @name AND ScopeID = @scopeid LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@name", regionName);
                     cmd.Parameters.AddParameter("@scopeid", scopeID);
@@ -255,7 +255,7 @@ namespace SilverSim.Database.SQLite.Grid
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_TableName + " WHERE regionName = @name AND ScopeID = @scopeid", connection))
+                using (var cmd = new SQLiteCommand("SELECT NULL FROM " + m_TableName + " WHERE regionName = @name AND ScopeID = @scopeid LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@name", regionName);
                     cmd.Parameters.AddParameter("@scopeid", scopeID);
@@ -285,7 +285,7 @@ namespace SilverSim.Database.SQLite.Grid
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_TableName + " WHERE uuid = @id", connection))
+                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_TableName + " WHERE uuid = @id LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@id", regionID);
                     using (SQLiteDataReader dbReader = cmd.ExecuteReader())
@@ -308,7 +308,7 @@ namespace SilverSim.Database.SQLite.Grid
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM " + m_TableName + " WHERE uuid = @id", connection))
+                using (var cmd = new SQLiteCommand("SELECT NULL FROM " + m_TableName + " WHERE uuid = @id LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@id", regionID);
                     using (SQLiteDataReader dbReader = cmd.ExecuteReader())

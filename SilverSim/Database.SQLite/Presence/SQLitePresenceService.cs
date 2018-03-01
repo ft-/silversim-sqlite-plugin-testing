@@ -150,8 +150,8 @@ namespace SilverSim.Database.SQLite.Presence
                 {
                     conn.Open();
                     using (var cmd = new SQLiteCommand(isUserIdSet ?
-                        "SELECT * FROM presence WHERE SessionID = @sessionID AND UserID = @userid" :
-                        "SELECT * FROM presence WHERE SessionID = @sessionID", conn))
+                        "SELECT * FROM presence WHERE SessionID = @sessionID AND UserID = @userid LIMIT 1" :
+                        "SELECT * FROM presence WHERE SessionID = @sessionID LIMIT 1", conn))
                     {
                         cmd.Parameters.AddParameter("@sessionID", sessionID);
                         if(isUserIdSet)

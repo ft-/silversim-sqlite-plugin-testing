@@ -35,7 +35,7 @@ namespace SilverSim.Database.SQLite.Groups
                 using (var conn = new SQLiteConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new SQLiteCommand("SELECT ActiveGroupID FROM activegroup WHERE PrincipalID = @principalid", conn))
+                    using (var cmd = new SQLiteCommand("SELECT ActiveGroupID FROM activegroup WHERE PrincipalID = @principalid LIMIT 1", conn))
                     {
                         cmd.Parameters.AddParameter("@principalid", principalID.ID);
                         using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -102,7 +102,7 @@ namespace SilverSim.Database.SQLite.Groups
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT ActiveGroupID FROM activegroup WHERE PrincipalID = @principalid", conn))
+                using (var cmd = new SQLiteCommand("SELECT ActiveGroupID FROM activegroup WHERE PrincipalID = @principalid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@principalid", principalID.ID);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -126,7 +126,7 @@ namespace SilverSim.Database.SQLite.Groups
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT SelectedRoleID FROM groupmemberships WHERE PrincipalID = @principalid AND GroupID = @groupid", conn))
+                using (var cmd = new SQLiteCommand("SELECT SelectedRoleID FROM groupmemberships WHERE PrincipalID = @principalid AND GroupID = @groupid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@groupid", group.ID);
                     cmd.Parameters.AddParameter("@principalid", principal.ID);

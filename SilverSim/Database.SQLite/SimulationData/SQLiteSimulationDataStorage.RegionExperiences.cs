@@ -119,7 +119,7 @@ namespace SilverSim.Database.SQLite.SimulationData
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM regionexperiences WHERE RegionID = @regionid AND ExperienceID = @experienceid", conn))
+                using (var cmd = new SQLiteCommand("SELECT * FROM regionexperiences WHERE RegionID = @regionid AND ExperienceID = @experienceid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     cmd.Parameters.AddParameter("@experienceid", experienceID);

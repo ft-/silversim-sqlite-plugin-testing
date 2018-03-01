@@ -232,7 +232,7 @@ namespace SilverSim.Database.SQLite.Friends
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand(m_InnerJoinSelectFull + "WHERE A.UserID = @userid AND A.FriendID = @friendid", connection))
+                using (var cmd = new SQLiteCommand(m_InnerJoinSelectFull + "WHERE A.UserID = @userid AND A.FriendID = @friendid LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@userid", user.ID);
                     cmd.Parameters.AddParameter("@friendid", friend.ID);

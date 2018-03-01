@@ -234,7 +234,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                 conn.Open();
                 return conn.InsideTransaction((transaction) =>
                 {
-                    using (var cmd = new SQLiteCommand("SELECT Owner FROM experiences WHERE ID = @experienceid", conn)
+                    using (var cmd = new SQLiteCommand("SELECT Owner FROM experiences WHERE ID = @experienceid LIMIT 1", conn)
                     {
                         Transaction = transaction
                     })
@@ -295,7 +295,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM experiences WHERE ID = @id", conn))
+                using (var cmd = new SQLiteCommand("SELECT * FROM experiences WHERE ID = @id LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", experienceID);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -350,7 +350,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                     }
                     if (!isallowed)
                     {
-                        using (var cmd = new SQLiteCommand("SELECT Owner FROM experiences WHERE ID = @id", conn)
+                        using (var cmd = new SQLiteCommand("SELECT Owner FROM experiences WHERE ID = @id LIMIT 1", conn)
                         {
                             Transaction = transaction
                         })

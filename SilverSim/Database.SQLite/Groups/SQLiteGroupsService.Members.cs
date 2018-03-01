@@ -127,7 +127,7 @@ namespace SilverSim.Database.SQLite.Groups
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT GroupID FROM groupmemberships WHERE GroupID = @groupid AND PrincipalID = @principalid", conn))
+                using (var cmd = new SQLiteCommand("SELECT GroupID FROM groupmemberships WHERE GroupID = @groupid AND PrincipalID = @principalid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@groupid", group.ID);
                     cmd.Parameters.AddParameter("@principalid", principal.ID);
@@ -180,7 +180,7 @@ namespace SilverSim.Database.SQLite.Groups
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM groupmemberships WHERE GroupID = @groupid AND PrincipalID = @principalid", conn))
+                using (var cmd = new SQLiteCommand("SELECT * FROM groupmemberships WHERE GroupID = @groupid AND PrincipalID = @principalid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@groupid", group.ID);
                     cmd.Parameters.AddParameter("@principalid", principal.ID);

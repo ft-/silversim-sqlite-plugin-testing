@@ -33,7 +33,7 @@ namespace SilverSim.Database.SQLite.SimulationData
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT SerializedData FROM environmentcontroller WHERE RegionID = @regionid", conn))
+                using (var cmd = new SQLiteCommand("SELECT SerializedData FROM environmentcontroller WHERE RegionID = @regionid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())

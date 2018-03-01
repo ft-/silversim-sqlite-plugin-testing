@@ -93,7 +93,7 @@ namespace SilverSim.Database.SQLite.GridUser
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM griduser WHERE ID = @id", conn))
+                using (var cmd = new SQLiteCommand("SELECT * FROM griduser WHERE ID = @id LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", userID);
                     using (SQLiteDataReader dbReader = cmd.ExecuteReader())
@@ -117,7 +117,7 @@ namespace SilverSim.Database.SQLite.GridUser
                 using (var conn = new SQLiteConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new SQLiteCommand("SELECT * FROM griduser WHERE ID = @id", conn))
+                    using (var cmd = new SQLiteCommand("SELECT * FROM griduser WHERE ID = @id LIMIT 1", conn))
                     {
                         cmd.Parameters.AddParameter("@id", userID);
                         using (SQLiteDataReader dbReader = cmd.ExecuteReader())

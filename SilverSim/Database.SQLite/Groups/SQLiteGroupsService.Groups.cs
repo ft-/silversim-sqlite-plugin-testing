@@ -74,7 +74,7 @@ namespace SilverSim.Database.SQLite.Groups
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT GroupID FROM groups WHERE Name = @groupname", conn))
+                using (var cmd = new SQLiteCommand("SELECT GroupID FROM groups WHERE Name = @groupname LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@groupname", groupName);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -92,7 +92,7 @@ namespace SilverSim.Database.SQLite.Groups
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT GroupID FROM groups WHERE GroupID = @groupid", conn))
+                using (var cmd = new SQLiteCommand("SELECT GroupID FROM groups WHERE GroupID = @groupid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@groupid", groupID);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -195,7 +195,7 @@ namespace SilverSim.Database.SQLite.Groups
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.Name = @groupname", conn))
+                using (var cmd = new SQLiteCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.Name = @groupname LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@groupname", groupName);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -218,7 +218,7 @@ namespace SilverSim.Database.SQLite.Groups
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.GroupID = @groupid", conn))
+                using (var cmd = new SQLiteCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.GroupID = @groupid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@groupid", group.ID);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -241,7 +241,7 @@ namespace SilverSim.Database.SQLite.Groups
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT Name, Location FROM groups WHERE GroupID = @groupid", conn))
+                using (var cmd = new SQLiteCommand("SELECT Name, Location FROM groups WHERE GroupID = @groupid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@groupid", groupID);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())

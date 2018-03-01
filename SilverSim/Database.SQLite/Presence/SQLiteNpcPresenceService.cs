@@ -134,7 +134,7 @@ namespace SilverSim.Database.SQLite.Presence
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM npcpresence WHERE NpcID = @npcid", conn))
+                using (var cmd = new SQLiteCommand("SELECT * FROM npcpresence WHERE NpcID = @npcid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@npcid", npcid);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -168,7 +168,7 @@ namespace SilverSim.Database.SQLite.Presence
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM npcpresence WHERE RegionID = @regionID AND FirstName = @first AND LastName = @last", conn))
+                using (var cmd = new SQLiteCommand("SELECT * FROM npcpresence WHERE RegionID = @regionID AND FirstName = @first AND LastName = @last LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@regionID", regionID);
                     cmd.Parameters.AddParameter("@first", firstname);
@@ -192,7 +192,7 @@ namespace SilverSim.Database.SQLite.Presence
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM npcpresence WHERE NpcID = @npcid", conn))
+                using (var cmd = new SQLiteCommand("SELECT * FROM npcpresence WHERE NpcID = @npcid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@npcid", npcid);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())

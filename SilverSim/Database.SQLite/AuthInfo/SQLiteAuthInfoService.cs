@@ -121,7 +121,7 @@ namespace SilverSim.Database.SQLite.AuthInfo
                 using (var connection = new SQLiteConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (var cmd = new SQLiteCommand("SELECT * FROM auth WHERE UserID = @id", connection))
+                    using (var cmd = new SQLiteCommand("SELECT * FROM auth WHERE UserID = @id LIMIT 1", connection))
                     {
                         cmd.Parameters.AddParameter("@id", accountid);
                         using (SQLiteDataReader reader = cmd.ExecuteReader())

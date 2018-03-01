@@ -122,7 +122,7 @@ namespace SilverSim.Database.SQLite.Groups
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT InviteID from groupinvites WHERE InviteID = @inviteid", conn))
+                using (var cmd = new SQLiteCommand("SELECT InviteID from groupinvites WHERE InviteID = @inviteid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@inviteid", groupInviteID);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -175,7 +175,7 @@ namespace SilverSim.Database.SQLite.Groups
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT * from groupinvites WHERE InviteID = @inviteid", conn))
+                using (var cmd = new SQLiteCommand("SELECT * from groupinvites WHERE InviteID = @inviteid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@inviteid", groupInviteID);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())

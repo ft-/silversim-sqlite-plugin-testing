@@ -86,7 +86,7 @@ namespace SilverSim.Database.SQLite.Maptile
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM maptiles WHERE LocX = @locx AND LocY = @locy AND ZoomLevel = @zoomlevel", connection))
+                using (var cmd = new SQLiteCommand("SELECT * FROM maptiles WHERE LocX = @locx AND LocY = @locy AND ZoomLevel = @zoomlevel LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@locx", location.X);
                     cmd.Parameters.AddParameter("@locy", location.Y);

@@ -40,10 +40,8 @@ namespace SilverSim.Database.SQLite.SimulationData
                 using (var connection = new SQLiteConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (var cmd = new SQLiteCommand("SELECT * FROM parcels WHERE RegionID = '" + regionID.ToString() + "' AND \"ParcelID\" = '" + parcelID.ToString() + "'", connection))
+                    using (var cmd = new SQLiteCommand("SELECT * FROM parcels WHERE RegionID = '" + regionID.ToString() + "' AND \"ParcelID\" = '" + parcelID.ToString() + "' LIMIT 1", connection))
                     {
-                        cmd.Parameters.AddParameter("@regionid", regionID);
-                        cmd.Parameters.AddParameter("@parcelid", parcelID);
                         using (SQLiteDataReader dbReader = cmd.ExecuteReader())
                         {
                             if (!dbReader.Read())

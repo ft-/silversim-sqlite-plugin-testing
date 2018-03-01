@@ -56,7 +56,7 @@ namespace SilverSim.Database.SQLite.Profile
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM classifieds WHERE classifieduuid = @uuid", conn))
+                using (var cmd = new SQLiteCommand("SELECT * FROM classifieds WHERE classifieduuid = @uuid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@uuid", id);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -95,7 +95,7 @@ namespace SilverSim.Database.SQLite.Profile
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT classifieduuid FROM classifieds WHERE classifieduuid = @uuid", conn))
+                using (var cmd = new SQLiteCommand("SELECT classifieduuid FROM classifieds WHERE classifieduuid = @uuid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@uuid", id);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())

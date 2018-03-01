@@ -71,7 +71,7 @@ namespace SilverSim.Database.SQLite.Asset
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT id, access_time FROM assetrefs WHERE id = @id", conn))
+                using (var cmd = new SQLiteCommand("SELECT id, access_time FROM assetrefs WHERE id = @id LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", key);
                     using (SQLiteDataReader dbReader = cmd.ExecuteReader())
@@ -169,7 +169,7 @@ namespace SilverSim.Database.SQLite.Asset
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM assetrefs INNER JOIN assetdata ON assetrefs.hash = assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id = @id", conn))
+                using (var cmd = new SQLiteCommand("SELECT * FROM assetrefs INNER JOIN assetdata ON assetrefs.hash = assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id = @id LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", key);
                     using (SQLiteDataReader dbReader = cmd.ExecuteReader())
@@ -229,7 +229,7 @@ namespace SilverSim.Database.SQLite.Asset
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM assetrefs WHERE id=@id", conn))
+                using (var cmd = new SQLiteCommand("SELECT * FROM assetrefs WHERE id=@id LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", key);
                     using (SQLiteDataReader dbReader = cmd.ExecuteReader())
@@ -276,7 +276,7 @@ namespace SilverSim.Database.SQLite.Asset
             {
                 bool processed;
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT usesprocessed FROM assetrefs WHERE id = @id", conn))
+                using (var cmd = new SQLiteCommand("SELECT usesprocessed FROM assetrefs WHERE id = @id LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", key);
                     using (SQLiteDataReader dbReader = cmd.ExecuteReader())
@@ -335,7 +335,7 @@ namespace SilverSim.Database.SQLite.Asset
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT data FROM assetrefs INNER JOIN assetdata ON assetrefs.hash = assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id=@id", conn))
+                using (var cmd = new SQLiteCommand("SELECT data FROM assetrefs INNER JOIN assetdata ON assetrefs.hash = assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id=@id LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", key);
                     using (SQLiteDataReader dbReader = cmd.ExecuteReader())

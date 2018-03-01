@@ -73,7 +73,7 @@ namespace SilverSim.Database.SQLite.Grid
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("SELECT flags FROM regiondefaults WHERE uuid = @id", connection))
+                using (var cmd = new SQLiteCommand("SELECT flags FROM regiondefaults WHERE uuid = @id LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@id", regionId);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -96,7 +96,7 @@ namespace SilverSim.Database.SQLite.Grid
                 connection.InsideTransaction((transaction) =>
                 {
                     bool haveEntry = false;
-                    using (var cmd = new SQLiteCommand("SELECT * FROM regiondefaults WHERE uuid = @id", connection)
+                    using (var cmd = new SQLiteCommand("SELECT * FROM regiondefaults WHERE uuid = @id LIMIT 1", connection)
                     {
                         Transaction = transaction
                     })

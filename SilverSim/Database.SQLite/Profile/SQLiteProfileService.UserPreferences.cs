@@ -34,7 +34,7 @@ namespace SilverSim.Database.SQLite.Profile
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT useruuid FROM usersettings where useruuid = @uuid", conn))
+                using (var cmd = new SQLiteCommand("SELECT useruuid FROM usersettings where useruuid = @uuid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@uuid", user.ID);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -50,7 +50,7 @@ namespace SilverSim.Database.SQLite.Profile
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM usersettings where useruuid = @uuid", conn))
+                using (var cmd = new SQLiteCommand("SELECT * FROM usersettings where useruuid = @uuid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@uuid", user.ID);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())

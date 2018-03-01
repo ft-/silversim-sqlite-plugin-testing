@@ -90,7 +90,7 @@ namespace SilverSim.Database.SQLite.TravelingData
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM travelingdata WHERE SessionID = @id", connection))
+                using (var cmd = new SQLiteCommand("SELECT * FROM travelingdata WHERE SessionID = @id LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@id", sessionID);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -110,7 +110,7 @@ namespace SilverSim.Database.SQLite.TravelingData
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM travelingdata WHERE UserID = @id AND ClientIPAddress = @ip", connection))
+                using (var cmd = new SQLiteCommand("SELECT * FROM travelingdata WHERE UserID = @id AND ClientIPAddress = @ip LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@id", agentID);
                     cmd.Parameters.AddParameter("@ip", ipAddress);
@@ -157,7 +157,7 @@ namespace SilverSim.Database.SQLite.TravelingData
 
                 bool res = connection.InsideTransaction((transaction) =>
                 {
-                    using (var cmd = new SQLiteCommand("SELECT * FROM travelingdata WHERE SessionID = @id", connection)
+                    using (var cmd = new SQLiteCommand("SELECT * FROM travelingdata WHERE SessionID = @id LIMIT 1", connection)
                     {
                         Transaction = transaction
                     })
