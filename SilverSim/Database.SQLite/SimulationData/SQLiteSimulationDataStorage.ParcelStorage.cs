@@ -53,7 +53,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                             {
                                 Area = (int)(long)dbReader["Area"],
                                 AuctionID = (uint)(long)dbReader["AuctionID"],
-                                AuthBuyer = dbReader.GetUUI("AuthBuyer"),
+                                AuthBuyer = dbReader.GetUGUI("AuthBuyer"),
                                 Category = dbReader.GetEnum<ParcelCategory>("Category"),
                                 ClaimDate = dbReader.GetDate("ClaimDate"),
                                 ClaimPrice = (int)(long)dbReader["ClaimPrice"],
@@ -68,7 +68,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                                 Name = (string)dbReader["Name"],
                                 LocalID = (int)(long)dbReader["LocalID"],
                                 MediaID = dbReader.GetUUID("MediaID"),
-                                Owner = dbReader.GetUUI("Owner"),
+                                Owner = dbReader.GetUGUI("Owner"),
                                 SnapshotID = dbReader.GetUUID("SnapshotID"),
                                 SalePrice = (int)(long)dbReader["SalePrice"],
                                 OtherCleanTime = (int)(long)dbReader["OtherCleanTime"],

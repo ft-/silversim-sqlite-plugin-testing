@@ -52,7 +52,7 @@ namespace SilverSim.Database.SQLite.AvatarName
         #endregion
 
         #region Accessors
-        public override bool TryGetValue(string firstName, string lastName, out UUI uui)
+        public override bool TryGetValue(string firstName, string lastName, out UGUIWithName uui)
         {
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
@@ -66,21 +66,21 @@ namespace SilverSim.Database.SQLite.AvatarName
                     {
                         if (!dbreader.Read())
                         {
-                            uui = default(UUI);
+                            uui = default(UGUIWithName);
                             return false;
                         }
-                        uui = ToUUI(dbreader);
+                        uui = ToUGUIWithName(dbreader);
                         return true;
                     }
                 }
             }
         }
 
-        public override UUI this[string firstName, string lastName]
+        public override UGUIWithName this[string firstName, string lastName]
         {
             get
             {
-                UUI uui;
+                UGUIWithName uui;
                 if (!TryGetValue(firstName, lastName, out uui))
                 {
                     throw new KeyNotFoundException();
@@ -89,7 +89,7 @@ namespace SilverSim.Database.SQLite.AvatarName
             }
         }
 
-        public override bool TryGetValue(UUID key, out UUI uui)
+        public override bool TryGetValue(UUID key, out UGUIWithName uui)
         {
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
@@ -102,21 +102,21 @@ namespace SilverSim.Database.SQLite.AvatarName
                     {
                         if (!dbreader.Read())
                         {
-                            uui = default(UUI);
+                            uui = default(UGUIWithName);
                             return false;
                         }
-                        uui = ToUUI(dbreader);
+                        uui = ToUGUIWithName(dbreader);
                         return true;
                     }
                 }
             }
         }
 
-        public override UUI this[UUID key]
+        public override UGUIWithName this[UUID key]
         {
             get
             {
-                UUI uui;
+                UGUIWithName uui;
                 if (!TryGetValue(key, out uui))
                 {
                     throw new KeyNotFoundException();
@@ -126,7 +126,7 @@ namespace SilverSim.Database.SQLite.AvatarName
         }
         #endregion
 
-        public override void Store(UUI value)
+        public override void Store(UGUIWithName value)
         {
             if (value.IsAuthoritative) /* do not store non-authoritative entries */
             {
@@ -160,11 +160,11 @@ namespace SilverSim.Database.SQLite.AvatarName
             }
         }
 
-        public override List<UUI> Search(string[] names)
+        public override List<UGUIWithName> Search(string[] names)
         {
             if (names.Length < 1 || names.Length > 2)
             {
-                return new List<UUI>();
+                return new List<UGUIWithName>();
             }
 
             if (names.Length == 1)
@@ -198,20 +198,20 @@ namespace SilverSim.Database.SQLite.AvatarName
             }
         }
 
-        private List<UUI> GetSearchResults(SQLiteCommand cmd)
+        private List<UGUIWithName> GetSearchResults(SQLiteCommand cmd)
         {
-            var results = new List<UUI>();
+            var results = new List<UGUIWithName>();
             using (SQLiteDataReader dbreader = cmd.ExecuteReader())
             {
                 while (dbreader.Read())
                 {
-                    results.Add(ToUUI(dbreader));
+                    results.Add(ToUGUIWithName(dbreader));
                 }
                 return results;
             }
         }
 
-        private static UUI ToUUI(SQLiteDataReader dbreader) => new UUI
+        private static UGUIWithName ToUGUIWithName(SQLiteDataReader dbreader) => new UGUIWithName
         {
             ID = dbreader.GetUUID("AvatarID"),
             HomeURI = dbreader.GetUri("HomeURI"),

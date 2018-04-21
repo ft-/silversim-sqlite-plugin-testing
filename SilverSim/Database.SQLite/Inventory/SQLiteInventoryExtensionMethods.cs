@@ -34,7 +34,7 @@ namespace SilverSim.Database.SQLite.Inventory
             ParentFolderID = reader.GetUUID("ParentFolderID"),
             Name = (string)reader["Name"],
             DefaultType = reader.GetEnum<AssetType>("DefaultType"),
-            Owner = new UUI(reader.GetUUID("OwnerID")),
+            Owner = reader.GetUGUI("OwnerID"),
             Version = (int)(long)reader["Version"]
         };
 
@@ -62,10 +62,10 @@ namespace SilverSim.Database.SQLite.Inventory
                 AssetID = reader.GetUUID("AssetID"),
                 AssetType = reader.GetEnum<AssetType>("AssetType"),
 
-                Owner = new UUI(reader.GetUUID("OwnerID")),
-                LastOwner = new UUI(reader.GetUUID("LastOwnerID")),
+                Owner = reader.GetUGUI("OwnerID"),
+                LastOwner = reader.GetUGUI("LastOwnerID"),
 
-                Creator = new UUI(reader.GetUUID("CreatorID")),
+                Creator = reader.GetUGUI("CreatorID"),
                 Group = new UGI(reader.GetUUID("GroupID"))
             };
             item.Permissions.Base = reader.GetEnum<InventoryPermissionsMask>("BasePermissionsMask");

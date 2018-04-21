@@ -29,7 +29,7 @@ namespace SilverSim.Database.SQLite.Groups
 {
     public sealed partial class SQLiteGroupsService : GroupsServiceInterface.IGroupInvitesInterface
     {
-        List<GroupInvite> IGroupInvitesInterface.this[UUI requestingAgent, UUI principal]
+        List<GroupInvite> IGroupInvitesInterface.this[UGUI requestingAgent, UGUI principal]
         {
             get
             {
@@ -56,7 +56,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        GroupInvite IGroupInvitesInterface.this[UUI requestingAgent, UUID groupInviteID]
+        GroupInvite IGroupInvitesInterface.this[UGUI requestingAgent, UUID groupInviteID]
         {
             get
             {
@@ -71,7 +71,7 @@ namespace SilverSim.Database.SQLite.Groups
 
         bool IGroupInvitesInterface.DoesSupportListGetters => true;
 
-        List<GroupInvite> IGroupInvitesInterface.this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
+        List<GroupInvite> IGroupInvitesInterface.this[UGUI requestingAgent, UGI group, UUID roleID, UGUI principal]
         {
             get
             {
@@ -100,7 +100,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        void IGroupInvitesInterface.Add(UUI requestingAgent, GroupInvite invite)
+        void IGroupInvitesInterface.Add(UGUI requestingAgent, GroupInvite invite)
         {
             var vals = new Dictionary<string, object>
             {
@@ -117,7 +117,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        bool IGroupInvitesInterface.ContainsKey(UUI requestingAgent, UUID groupInviteID)
+        bool IGroupInvitesInterface.ContainsKey(UGUI requestingAgent, UUID groupInviteID)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -133,7 +133,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        void IGroupInvitesInterface.Delete(UUI requestingAgent, UUID inviteID)
+        void IGroupInvitesInterface.Delete(UGUI requestingAgent, UUID inviteID)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -146,7 +146,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        List<GroupInvite> IGroupInvitesInterface.GetByGroup(UUI requestingAgent, UGI group)
+        List<GroupInvite> IGroupInvitesInterface.GetByGroup(UGUI requestingAgent, UGI group)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -170,7 +170,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        bool IGroupInvitesInterface.TryGetValue(UUI requestingAgent, UUID groupInviteID, out GroupInvite ginvite)
+        bool IGroupInvitesInterface.TryGetValue(UGUI requestingAgent, UUID groupInviteID, out GroupInvite ginvite)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {

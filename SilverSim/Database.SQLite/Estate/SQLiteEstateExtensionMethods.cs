@@ -30,7 +30,7 @@ namespace SilverSim.Database.SQLite.Estate
         {
             ID = (uint)(long)reader["ID"],
             Name = (string)reader["Name"],
-            Owner = reader.GetUUI("Owner"),
+            Owner = reader.GetUGUI("Owner"),
             Flags = reader.GetEnum<RegionOptionFlags>("Flags"),
             PricePerMeter = (int)(long)reader["PricePerMeter"],
             BillableFactor = (double)reader["BillableFactor"],

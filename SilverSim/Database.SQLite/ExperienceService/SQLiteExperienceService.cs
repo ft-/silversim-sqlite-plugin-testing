@@ -44,8 +44,8 @@ namespace SilverSim.Database.SQLite.ExperienceService
             Name = (string)reader["Name"],
             Description = (string)reader["Description"],
             Properties = reader.GetEnum<ExperiencePropertyFlags>("Properties"),
-            Owner = reader.GetUUI("Owner"),
-            Creator = reader.GetUUI("Creator"),
+            Owner = reader.GetUGUI("Owner"),
+            Creator = reader.GetUGUI("Creator"),
             Group = reader.GetUGI("Group"),
             Maturity = reader.GetEnum<RegionAccess>("Maturity"),
             Marketplace = (string)reader["Marketplace"],
@@ -92,18 +92,20 @@ namespace SilverSim.Database.SQLite.ExperienceService
 
         public override void Add(ExperienceInfo info)
         {
-            var vals = new Dictionary<string, object>();
-            vals.Add("ID", info.ID);
-            vals.Add("Name", info.Name);
-            vals.Add("Description", info.Description);
-            vals.Add("Properties", info.Properties);
-            vals.Add("Owner", info.Owner);
-            vals.Add("Creator", info.Creator);
-            vals.Add("Group", info.Group);
-            vals.Add("Maturity", info.Maturity);
-            vals.Add("Marketplace", info.Marketplace);
-            vals.Add("LogoID", info.LogoID);
-            vals.Add("SlUrl", info.SlUrl);
+            var vals = new Dictionary<string, object>
+            {
+                { "ID", info.ID },
+                { "Name", info.Name },
+                { "Description", info.Description },
+                { "Properties", info.Properties },
+                { "Owner", info.Owner },
+                { "Creator", info.Creator },
+                { "Group", info.Group },
+                { "Maturity", info.Maturity },
+                { "Marketplace", info.Marketplace },
+                { "LogoID", info.LogoID },
+                { "SlUrl", info.SlUrl }
+            };
 
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -154,7 +156,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
             return result;
         }
 
-        public override List<UUID> GetCreatorExperiences(UUI creator)
+        public override List<UUID> GetCreatorExperiences(UGUI creator)
         {
             var result = new List<UUID>();
             using (var conn = new SQLiteConnection(m_ConnectionString))
@@ -167,7 +169,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                     {
                         while (reader.Read())
                         {
-                            if (reader.GetUUI("Creator").EqualsGrid(creator))
+                            if (reader.GetUGUI("Creator").EqualsGrid(creator))
                             {
                                 result.Add(reader.GetUUID("ID"));
                             }
@@ -202,7 +204,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
             return result;
         }
 
-        public override List<UUID> GetOwnerExperiences(UUI owner)
+        public override List<UUID> GetOwnerExperiences(UGUI owner)
         {
             var result = new List<UUID>();
             using (var conn = new SQLiteConnection(m_ConnectionString))
@@ -215,7 +217,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                     {
                         while (reader.Read())
                         {
-                            if (reader.GetUUI("Owner").EqualsGrid(owner))
+                            if (reader.GetUGUI("Owner").EqualsGrid(owner))
                             {
                                 result.Add(reader.GetUUID("ID"));
                             }
@@ -227,7 +229,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
         }
 
         private static readonly string[] m_RemoveFromTables = new string[] { "experiencekeyvalues", "experienceadmins", "experienceusers" };
-        public override bool Remove(UUI requestingAgent, UUID id)
+        public override bool Remove(UGUI requestingAgent, UUID id)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -247,7 +249,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                                 return false;
                             }
 
-                            if (!reader.GetUUI("Owner").EqualsGrid(requestingAgent))
+                            if (!reader.GetUGUI("Owner").EqualsGrid(requestingAgent))
                             {
                                 return false;
                             }
@@ -312,18 +314,20 @@ namespace SilverSim.Database.SQLite.ExperienceService
             return false;
         }
 
-        public override void Update(UUI requestingAgent, ExperienceInfo info)
+        public override void Update(UGUI requestingAgent, ExperienceInfo info)
         {
-            var vals = new Dictionary<string, object>();
-            vals.Add("Name", info.Name);
-            vals.Add("Description", info.Description);
-            vals.Add("Properties", info.Properties);
-            vals.Add("Owner", info.Owner);
-            vals.Add("Group", info.Group);
-            vals.Add("Maturity", info.Maturity);
-            vals.Add("Marketplace", info.Marketplace);
-            vals.Add("LogoID", info.LogoID);
-            vals.Add("SlUrl", info.SlUrl);
+            var vals = new Dictionary<string, object>
+            {
+                { "Name", info.Name },
+                { "Description", info.Description },
+                { "Properties", info.Properties },
+                { "Owner", info.Owner },
+                { "Group", info.Group },
+                { "Maturity", info.Maturity },
+                { "Marketplace", info.Marketplace },
+                { "LogoID", info.LogoID },
+                { "SlUrl", info.SlUrl }
+            };
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
@@ -341,7 +345,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                         {
                             while (reader.Read())
                             {
-                                if (reader.GetUUI("Admin").EqualsGrid(requestingAgent))
+                                if (reader.GetUGUI("Admin").EqualsGrid(requestingAgent))
                                 {
                                     isallowed = true;
                                 }
@@ -360,7 +364,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                             {
                                 if (reader.Read())
                                 {
-                                    isallowed = reader.GetUUI("Owner").EqualsGrid(requestingAgent);
+                                    isallowed = reader.GetUGUI("Owner").EqualsGrid(requestingAgent);
                                 }
                             }
                         }
@@ -398,8 +402,8 @@ namespace SilverSim.Database.SQLite.ExperienceService
             new AddColumn<string>("Name") { Cardinality = 255, Default = string.Empty },
             new AddColumn<string>("Description") { Cardinality = 255, Default = string.Empty },
             new AddColumn<ExperiencePropertyFlags>("Properties") { IsNullAllowed = false, Default = ExperiencePropertyFlags.None },
-            new AddColumn<UUI>("Owner") { IsNullAllowed = false, Default = UUI.Unknown },
-            new AddColumn<UUI>("Creator") { IsNullAllowed = false, Default = UUI.Unknown },
+            new AddColumn<UGUI>("Owner") { IsNullAllowed = false, Default = UGUI.Unknown },
+            new AddColumn<UGUI>("Creator") { IsNullAllowed = false, Default = UGUI.Unknown },
             new AddColumn<UGI>("Group") { IsNullAllowed = false, Default = UGI.Unknown },
             new AddColumn<RegionAccess>("Maturity") { IsNullAllowed = false, Default = RegionAccess.Mature },
             new AddColumn<string>("Marketplace") { IsNullAllowed = false, Cardinality = 255, Default = string.Empty },
@@ -410,13 +414,13 @@ namespace SilverSim.Database.SQLite.ExperienceService
 
             new SqlTable("experienceadmins"),
             new AddColumn<UUID>("ExperienceID") { IsNullAllowed = false },
-            new AddColumn<UUI>("Admin") { IsNullAllowed = false },
+            new AddColumn<UGUI>("Admin") { IsNullAllowed = false },
             new PrimaryKeyInfo("ExperienceID", "Admin"),
             new NamedKeyInfo("ExperienceID", "ExperienceID"),
 
             new SqlTable("experienceusers"),
             new AddColumn<UUID>("ExperienceID") { IsNullAllowed = false },
-            new AddColumn<UUI>("User") { IsNullAllowed = false },
+            new AddColumn<UGUI>("User") { IsNullAllowed = false },
             new PrimaryKeyInfo("ExperienceID", "User"),
             new NamedKeyInfo("ExperienceID", "ExperienceID"),
             new NamedKeyInfo("User", "User"),

@@ -80,7 +80,7 @@ namespace SilverSim.Database.SQLite.Groups
         public static GroupMember ToGroupMember(this SQLiteDataReader reader) => new GroupMember
         {
             Group = new UGI(reader.GetUUID("GroupID")),
-            Principal = new UUI(reader.GetUUID("PrincipalID")),
+            Principal = reader.GetUGUI("PrincipalID"),
             SelectedRoleID = reader.GetUUID("SelectedRoleID"),
             Contribution = (int)(long)reader["Contribution"],
             IsListInProfile = reader.GetBool("ListInProfile"),
@@ -92,7 +92,7 @@ namespace SilverSim.Database.SQLite.Groups
         {
             Group = new UGI(reader.GetUUID("GroupID")),
             RoleID = reader.GetUUID("RoleID"),
-            Principal = new UUI(reader.GetUUID("PrincipalID")),
+            Principal = reader.GetUGUI("PrincipalID"),
             Powers = reader.GetEnum<GroupPowers>("Powers")
         };
 
@@ -100,7 +100,7 @@ namespace SilverSim.Database.SQLite.Groups
         {
             Group = new UGI(reader.GetUUID("GroupID")),
             RoleID = UUID.Zero,
-            Principal = new UUI(reader.GetUUID("PrincipalID")),
+            Principal = reader.GetUGUI("PrincipalID"),
             Powers = powers
         };
 
@@ -108,7 +108,7 @@ namespace SilverSim.Database.SQLite.Groups
         {
             Group = new UGI(reader.GetUUID("GroupID")),
             RoleID = reader.GetUUID("RoleID"),
-            Principal = new UUI(reader.GetUUID("PrincipalID")),
+            Principal = reader.GetUGUI("PrincipalID"),
             Powers = reader.GetEnum<GroupPowers>("Powers"),
             GroupTitle = (string)reader["Title"]
         };
@@ -117,7 +117,7 @@ namespace SilverSim.Database.SQLite.Groups
         {
             Group = new UGI(reader.GetUUID("GroupID")),
             RoleID = UUID.Zero,
-            Principal = new UUI(reader.GetUUID("PrincipalID")),
+            Principal = reader.GetUGUI("PrincipalID"),
             Powers = powers
         };
 
@@ -126,7 +126,7 @@ namespace SilverSim.Database.SQLite.Groups
             ID = reader.GetUUID("InviteID"),
             Group = new UGI(reader.GetUUID("GroupID")),
             RoleID = reader.GetUUID("RoleID"),
-            Principal = new UUI(reader.GetUUID("PrincipalID")),
+            Principal = reader.GetUGUI("PrincipalID"),
             Timestamp = reader.GetDate("Timestamp")
         };
 
@@ -142,7 +142,7 @@ namespace SilverSim.Database.SQLite.Groups
             AttachmentType = reader.GetEnum<AssetType>("AttachmentType"),
             AttachmentName = (string)reader["AttachmentName"],
             AttachmentItemID = reader.GetUUID("AttachmentItemID"),
-            AttachmentOwner = new UUI(reader.GetUUID("AttachmentOwnerID"))
+            AttachmentOwner = reader.GetUGUI("AttachmentOwnerID")
         };
     }
 }

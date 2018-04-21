@@ -82,7 +82,7 @@ namespace SilverSim.Database.SQLite.Estate
             #region estate_managers
             new SqlTable("estate_managers"),
             new AddColumn<uint>("EstateID") { IsNullAllowed = false },
-            new AddColumn<UUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UGUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
             new PrimaryKeyInfo(new string[] { "EstateID", "UserID" }),
             new NamedKeyInfo("UserID", "UserID"),
             new NamedKeyInfo("EstateID", "EstateID"),
@@ -100,7 +100,7 @@ namespace SilverSim.Database.SQLite.Estate
             #region estate_users
             new SqlTable("estate_users"),
             new AddColumn<uint>("EstateID") { IsNullAllowed = false },
-            new AddColumn<UUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UGUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
             new PrimaryKeyInfo(new string[] { "EstateID", "UserID" }),
             new NamedKeyInfo("EstateID", "EstateID"),
             new NamedKeyInfo("UserID", "UserID"),
@@ -109,7 +109,7 @@ namespace SilverSim.Database.SQLite.Estate
             #region estate_bans
             new SqlTable("estate_bans"),
             new AddColumn<uint>("EstateID") { IsNullAllowed = false },
-            new AddColumn<UUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UGUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
             new PrimaryKeyInfo(new string[] { "EstateID", "UserID" }),
             new NamedKeyInfo("EstateID", "EstateID"),
             new NamedKeyInfo("UserID", "UserID"),
@@ -119,7 +119,7 @@ namespace SilverSim.Database.SQLite.Estate
             new SqlTable("estates"),
             new AddColumn<uint>("ID") { IsNullAllowed = false },
             new AddColumn<string>("Name") { Cardinality = 64, IsNullAllowed = false },
-            new AddColumn<UUI>("Owner") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UGUI>("Owner") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<uint>("Flags") { IsNullAllowed = false, Default = (uint)0 },
             new AddColumn<int>("PricePerMeter") { IsNullAllowed = false, Default = 0 },
             new AddColumn<double>("BillableFactor") { IsNullAllowed = false, Default = (double)1 },

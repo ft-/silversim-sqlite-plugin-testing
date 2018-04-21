@@ -29,7 +29,7 @@ namespace SilverSim.Database.SQLite.Groups
 {
     public sealed partial class SQLiteGroupsService : GroupsServiceInterface.IGroupRolesInterface
     {
-        List<GroupRole> IGroupRolesInterface.this[UUI requestingAgent, UGI group]
+        List<GroupRole> IGroupRolesInterface.this[UGUI requestingAgent, UGI group]
         {
             get
             {
@@ -55,7 +55,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        List<GroupRole> IGroupRolesInterface.this[UUI requestingAgent, UGI group, UUI principal]
+        List<GroupRole> IGroupRolesInterface.this[UGUI requestingAgent, UGI group, UGUI principal]
         {
             get
             {
@@ -82,7 +82,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        GroupRole IGroupRolesInterface.this[UUI requestingAgent, UGI group, UUID roleID]
+        GroupRole IGroupRolesInterface.this[UGUI requestingAgent, UGI group, UUID roleID]
         {
             get
             {
@@ -95,7 +95,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        void IGroupRolesInterface.Add(UUI requestingAgent, GroupRole role)
+        void IGroupRolesInterface.Add(UGUI requestingAgent, GroupRole role)
         {
             var vals = new Dictionary<string, object>
             {
@@ -113,7 +113,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        bool IGroupRolesInterface.ContainsKey(UUI requestingAgent, UGI group, UUID roleID)
+        bool IGroupRolesInterface.ContainsKey(UGUI requestingAgent, UGI group, UUID roleID)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -130,7 +130,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        void IGroupRolesInterface.Delete(UUI requestingAgent, UGI group, UUID roleID)
+        void IGroupRolesInterface.Delete(UGUI requestingAgent, UGI group, UUID roleID)
         {
             var tablenames = new string[] { "groupinvites", "grouprolememberships", "grouproles" };
 
@@ -165,7 +165,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        bool IGroupRolesInterface.TryGetValue(UUI requestingAgent, UGI group, UUID roleID, out GroupRole groupRole)
+        bool IGroupRolesInterface.TryGetValue(UGUI requestingAgent, UGI group, UUID roleID, out GroupRole groupRole)
         {
             groupRole = null;
             using (var conn = new SQLiteConnection(m_ConnectionString))
@@ -188,7 +188,7 @@ namespace SilverSim.Database.SQLite.Groups
             return false;
         }
 
-        void IGroupRolesInterface.Update(UUI requestingAgent, GroupRole role)
+        void IGroupRolesInterface.Update(UGUI requestingAgent, GroupRole role)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {

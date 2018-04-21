@@ -28,11 +28,11 @@ namespace SilverSim.Database.SQLite.Estate
 {
     public sealed partial class SQLiteEstateService : IEstateManagerServiceInterface, IEstateManagerServiceListAccessInterface
     {
-        List<UUI> IEstateManagerServiceListAccessInterface.this[uint estateID]
+        List<UGUI> IEstateManagerServiceListAccessInterface.this[uint estateID]
         {
             get
             {
-                var estatemanagers = new List<UUI>();
+                var estatemanagers = new List<UGUI>();
                 using (var conn = new SQLiteConnection(m_ConnectionString))
                 {
                     conn.Open();
@@ -43,7 +43,7 @@ namespace SilverSim.Database.SQLite.Estate
                         {
                             while (reader.Read())
                             {
-                                estatemanagers.Add(reader.GetUUI("UserID"));
+                                estatemanagers.Add(reader.GetUGUI("UserID"));
                             }
                         }
                     }
@@ -52,7 +52,7 @@ namespace SilverSim.Database.SQLite.Estate
             }
         }
 
-        bool IEstateManagerServiceInterface.this[uint estateID, UUI agent]
+        bool IEstateManagerServiceInterface.this[uint estateID, UGUI agent]
         {
             get
             {
@@ -67,7 +67,7 @@ namespace SilverSim.Database.SQLite.Estate
                         {
                             while (reader.Read())
                             {
-                                UUI uui = reader.GetUUI("UserID");
+                                UGUI uui = reader.GetUGUI("UserID");
                                 if (uui.EqualsGrid(agent))
                                 {
                                     return true;

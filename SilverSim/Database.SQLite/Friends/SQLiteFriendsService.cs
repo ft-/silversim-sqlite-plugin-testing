@@ -69,7 +69,7 @@ namespace SilverSim.Database.SQLite.Friends
 
         public void ResolveUUI(FriendInfo fi)
         {
-            UUI uui;
+            UGUI uui;
             if (!fi.Friend.IsAuthoritative &&
                 m_AvatarNameService.TryGetValue(fi.Friend, out uui))
             {
@@ -82,7 +82,7 @@ namespace SilverSim.Database.SQLite.Friends
             }
         }
 
-        public override List<FriendInfo> this[UUI user]
+        public override List<FriendInfo> this[UGUI user]
         {
             get
             {
@@ -109,7 +109,7 @@ namespace SilverSim.Database.SQLite.Friends
             }
         }
 
-        public override FriendInfo this[UUI user, UUI friend]
+        public override FriendInfo this[UGUI user, UGUI friend]
         {
             get
             {
@@ -176,18 +176,23 @@ namespace SilverSim.Database.SQLite.Friends
                 connection.Open();
                 connection.InsideTransaction((transaction) =>
                 {
-                    var vals = new Dictionary<string, object>();
-                    vals.Add("UserID", fi.User.ID);
-                    vals.Add("FriendID", fi.Friend.ID);
-                    vals.Add("Secret", fi.Secret);
-                    vals.Add("RightsToFriend", fi.FriendGivenFlags);
+                    var vals = new Dictionary<string, object>
+                    {
+                        { "UserID", fi.User.ID },
+                        { "FriendID", fi.Friend.ID },
+                        { "Secret", fi.Secret },
+                        { "RightsToFriend", fi.FriendGivenFlags }
+                    };
 
                     connection.ReplaceInto("friends", vals, transaction);
 
-                    vals.Add("UserID", fi.Friend.ID);
-                    vals.Add("FriendID", fi.User.ID);
-                    vals.Add("Secret", fi.Secret);
-                    vals.Add("RightsToFriend", fi.UserGivenFlags);
+                    vals = new Dictionary<string, object>
+                    {
+                        { "UserID", fi.Friend.ID },
+                        { "FriendID", fi.User.ID },
+                        { "Secret", fi.Secret },
+                        { "RightsToFriend", fi.UserGivenFlags }
+                    };
                     connection.ReplaceInto("friends", vals, transaction);
                 });
             }
@@ -227,7 +232,7 @@ namespace SilverSim.Database.SQLite.Friends
             }
         }
 
-        public override bool TryGetValue(UUI user, UUI friend, out FriendInfo fInfo)
+        public override bool TryGetValue(UGUI user, UGUI friend, out FriendInfo fInfo)
         {
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {

@@ -30,7 +30,7 @@ namespace SilverSim.Database.SQLite.Groups
 {
     public sealed partial class SQLiteGroupsService : GroupsServiceInterface.IGroupsInterface
     {
-        GroupInfo IGroupsInterface.this[UUI requestingAgent, UGI group]
+        GroupInfo IGroupsInterface.this[UGUI requestingAgent, UGI group]
         {
             get
             {
@@ -43,7 +43,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        GroupInfo IGroupsInterface.this[UUI requestingAgent, string groupName]
+        GroupInfo IGroupsInterface.this[UGUI requestingAgent, string groupName]
         {
             get
             {
@@ -56,7 +56,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        UGI IGroupsInterface.this[UUI requestingAgent, UUID groupID]
+        UGI IGroupsInterface.this[UGUI requestingAgent, UUID groupID]
         {
             get
             {
@@ -69,7 +69,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        bool IGroupsInterface.ContainsKey(UUI requestingAgent, string groupName)
+        bool IGroupsInterface.ContainsKey(UGUI requestingAgent, string groupName)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -85,9 +85,9 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        bool IGroupsInterface.ContainsKey(UUI requestingAgent, UGI group) => Groups.ContainsKey(requestingAgent, group.ID);
+        bool IGroupsInterface.ContainsKey(UGUI requestingAgent, UGI group) => Groups.ContainsKey(requestingAgent, group.ID);
 
-        bool IGroupsInterface.ContainsKey(UUI requestingAgent, UUID groupID)
+        bool IGroupsInterface.ContainsKey(UGUI requestingAgent, UUID groupID)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -103,7 +103,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        GroupInfo IGroupsInterface.Create(UUI requestingAgent, GroupInfo group)
+        GroupInfo IGroupsInterface.Create(UGUI requestingAgent, GroupInfo group)
         {
             var vals = new Dictionary<string, object>
             {
@@ -128,7 +128,7 @@ namespace SilverSim.Database.SQLite.Groups
             return group;
         }
 
-        void IGroupsInterface.Delete(UUI requestingAgent, UGI group)
+        void IGroupsInterface.Delete(UGUI requestingAgent, UGI group)
         {
             var tablenames = new string[] { "grouproles", "grouprolememberships", "groupnotices", "groupmemberships", "groupinvites", "groups" };
             using (var conn = new SQLiteConnection(m_ConnectionString))
@@ -159,7 +159,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        List<DirGroupInfo> IGroupsInterface.GetGroupsByName(UUI requestingAgent, string query)
+        List<DirGroupInfo> IGroupsInterface.GetGroupsByName(UGUI requestingAgent, string query)
         {
             var groups = new List<DirGroupInfo>();
             using (var conn = new SQLiteConnection(m_ConnectionString))
@@ -189,7 +189,7 @@ namespace SilverSim.Database.SQLite.Groups
             return groups;
         }
 
-        bool IGroupsInterface.TryGetValue(UUI requestingAgent, string groupName, out GroupInfo groupInfo)
+        bool IGroupsInterface.TryGetValue(UGUI requestingAgent, string groupName, out GroupInfo groupInfo)
         {
             groupInfo = null;
             using (var conn = new SQLiteConnection(m_ConnectionString))
@@ -212,7 +212,7 @@ namespace SilverSim.Database.SQLite.Groups
             return false;
         }
 
-        bool IGroupsInterface.TryGetValue(UUI requestingAgent, UGI group, out GroupInfo groupInfo)
+        bool IGroupsInterface.TryGetValue(UGUI requestingAgent, UGI group, out GroupInfo groupInfo)
         {
             groupInfo = null;
             using (var conn = new SQLiteConnection(m_ConnectionString))
@@ -235,7 +235,7 @@ namespace SilverSim.Database.SQLite.Groups
             return false;
         }
 
-        bool IGroupsInterface.TryGetValue(UUI requestingAgent, UUID groupID, out UGI ugi)
+        bool IGroupsInterface.TryGetValue(UGUI requestingAgent, UUID groupID, out UGI ugi)
         {
             ugi = default(UGI);
             using (var conn = new SQLiteConnection(m_ConnectionString))
@@ -266,7 +266,7 @@ namespace SilverSim.Database.SQLite.Groups
             return false;
         }
 
-        GroupInfo IGroupsInterface.Update(UUI requestingAgent, GroupInfo group)
+        GroupInfo IGroupsInterface.Update(UGUI requestingAgent, GroupInfo group)
         {
             var vals = new Dictionary<string, object>
             {

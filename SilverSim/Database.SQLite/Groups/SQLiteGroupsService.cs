@@ -49,9 +49,9 @@ namespace SilverSim.Database.SQLite.Groups
         private const string RCountQuery = "(SELECT COUNT(xrm.PrincipalID) FROM grouprolememberships AS xrm WHERE xrm.RoleID = r.RoleID AND xrm.GroupID = r.GroupID) AS RoleMembers," +
                                     "(SELECT COUNT(xm.PrincipalID) FROM groupmemberships AS xm WHERE xm.GroupID = r.GroupID) AS GroupMembers";
 
-        private UUI ResolveName(UUI uui)
+        private UGUI ResolveName(UGUI uui)
         {
-            UUI resultuui;
+            UGUI resultuui;
             if (m_AvatarNameService.TryGetValue(uui, out resultuui))
             {
                 return resultuui;
@@ -59,7 +59,7 @@ namespace SilverSim.Database.SQLite.Groups
             return uui;
         }
 
-        private UGI ResolveName(UUI requestingAgent, UGI group)
+        private UGI ResolveName(UGUI requestingAgent, UGI group)
         {
             UGI resolved;
             return Groups.TryGetValue(requestingAgent, group.ID, out resolved) ? resolved : group;
@@ -83,7 +83,7 @@ namespace SilverSim.Database.SQLite.Groups
 
         public override IGroupRolesInterface Roles => this;
 
-        private bool TryGetGroupRoleRights(UUI requestingAgent, UGI group, UUID roleID, out GroupPowers powers)
+        private bool TryGetGroupRoleRights(UGUI requestingAgent, UGI group, UUID roleID, out GroupPowers powers)
         {
             powers = GroupPowers.None;
             using (var conn = new SQLiteConnection(m_ConnectionString))
@@ -106,7 +106,7 @@ namespace SilverSim.Database.SQLite.Groups
             return false;
         }
 
-        public override GroupPowers GetAgentPowers(UGI group, UUI agent)
+        public override GroupPowers GetAgentPowers(UGI group, UGUI agent)
         {
             if (!Members.ContainsKey(agent, group, agent))
             {

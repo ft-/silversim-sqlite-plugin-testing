@@ -29,7 +29,7 @@ namespace SilverSim.Database.SQLite.Groups
 {
     public sealed partial class SQLiteGroupsService : GroupsServiceInterface.IGroupNoticesInterface
     {
-        GroupNotice IGroupNoticesInterface.this[UUI requestingAgent, UUID groupNoticeID]
+        GroupNotice IGroupNoticesInterface.this[UGUI requestingAgent, UUID groupNoticeID]
         {
             get
             {
@@ -42,7 +42,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        void IGroupNoticesInterface.Add(UUI requestingAgent, GroupNotice notice)
+        void IGroupNoticesInterface.Add(UGUI requestingAgent, GroupNotice notice)
         {
             var vals = new Dictionary<string, object>
             {
@@ -65,7 +65,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        void IGroupNoticesInterface.Delete(UUI requestingAgent, UUID groupNoticeID)
+        void IGroupNoticesInterface.Delete(UGUI requestingAgent, UUID groupNoticeID)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -81,7 +81,7 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        List<GroupNotice> IGroupNoticesInterface.GetNotices(UUI requestingAgent, UGI group)
+        List<GroupNotice> IGroupNoticesInterface.GetNotices(UGUI requestingAgent, UGI group)
         {
             var notices = new List<GroupNotice>();
             using (var conn = new SQLiteConnection(m_ConnectionString))
@@ -105,7 +105,7 @@ namespace SilverSim.Database.SQLite.Groups
             return notices;
         }
 
-        bool IGroupNoticesInterface.TryGetValue(UUI requestingAgent, UUID groupNoticeID, out GroupNotice groupNotice)
+        bool IGroupNoticesInterface.TryGetValue(UGUI requestingAgent, UUID groupNoticeID, out GroupNotice groupNotice)
         {
             GroupNotice notice;
             using (var conn = new SQLiteConnection(m_ConnectionString))
@@ -131,7 +131,7 @@ namespace SilverSim.Database.SQLite.Groups
             return true;
         }
 
-        bool IGroupNoticesInterface.ContainsKey(UUI requestingAgent, UUID groupNoticeID)
+        bool IGroupNoticesInterface.ContainsKey(UGUI requestingAgent, UUID groupNoticeID)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {

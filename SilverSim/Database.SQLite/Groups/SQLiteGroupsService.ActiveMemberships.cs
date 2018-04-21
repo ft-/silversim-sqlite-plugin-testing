@@ -28,7 +28,7 @@ namespace SilverSim.Database.SQLite.Groups
 {
     public sealed partial class SQLiteGroupsService : GroupsServiceInterface.IActiveGroupMembershipInterface
     {
-        GroupActiveMembership IActiveGroupMembershipInterface.this[UUI requestingAgent, UUI principal]
+        GroupActiveMembership IActiveGroupMembershipInterface.this[UGUI requestingAgent, UGUI principal]
         {
             get
             {
@@ -41,13 +41,13 @@ namespace SilverSim.Database.SQLite.Groups
             }
         }
 
-        bool IActiveGroupMembershipInterface.ContainsKey(UUI requestingAgent, UUI principal)
+        bool IActiveGroupMembershipInterface.ContainsKey(UGUI requestingAgent, UGUI principal)
         {
             GroupActiveMembership gam;
             return ActiveMembership.TryGetValue(requestingAgent, principal, out gam);
         }
 
-        bool IActiveGroupMembershipInterface.TryGetValue(UUI requestingAgent, UUI principal, out GroupActiveMembership gam)
+        bool IActiveGroupMembershipInterface.TryGetValue(UGUI requestingAgent, UGUI principal, out GroupActiveMembership gam)
         {
             gam = default(GroupActiveMembership);
             UGI activegroup;

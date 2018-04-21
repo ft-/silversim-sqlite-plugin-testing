@@ -28,7 +28,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
 {
     public sealed partial class SQLiteExperienceService : ExperienceServiceInterface.IExperiencePermissionsInterface
     {
-        Dictionary<UUID, bool> IExperiencePermissionsInterface.this[UUI agent]
+        Dictionary<UUID, bool> IExperiencePermissionsInterface.this[UGUI agent]
         {
             get
             {
@@ -43,7 +43,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                         {
                             while (reader.Read())
                             {
-                                UUI ret = reader.GetUUI("User");
+                                UGUI ret = reader.GetUGUI("User");
                                 if (ret.EqualsGrid(agent))
                                 {
                                     result.Add(reader.GetUUID("ExperienceID"), reader.GetBool("IsAllowed"));
@@ -57,7 +57,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
             }
         }
 
-        bool IExperiencePermissionsInterface.this[UUID experienceID, UUI agent]
+        bool IExperiencePermissionsInterface.this[UUID experienceID, UGUI agent]
         {
             get
             {
@@ -85,7 +85,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
             }
         }
 
-        bool IExperiencePermissionsInterface.Remove(UUID experienceID, UUI agent)
+        bool IExperiencePermissionsInterface.Remove(UUID experienceID, UGUI agent)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -99,7 +99,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
             }
         }
 
-        bool IExperiencePermissionsInterface.TryGetValue(UUID experienceID, UUI agent, out bool allowed)
+        bool IExperiencePermissionsInterface.TryGetValue(UUID experienceID, UGUI agent, out bool allowed)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -112,7 +112,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                     {
                         while (reader.Read())
                         {
-                            UUI ret = reader.GetUUI("User");
+                            UGUI ret = reader.GetUGUI("User");
                             if (ret.EqualsGrid(agent))
                             {
                                 allowed = reader.GetBool("IsAllowed");

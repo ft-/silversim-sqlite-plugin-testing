@@ -29,7 +29,7 @@ namespace SilverSim.Database.SQLite.Profile
 {
     public sealed partial class SQLiteProfileService : ProfileServiceInterface.IUserPreferencesInterface
     {
-        bool IUserPreferencesInterface.ContainsKey(UUI user)
+        bool IUserPreferencesInterface.ContainsKey(UGUI user)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -45,7 +45,7 @@ namespace SilverSim.Database.SQLite.Profile
             }
         }
 
-        bool IUserPreferencesInterface.TryGetValue(UUI user, out ProfilePreferences prefs)
+        bool IUserPreferencesInterface.TryGetValue(UGUI user, out ProfilePreferences prefs)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -80,7 +80,7 @@ namespace SilverSim.Database.SQLite.Profile
             }
         }
 
-        ProfilePreferences IUserPreferencesInterface.this[UUI user]
+        ProfilePreferences IUserPreferencesInterface.this[UGUI user]
         {
             get
             {

@@ -147,7 +147,7 @@ namespace SilverSim.Database.SQLite._Migration
             {
                 typeSql = "text";
             }
-            else if (f == typeof(UUI) || f == typeof(UGI))
+            else if (f == typeof(UGUI) || f == typeof(UGUIWithName) || f == typeof(UGI))
             {
                 typeSql = "text";
             }
@@ -372,7 +372,9 @@ namespace SilverSim.Database.SQLite._Migration
             {
                 if (colInfo.Default.GetType() != colInfo.FieldType &&
                     !(colInfo.Default.GetType() == typeof(UUID) &&
-                    colInfo.FieldType == typeof(UUI)) &&
+                    colInfo.FieldType == typeof(UGUI)) &&
+                    !(colInfo.Default.GetType() == typeof(UUID) &&
+                    colInfo.FieldType == typeof(UGUIWithName)) &&
                     !(colInfo.Default.GetType() == typeof(UUID) &&
                     colInfo.FieldType == typeof(UGI)))
                 {

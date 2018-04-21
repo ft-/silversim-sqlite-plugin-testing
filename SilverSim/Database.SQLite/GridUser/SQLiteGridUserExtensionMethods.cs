@@ -29,7 +29,7 @@ namespace SilverSim.Database.SQLite.GridUser
     {
         public static GridUserInfo ToGridUser(this SQLiteDataReader reader) => new GridUserInfo
         {
-            User = new UUI(reader.GetUUID("ID")),
+            User = reader.GetUGUI("ID"),
             HomeRegionID = reader.GetUUID("HomeRegionID"),
             HomeLookAt = reader.GetVector3("HomeLookAt"),
             HomePosition = reader.GetVector3("HomePosition"),

@@ -40,7 +40,7 @@ namespace SilverSim.Database.SQLite.SimulationData
             m_TableName = tableName;
         }
 
-        public bool TryGetValue(UUID regionID, UUID parcelID, UUI accessor, out ParcelAccessEntry e)
+        public bool TryGetValue(UUID regionID, UUID parcelID, UGUI accessor, out ParcelAccessEntry e)
         {
             var result = new List<ParcelAccessEntry>();
 
@@ -66,7 +66,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                             {
                                 RegionID = regionID,
                                 ParcelID = reader.GetUUID("ParcelID"),
-                                Accessor = reader.GetUUI("Accessor")
+                                Accessor = reader.GetUGUI("Accessor")
                             };
                             ulong val = (ulong)(long)reader["ExpiresAt"];
                             if (val != 0)
@@ -91,7 +91,7 @@ namespace SilverSim.Database.SQLite.SimulationData
             return true;
         }
 
-        public bool this[UUID regionID, UUID parcelID, UUI accessor]
+        public bool this[UUID regionID, UUID parcelID, UGUI accessor]
         {
             get
             {
@@ -125,7 +125,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                                 {
                                     RegionID = reader.GetUUID("RegionID"),
                                     ParcelID = reader.GetUUID("ParcelID"),
-                                    Accessor = reader.GetUUI("Accessor")
+                                    Accessor = reader.GetUGUI("Accessor")
                                 };
                                 var val = (ulong)(long)reader["ExpiresAt"];
                                 if (val != 0)
@@ -162,7 +162,7 @@ namespace SilverSim.Database.SQLite.SimulationData
             }
         }
 
-        public void ExtendExpiry(UUID regionID, UUID parcelID, UUI accessor, ulong extendseconds)
+        public void ExtendExpiry(UUID regionID, UUID parcelID, UGUI accessor, ulong extendseconds)
         {
             bool success = false;
             using (var connection = new SQLiteConnection(m_ConnectionString))
@@ -242,7 +242,7 @@ namespace SilverSim.Database.SQLite.SimulationData
             }
         }
 
-        public bool Remove(UUID regionID, UUID parcelID, UUI accessor)
+        public bool Remove(UUID regionID, UUID parcelID, UGUI accessor)
         {
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {

@@ -46,11 +46,11 @@ namespace SilverSim.Database.SQLite.UserAccounts
             m_ConnectionString = SQLiteUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
-        public override UUI this[UUID key]
+        public override UGUIWithName this[UUID key]
         {
             get
             {
-                UUI uui;
+                UGUIWithName uui;
                 if (!TryGetValue(key, out uui))
                 {
                     throw new KeyNotFoundException();
@@ -59,18 +59,18 @@ namespace SilverSim.Database.SQLite.UserAccounts
             }
         }
 
-        public override void Store(UUI uui)
+        public override void Store(UGUIWithName uui)
         {
             /* intentionally ignored */
         }
 
         public override bool Remove(UUID key) => false;
 
-        public override UUI this[string firstName, string lastName]
+        public override UGUIWithName this[string firstName, string lastName]
         {
             get
             {
-                UUI uui;
+                UGUIWithName uui;
                 if (!TryGetValue(firstName, lastName, out uui))
                 {
                     throw new KeyNotFoundException();
@@ -84,9 +84,9 @@ namespace SilverSim.Database.SQLite.UserAccounts
             /* intentionally left empty */
         }
 
-        public override List<UUI> Search(string[] names)
+        public override List<UGUIWithName> Search(string[] names)
         {
-            var list = new List<UUI>();
+            var list = new List<UGUIWithName>();
 
             if (names.Length == 1)
             {
@@ -100,7 +100,7 @@ namespace SilverSim.Database.SQLite.UserAccounts
                         {
                             while (reader.Read())
                             {
-                                list.Add(GetUUIFromReader(reader));
+                                list.Add(GetUGUIWithNameFromReader(reader));
                             }
                         }
                     }
@@ -119,7 +119,7 @@ namespace SilverSim.Database.SQLite.UserAccounts
                         {
                             while (reader.Read())
                             {
-                                list.Add(GetUUIFromReader(reader));
+                                list.Add(GetUGUIWithNameFromReader(reader));
                             }
                         }
                     }
@@ -128,7 +128,7 @@ namespace SilverSim.Database.SQLite.UserAccounts
             return list;
         }
 
-        private UUI GetUUIFromReader(SQLiteDataReader reader) => new UUI
+        private UGUIWithName GetUGUIWithNameFromReader(SQLiteDataReader reader) => new UGUIWithName
         {
             FirstName = (string)reader["FirstName"],
             LastName = (string)reader["LastName"],
@@ -142,7 +142,7 @@ namespace SilverSim.Database.SQLite.UserAccounts
             m_HomeURI = new Uri(loader.HomeURI);
         }
 
-        public override bool TryGetValue(UUID key, out UUI uui)
+        public override bool TryGetValue(UUID key, out UGUIWithName uui)
         {
             uui = null;
             using (var connection = new SQLiteConnection(m_ConnectionString))
@@ -155,7 +155,7 @@ namespace SilverSim.Database.SQLite.UserAccounts
                     {
                         if (reader.Read())
                         {
-                            uui = GetUUIFromReader(reader);
+                            uui = GetUGUIWithNameFromReader(reader);
                             return true;
                         }
                     }
@@ -164,7 +164,7 @@ namespace SilverSim.Database.SQLite.UserAccounts
             return false;
         }
 
-        public override bool TryGetValue(string firstName, string lastName, out UUI uui)
+        public override bool TryGetValue(string firstName, string lastName, out UGUIWithName uui)
         {
             uui = null;
             using (var connection = new SQLiteConnection(m_ConnectionString))
@@ -178,7 +178,7 @@ namespace SilverSim.Database.SQLite.UserAccounts
                     {
                         if (reader.Read())
                         {
-                            uui = GetUUIFromReader(reader);
+                            uui = GetUGUIWithNameFromReader(reader);
                             return true;
                         }
                     }

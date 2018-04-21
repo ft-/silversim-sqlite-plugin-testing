@@ -29,7 +29,7 @@ namespace SilverSim.Database.SQLite.Profile
 {
     public sealed partial class SQLiteProfileService : ProfileServiceInterface.IPropertiesInterface
     {
-        ProfileProperties IPropertiesInterface.this[UUI user]
+        ProfileProperties IPropertiesInterface.this[UGUI user]
         {
             get
             {
@@ -46,7 +46,7 @@ namespace SilverSim.Database.SQLite.Profile
                                 return new ProfileProperties
                                 {
                                     User = user,
-                                    Partner = new UUI(reader.GetUUID("profilePartner")),
+                                    Partner = reader.GetUGUI("profilePartner"),
                                     PublishProfile = reader.GetBool("profileAllowPublish"),
                                     PublishMature = reader.GetBool("profileMaturePublish"),
                                     WebUrl = (string)reader["profileURL"],
@@ -66,7 +66,7 @@ namespace SilverSim.Database.SQLite.Profile
                                 return new ProfileProperties
                                 {
                                     User = user,
-                                    Partner = UUI.Unknown,
+                                    Partner = UGUI.Unknown,
                                     WebUrl = string.Empty,
                                     WantToText = string.Empty,
                                     SkillsText = string.Empty,
@@ -81,7 +81,7 @@ namespace SilverSim.Database.SQLite.Profile
             }
         }
 
-        ProfileProperties IPropertiesInterface.this[UUI user, PropertiesUpdateFlags flags]
+        ProfileProperties IPropertiesInterface.this[UGUI user, PropertiesUpdateFlags flags]
         {
             set
             {
