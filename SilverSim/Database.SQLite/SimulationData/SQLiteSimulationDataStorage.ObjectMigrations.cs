@@ -200,6 +200,8 @@ namespace SilverSim.Database.SQLite.SimulationData
             new AddColumn<Quaternion>("UnSitTargetOrientation") { IsNullAllowed = false, Default = Quaternion.Identity },
             new TableRevision(22),
             new AddColumn<byte[]>("LocalizationData") { IsLong = true },
+            new TableRevision(23),
+            new AddColumn<byte[]>("VehicleData"),
             #endregion
 
             #region Table primitems

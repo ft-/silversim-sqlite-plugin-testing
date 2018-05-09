@@ -22,6 +22,7 @@
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Object.Parameters;
+using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;
@@ -212,6 +213,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                 UnSitTargetOrientation = dbReader.GetQuaternion("UnSitTargetOrientation"),
                 LocalizationSerialization = dbReader.GetBytes("LocalizationData")
             };
+            objpart.LoadFromVehicleSerialization(dbReader.GetBytes("VehicleData"));
 
             using (var ms = new MemoryStream(dbReader.GetBytes("DynAttrs")))
             {
