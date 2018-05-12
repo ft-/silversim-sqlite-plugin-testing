@@ -22,6 +22,7 @@
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Object.Parameters;
+using SilverSim.Scene.Types.Pathfinding;
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
@@ -130,6 +131,7 @@ namespace SilverSim.Database.SQLite.SimulationData
 
                 PhysicsShapeType = dbReader.GetEnum<PrimitivePhysicsShapeType>("PhysicsShapeType"),
                 PathfindingType = dbReader.GetEnum<PathfindingType>("PathfindingType"),
+                PathfindingCharacterType = dbReader.GetEnum<CharacterType>("PathfindingCharacterType"),
                 WalkableCoefficientAvatar = (double)dbReader["WalkableCoefficientAvatar"],
                 WalkableCoefficientA = (double)dbReader["WalkableCoefficientA"],
                 WalkableCoefficientB = (double)dbReader["WalkableCoefficientB"],
