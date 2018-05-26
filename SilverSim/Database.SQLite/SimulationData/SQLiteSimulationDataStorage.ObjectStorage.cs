@@ -279,202 +279,214 @@ namespace SilverSim.Database.SQLite.SimulationData
         #endregion
 
         #region Load all object groups of a single region
-        List<ObjectGroup> ISimulationDataObjectStorageInterface.this[UUID regionID]
+        List<ObjectGroup> ISimulationDataObjectStorageInterface.LoadObjects(UUID regionID, bool skipErrors)
         {
-            get
+            var objGroups = new Dictionary<UUID, ObjectGroup>();
+            var originalAssetIDs = new Dictionary<UUID, UUID>();
+            var nextOwnerAssetIDs = new Dictionary<UUID, UUID>();
+            var objGroupParts = new Dictionary<UUID, SortedDictionary<int, ObjectPart>>();
+            var objPartIDs = new List<UUID>();
+            var objParts = new Dictionary<UUID, ObjectPart>();
+            var orphanedPrims = new List<UUID>();
+            var orphanedPrimInventories = new List<KeyValuePair<UUID, UUID>>();
+
+            using (var connection = new SQLiteConnection(m_ConnectionString))
             {
-                var objGroups = new Dictionary<UUID, ObjectGroup>();
-                var originalAssetIDs = new Dictionary<UUID, UUID>();
-                var nextOwnerAssetIDs = new Dictionary<UUID, UUID>();
-                var objGroupParts = new Dictionary<UUID, SortedDictionary<int, ObjectPart>>();
-                var objPartIDs = new List<UUID>();
-                var objParts = new Dictionary<UUID, ObjectPart>();
-                var orphanedPrims = new List<UUID>();
-                var orphanedPrimInventories = new List<KeyValuePair<UUID, UUID>>();
+                connection.Open();
+                UUID objgroupID = UUID.Zero;
+                m_Log.InfoFormat("Loading object groups for region ID {0}", regionID);
 
-                using (var connection = new SQLiteConnection(m_ConnectionString))
+                using (var cmd = new SQLiteCommand("SELECT * FROM objects WHERE RegionID = @regionid", connection))
                 {
-                    connection.Open();
-                    UUID objgroupID = UUID.Zero;
-                    m_Log.InfoFormat("Loading object groups for region ID {0}", regionID);
-
-                    using (var cmd = new SQLiteCommand("SELECT * FROM objects WHERE RegionID = @regionid", connection))
+                    cmd.Parameters.AddParameter("@regionid", regionID);
+                    cmd.CommandTimeout = 3600;
+                    using (SQLiteDataReader dbReader = cmd.ExecuteReader())
                     {
-                        cmd.Parameters.AddParameter("@regionid", regionID);
-                        cmd.CommandTimeout = 3600;
-                        using (SQLiteDataReader dbReader = cmd.ExecuteReader())
+                        while (dbReader.Read())
                         {
-                            while (dbReader.Read())
+                            try
                             {
-                                try
-                                {
-                                    objgroupID = dbReader.GetUUID("ID");
-                                    originalAssetIDs[objgroupID] = dbReader.GetUUID("OriginalAssetID");
-                                    nextOwnerAssetIDs[objgroupID] = dbReader.GetUUID("NextOwnerAssetID");
-                                    objGroups[objgroupID] = ObjectGroupFromDbReader(dbReader);
-                                }
-                                catch (Exception e)
-                                {
-                                    m_Log.WarnFormat("Failed to load object {0}: {1}\n{2}", objgroupID, e.Message, e.StackTrace);
-                                    objGroups.Remove(objgroupID);
-                                }
+                                objgroupID = dbReader.GetUUID("ID");
+                                originalAssetIDs[objgroupID] = dbReader.GetUUID("OriginalAssetID");
+                                nextOwnerAssetIDs[objgroupID] = dbReader.GetUUID("NextOwnerAssetID");
+                                objGroups[objgroupID] = ObjectGroupFromDbReader(dbReader);
+                            }
+                            catch (Exception e)
+                            {
+                                m_Log.WarnFormat("Failed to load object {0}: {1}\n{2}", objgroupID, e.Message, e.StackTrace);
+                                objGroups.Remove(objgroupID);
                             }
                         }
                     }
-
-                    m_Log.InfoFormat("Loading prims for region ID {0}", regionID);
-                    int primcount = 0;
-                    using (var cmd = new SQLiteCommand("SELECT * FROM prims WHERE \"RegionID\" = @regionid", connection))
-                    {
-                        cmd.Parameters.AddParameter("@regionid", regionID);
-                        cmd.CommandTimeout = 3600;
-                        using (SQLiteDataReader dbReader = cmd.ExecuteReader())
-                        {
-                            while (dbReader.Read())
-                            {
-                                UUID rootPartID = dbReader.GetUUID("RootPartID");
-                                if (objGroups.ContainsKey(rootPartID))
-                                {
-                                    if (!objGroupParts.ContainsKey(rootPartID))
-                                    {
-                                        objGroupParts.Add(rootPartID, new SortedDictionary<int, ObjectPart>());
-                                    }
-
-                                    ObjectPart objpart = ObjectPartFromDbReader(dbReader);
-
-                                    objGroupParts[rootPartID].Add(objpart.LoadedLinkNumber, objpart);
-                                    objPartIDs.Add(objpart.ID);
-                                    objParts[objpart.ID] = objpart;
-                                    if ((++primcount) % 5000 == 0)
-                                    {
-                                        m_Log.InfoFormat("Loading prims for region ID {0} - {1} loaded", regionID, primcount);
-                                    }
-                                }
-                                else
-                                {
-                                    m_Log.WarnFormat("deleting orphan prim in region ID {0}: {1}", regionID, dbReader.GetUUID("ID"));
-                                    orphanedPrims.Add(dbReader.GetUUID("ID"));
-                                }
-                            }
-                        }
-                    }
-                    m_Log.InfoFormat("Loaded prims for region ID {0} - {1} loaded", regionID, primcount);
-
-                    int primitemcount = 0;
-                    m_Log.InfoFormat("Loading prim inventories for region ID {0}", regionID);
-                    using (var cmd = new SQLiteCommand("SELECT * FROM primitems WHERE \"RegionID\" = @regionid", connection))
-                    {
-                        cmd.Parameters.AddParameter("@regionid", regionID);
-                        cmd.CommandTimeout = 3600;
-                        using (SQLiteDataReader dbReader = cmd.ExecuteReader())
-                        {
-                            while (dbReader.Read())
-                            {
-                                UUID partID = dbReader.GetUUID("PrimID");
-                                ObjectPart part;
-                                if (objParts.TryGetValue(partID, out part))
-                                {
-                                    ObjectPartInventoryItem item = ObjectPartInventoryItemFromDbReader(dbReader);
-
-                                    part.Inventory.Add(item.ID, item.Name, item);
-                                    if ((++primitemcount) % 5000 == 0)
-                                    {
-                                        m_Log.InfoFormat("Loading prim inventories for region ID {0} - {1} loaded", regionID, primitemcount);
-                                    }
-                                }
-                                else
-                                {
-                                    m_Log.WarnFormat("deleting orphan prim inventory in region ID {0}: {1}", regionID, dbReader.GetUUID("InventoryID"));
-                                    orphanedPrimInventories.Add(new KeyValuePair<UUID, UUID>(dbReader.GetUUID("PrimID"), dbReader.GetUUID("InventoryID")));
-                                }
-                            }
-                        }
-                    }
-                    m_Log.InfoFormat("Loaded prim inventories for region ID {0} - {1} loaded", regionID, primitemcount);
                 }
 
-                var removeObjGroups = new List<UUID>();
-                foreach (KeyValuePair<UUID, ObjectGroup> kvp in objGroups)
+                m_Log.InfoFormat("Loading prims for region ID {0}", regionID);
+                int primcount = 0;
+                using (var cmd = new SQLiteCommand("SELECT * FROM prims WHERE \"RegionID\" = @regionid", connection))
                 {
-                    if (!objGroupParts.ContainsKey(kvp.Key))
+                    cmd.Parameters.AddParameter("@regionid", regionID);
+                    cmd.CommandTimeout = 3600;
+                    using (SQLiteDataReader dbReader = cmd.ExecuteReader())
                     {
+                        while (dbReader.Read())
+                        {
+                            UUID rootPartID = dbReader.GetUUID("RootPartID");
+                            if (objGroups.ContainsKey(rootPartID))
+                            {
+                                if (!objGroupParts.ContainsKey(rootPartID))
+                                {
+                                    objGroupParts.Add(rootPartID, new SortedDictionary<int, ObjectPart>());
+                                }
+
+                                ObjectPart objpart = ObjectPartFromDbReader(dbReader);
+
+                                objGroupParts[rootPartID].Add(objpart.LoadedLinkNumber, objpart);
+                                objPartIDs.Add(objpart.ID);
+                                objParts[objpart.ID] = objpart;
+                                if ((++primcount) % 5000 == 0)
+                                {
+                                    m_Log.InfoFormat("Loading prims for region ID {0} - {1} loaded", regionID, primcount);
+                                }
+                            }
+                            else
+                            {
+                                m_Log.WarnFormat("deleting orphan prim in region ID {0}: {1}", regionID, dbReader.GetUUID("ID"));
+                                orphanedPrims.Add(dbReader.GetUUID("ID"));
+                            }
+                        }
+                    }
+                }
+                m_Log.InfoFormat("Loaded prims for region ID {0} - {1} loaded", regionID, primcount);
+
+                int primitemcount = 0;
+                m_Log.InfoFormat("Loading prim inventories for region ID {0}", regionID);
+                using (var cmd = new SQLiteCommand("SELECT * FROM primitems WHERE \"RegionID\" = @regionid", connection))
+                {
+                    cmd.Parameters.AddParameter("@regionid", regionID);
+                    cmd.CommandTimeout = 3600;
+                    using (SQLiteDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        while (dbReader.Read())
+                        {
+                            UUID partID = dbReader.GetUUID("PrimID");
+                            ObjectPart part;
+                            if (objParts.TryGetValue(partID, out part))
+                            {
+                                ObjectPartInventoryItem item = ObjectPartInventoryItemFromDbReader(dbReader);
+
+                                if (skipErrors)
+                                {
+                                    try
+                                    {
+                                        part.Inventory.Add(item.ID, item.Name, item);
+                                    }
+                                    catch
+                                    {
+                                        m_Log.WarnFormat("deleting duplicate prim inventory in region ID {0}: {1}", regionID, dbReader.GetUUID("InventoryID"));
+                                        orphanedPrimInventories.Add(new KeyValuePair<UUID, UUID>(dbReader.GetUUID("PrimID"), dbReader.GetUUID("InventoryID")));
+                                    }
+                                }
+                                else
+                                {
+                                    part.Inventory.Add(item.ID, item.Name, item);
+                                }
+                                if ((++primitemcount) % 5000 == 0)
+                                {
+                                    m_Log.InfoFormat("Loading prim inventories for region ID {0} - {1} loaded", regionID, primitemcount);
+                                }
+                            }
+                            else
+                            {
+                                m_Log.WarnFormat("deleting orphan prim inventory in region ID {0}: {1}", regionID, dbReader.GetUUID("InventoryID"));
+                                orphanedPrimInventories.Add(new KeyValuePair<UUID, UUID>(dbReader.GetUUID("PrimID"), dbReader.GetUUID("InventoryID")));
+                            }
+                        }
+                    }
+                }
+                m_Log.InfoFormat("Loaded prim inventories for region ID {0} - {1} loaded", regionID, primitemcount);
+            }
+
+            var removeObjGroups = new List<UUID>();
+            foreach (KeyValuePair<UUID, ObjectGroup> kvp in objGroups)
+            {
+                if (!objGroupParts.ContainsKey(kvp.Key))
+                {
+                    removeObjGroups.Add(kvp.Key);
+                }
+                else
+                {
+                    foreach (ObjectPart objpart in objGroupParts[kvp.Key].Values)
+                    {
+                        kvp.Value.Add(objpart.LoadedLinkNumber, objpart.ID, objpart);
+                    }
+
+                    try
+                    {
+                        kvp.Value.OriginalAssetID = originalAssetIDs[kvp.Value.ID];
+                        kvp.Value.NextOwnerAssetID = nextOwnerAssetIDs[kvp.Value.ID];
+                        kvp.Value.FinalizeObject();
+                    }
+                    catch
+                    {
+                        m_Log.WarnFormat("deleting orphan object in region ID {0}: {1}", regionID, kvp.Key);
                         removeObjGroups.Add(kvp.Key);
                     }
-                    else
-                    {
-                        foreach (ObjectPart objpart in objGroupParts[kvp.Key].Values)
-                        {
-                            kvp.Value.Add(objpart.LoadedLinkNumber, objpart.ID, objpart);
-                        }
-
-                        try
-                        {
-                            kvp.Value.OriginalAssetID = originalAssetIDs[kvp.Value.ID];
-                            kvp.Value.NextOwnerAssetID = nextOwnerAssetIDs[kvp.Value.ID];
-                            kvp.Value.FinalizeObject();
-                        }
-                        catch
-                        {
-                            m_Log.WarnFormat("deleting orphan object in region ID {0}: {1}", regionID, kvp.Key);
-                            removeObjGroups.Add(kvp.Key);
-                        }
-                    }
                 }
-
-                foreach (UUID objid in removeObjGroups)
-                {
-                    objGroups.Remove(objid);
-                }
-
-                for (int idx = 0; idx < removeObjGroups.Count; idx += 256)
-                {
-                    int elemcnt = Math.Min(removeObjGroups.Count - idx, 256);
-                    string sqlcmd = "DELETE FROM objects WHERE \"RegionID\" = '" + regionID.ToString() + "' AND \"ID\" IN (" +
-                        string.Join(",", from id in removeObjGroups.GetRange(idx, elemcnt) select "'" + id.ToString() + "'") +
-                        ")";
-                    using (var conn = new SQLiteConnection(m_ConnectionString))
-                    {
-                        conn.Open();
-                        using (var cmd = new SQLiteCommand(sqlcmd, conn))
-                        {
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
-                }
-
-                for (int idx = 0; idx < orphanedPrims.Count; idx += 256)
-                {
-                    int elemcnt = Math.Min(orphanedPrims.Count - idx, 256);
-                    string sqlcmd = "DELETE FROM prims WHERE \"RegionID\" = '" + regionID.ToString() + "' AND \"ID\" IN (" +
-                        string.Join(",", from id in orphanedPrims.GetRange(idx, elemcnt) select "'" + id.ToString() + "'") +
-                        ")";
-                    using (var conn = new SQLiteConnection(m_ConnectionString))
-                    {
-                        conn.Open();
-                        using (var cmd = new SQLiteCommand(sqlcmd, conn))
-                        {
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
-                }
-                for (int idx = 0; idx < orphanedPrimInventories.Count; idx += 256)
-                {
-                    int elemcnt = Math.Min(orphanedPrimInventories.Count - idx, 256);
-                    string sqlcmd = "DELETE FROM primitems WHERE \"RegionID\" = '" + regionID.ToString() + "' AND (" +
-                        string.Join(" OR ", from id in orphanedPrimInventories.GetRange(idx, elemcnt)
-                                            select string.Format("(\"PrimID\" = '{0}' AND \"InventoryID\" = '{1}')", id.Key.ToString(), id.Value.ToString())) + ")";
-                    using (var conn = new SQLiteConnection(m_ConnectionString))
-                    {
-                        conn.Open();
-                        using (var cmd = new SQLiteCommand(sqlcmd, conn))
-                        {
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
-                }
-
-                return new List<ObjectGroup>(objGroups.Values);
             }
+
+            foreach (UUID objid in removeObjGroups)
+            {
+                objGroups.Remove(objid);
+            }
+
+            for (int idx = 0; idx < removeObjGroups.Count; idx += 256)
+            {
+                int elemcnt = Math.Min(removeObjGroups.Count - idx, 256);
+                string sqlcmd = "DELETE FROM objects WHERE \"RegionID\" = '" + regionID.ToString() + "' AND \"ID\" IN (" +
+                    string.Join(",", from id in removeObjGroups.GetRange(idx, elemcnt) select "'" + id.ToString() + "'") +
+                    ")";
+                using (var conn = new SQLiteConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    using (var cmd = new SQLiteCommand(sqlcmd, conn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+
+            for (int idx = 0; idx < orphanedPrims.Count; idx += 256)
+            {
+                int elemcnt = Math.Min(orphanedPrims.Count - idx, 256);
+                string sqlcmd = "DELETE FROM prims WHERE \"RegionID\" = '" + regionID.ToString() + "' AND \"ID\" IN (" +
+                    string.Join(",", from id in orphanedPrims.GetRange(idx, elemcnt) select "'" + id.ToString() + "'") +
+                    ")";
+                using (var conn = new SQLiteConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    using (var cmd = new SQLiteCommand(sqlcmd, conn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            for (int idx = 0; idx < orphanedPrimInventories.Count; idx += 256)
+            {
+                int elemcnt = Math.Min(orphanedPrimInventories.Count - idx, 256);
+                string sqlcmd = "DELETE FROM primitems WHERE \"RegionID\" = '" + regionID.ToString() + "' AND (" +
+                    string.Join(" OR ", from id in orphanedPrimInventories.GetRange(idx, elemcnt)
+                                        select string.Format("(\"PrimID\" = '{0}' AND \"InventoryID\" = '{1}')", id.Key.ToString(), id.Value.ToString())) + ")";
+                using (var conn = new SQLiteConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    using (var cmd = new SQLiteCommand(sqlcmd, conn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+
+            return new List<ObjectGroup>(objGroups.Values);
         }
         #endregion
     }
