@@ -206,6 +206,49 @@ namespace SilverSim.Database.SQLite.Asset
             }
         }
 
+        public override bool TryGetValue(UUID key, out AssetMetadata metadata, out int length)
+        {
+            metadata = null;
+            length = 0;
+            using (var conn = new SQLiteConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (var cmd = new SQLiteCommand("SELECT id, length(data) AS dataLength, assetType, name, create_time, access_time, asset_flags, temporary FROM assetrefs INNER JOIN assetdata ON assetrefs.hash = assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id = @id LIMIT 1", conn))
+                {
+                    cmd.Parameters.AddParameter("@id", key);
+                    using (SQLiteDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        if (!dbReader.Read())
+                        {
+                            return false;
+                        }
+                        metadata = new AssetMetadata
+                        {
+                            ID = dbReader.GetUUID("id"),
+                            Type = dbReader.GetEnum<AssetType>("assetType"),
+                            Name = (string)dbReader["name"],
+                            CreateTime = dbReader.GetDate("create_time"),
+                            AccessTime = dbReader.GetDate("access_time"),
+                            Flags = dbReader.GetEnum<AssetFlags>("asset_flags"),
+                            Temporary = dbReader.GetBool("temporary")
+                        };
+                        length = (int)(long)dbReader["dataLength"];
+                    }
+                }
+
+                if (DateTime.UtcNow - metadata.AccessTime > TimeSpan.FromHours(1))
+                {
+                    /* update access_time */
+                    using (var cmd = new SQLiteCommand("UPDATE assetrefs SET access_time = @access WHERE id = @id", conn))
+                    {
+                        cmd.Parameters.AddParameter("@access", Date.GetUnixTime());
+                        cmd.Parameters.AddParameter("@id", key);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                return true;
+            }
+        }
         #endregion
 
         #region Metadata interface
