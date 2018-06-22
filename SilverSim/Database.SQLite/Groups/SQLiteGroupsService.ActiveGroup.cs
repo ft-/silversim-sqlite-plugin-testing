@@ -26,7 +26,7 @@ using System.Data.SQLite;
 
 namespace SilverSim.Database.SQLite.Groups
 {
-    public sealed partial class SQLiteGroupsService : GroupsServiceInterface.IGroupSelectInterface
+    public sealed partial class SQLiteGroupsService : IGroupSelectInterface
     {
         UGI IGroupSelectInterface.this[UGUI requestingAgent, UGUI principalID]
         {

@@ -27,7 +27,7 @@ using System.Data.SQLite;
 
 namespace SilverSim.Database.SQLite.Groups
 {
-    public sealed partial class SQLiteGroupsService : GroupsServiceInterface.IGroupInvitesInterface
+    public sealed partial class SQLiteGroupsService : IGroupInvitesInterface
     {
         List<GroupInvite> IGroupInvitesInterface.this[UGUI requestingAgent, UGUI principal]
         {
@@ -53,19 +53,6 @@ namespace SilverSim.Database.SQLite.Groups
                         }
                     }
                 }
-            }
-        }
-
-        GroupInvite IGroupInvitesInterface.this[UGUI requestingAgent, UUID groupInviteID]
-        {
-            get
-            {
-                GroupInvite invite;
-                if (!Invites.TryGetValue(requestingAgent, groupInviteID, out invite))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return invite;
             }
         }
 

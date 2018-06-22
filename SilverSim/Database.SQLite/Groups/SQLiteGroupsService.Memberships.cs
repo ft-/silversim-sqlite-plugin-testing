@@ -27,7 +27,7 @@ using System.Data.SQLite;
 
 namespace SilverSim.Database.SQLite.Groups
 {
-    public sealed partial class SQLiteGroupsService : GroupsServiceInterface.IGroupMembershipsInterface
+    public sealed partial class SQLiteGroupsService : IGroupMembershipsInterface
     {
         private GroupMembership MembershipFromReader(SQLiteDataReader reader, UGUI requestingAgent) => new GroupMembership
         {
@@ -77,19 +77,6 @@ namespace SilverSim.Database.SQLite.Groups
                     }
                 }
                 return memberships;
-            }
-        }
-
-        GroupMembership IGroupMembershipsInterface.this[UGUI requestingAgent, UGI group, UGUI principal]
-        {
-            get
-            {
-                GroupMembership gmem;
-                if (!Memberships.TryGetValue(requestingAgent, group, principal, out gmem))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return gmem;
             }
         }
 

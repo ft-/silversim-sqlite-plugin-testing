@@ -110,33 +110,8 @@ namespace SilverSim.Database.SQLite.GridUser
             return false;
         }
 
-        public override GridUserInfo this[UUID userID]
-        {
-            get
-            {
-                using (var conn = new SQLiteConnection(m_ConnectionString))
-                {
-                    conn.Open();
-                    using (var cmd = new SQLiteCommand("SELECT * FROM griduser WHERE ID = @id LIMIT 1", conn))
-                    {
-                        cmd.Parameters.AddParameter("@id", userID);
-                        using (SQLiteDataReader dbReader = cmd.ExecuteReader())
-                        {
-                            if (dbReader.Read())
-                            {
-                                return dbReader.ToGridUser();
-                            }
-                        }
-                    }
-                }
-                throw new GridUserNotFoundException();
-            }
-        }
-
         public override bool TryGetValue(UGUI userID, out GridUserInfo gridUserInfo) =>
             TryGetValue(userID.ID, out gridUserInfo);
-
-        public override GridUserInfo this[UGUI userID] => this[userID.ID];
 
         public override void LoggedInAdd(UGUI userID)
         {

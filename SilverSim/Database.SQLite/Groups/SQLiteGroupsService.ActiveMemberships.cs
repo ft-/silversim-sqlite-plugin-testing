@@ -22,25 +22,11 @@
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
-using System.Collections.Generic;
 
 namespace SilverSim.Database.SQLite.Groups
 {
-    public sealed partial class SQLiteGroupsService : GroupsServiceInterface.IActiveGroupMembershipInterface
+    public sealed partial class SQLiteGroupsService : IActiveGroupMembershipInterface
     {
-        GroupActiveMembership IActiveGroupMembershipInterface.this[UGUI requestingAgent, UGUI principal]
-        {
-            get
-            {
-                GroupActiveMembership gam;
-                if (!ActiveMembership.TryGetValue(requestingAgent, principal, out gam))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return gam;
-            }
-        }
-
         bool IActiveGroupMembershipInterface.ContainsKey(UGUI requestingAgent, UGUI principal)
         {
             GroupActiveMembership gam;

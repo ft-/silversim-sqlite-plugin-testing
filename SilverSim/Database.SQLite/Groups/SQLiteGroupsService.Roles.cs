@@ -27,7 +27,7 @@ using System.Data.SQLite;
 
 namespace SilverSim.Database.SQLite.Groups
 {
-    public sealed partial class SQLiteGroupsService : GroupsServiceInterface.IGroupRolesInterface
+    public sealed partial class SQLiteGroupsService : IGroupRolesInterface
     {
         List<GroupRole> IGroupRolesInterface.this[UGUI requestingAgent, UGI group]
         {
@@ -79,19 +79,6 @@ namespace SilverSim.Database.SQLite.Groups
                     }
                 }
                 return roles;
-            }
-        }
-
-        GroupRole IGroupRolesInterface.this[UGUI requestingAgent, UGI group, UUID roleID]
-        {
-            get
-            {
-                GroupRole role;
-                if (!Roles.TryGetValue(requestingAgent, group, roleID, out role))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return role;
             }
         }
 

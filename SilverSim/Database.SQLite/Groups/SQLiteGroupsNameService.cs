@@ -52,19 +52,6 @@ namespace SilverSim.Database.SQLite.Groups
         #endregion
 
         #region Accessors
-        public override UGI this[UUID groupID]
-        {
-            get
-            {
-                UGI ugi;
-                if (!TryGetValue(groupID, out ugi))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return ugi;
-            }
-        }
-
         public override bool TryGetValue(UUID groupID, out UGI ugi)
         {
             using (var connection = new SQLiteConnection(m_ConnectionString))

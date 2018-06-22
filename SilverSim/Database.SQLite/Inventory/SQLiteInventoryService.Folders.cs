@@ -75,19 +75,6 @@ namespace SilverSim.Database.SQLite.Inventory
             return false;
         }
 
-        InventoryFolder IInventoryFolderServiceInterface.this[UUID key]
-        {
-            get
-            {
-                InventoryFolder folder;
-                if (!Folder.TryGetValue(key, out folder))
-                {
-                    throw new InventoryFolderNotFoundException(key);
-                }
-                return folder;
-            }
-        }
-
         bool IInventoryFolderServiceInterface.TryGetValue(UUID principalID, UUID key, out InventoryFolder folder)
         {
             using (var connection = new SQLiteConnection(m_ConnectionString))
@@ -132,19 +119,6 @@ namespace SilverSim.Database.SQLite.Inventory
             }
 
             return false;
-        }
-
-        InventoryFolder IInventoryFolderServiceInterface.this[UUID principalID, UUID key]
-        {
-            get
-            {
-                InventoryFolder folder;
-                if (!Folder.TryGetValue(principalID, key, out folder))
-                {
-                    throw new InventoryFolderNotFoundException(key);
-                }
-                return folder;
-            }
         }
 
         bool IInventoryFolderServiceInterface.ContainsKey(UUID principalID, AssetType type)
@@ -232,19 +206,6 @@ namespace SilverSim.Database.SQLite.Inventory
 
             folder = default(InventoryFolder);
             return false;
-        }
-
-        InventoryFolder IInventoryFolderServiceInterface.this[UUID principalID, AssetType type]
-        {
-            get
-            {
-                InventoryFolder folder;
-                if(!Folder.TryGetValue(principalID, type, out folder))
-                {
-                    throw new InventoryFolderTypeNotFoundException(type);
-                }
-                return folder;
-            }
         }
 
         List<InventoryFolder> IInventoryFolderServiceInterface.GetFolders(UUID principalID, UUID key)

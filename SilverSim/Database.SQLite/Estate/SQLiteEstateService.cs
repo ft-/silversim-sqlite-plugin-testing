@@ -318,29 +318,6 @@ namespace SilverSim.Database.SQLite.Estate
             }
         }
 
-        public override EstateInfo this[uint estateID]
-        {
-            get
-            {
-                using (var conn = new SQLiteConnection(m_ConnectionString))
-                {
-                    conn.Open();
-                    using (var cmd = new SQLiteCommand("SELECT * FROM estates WHERE ID = @id LIMIT 1", conn))
-                    {
-                        cmd.Parameters.AddParameter("@id", estateID);
-                        using (SQLiteDataReader reader = cmd.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                return reader.ToEstateInfo();
-                            }
-                        }
-                    }
-                }
-                throw new KeyNotFoundException();
-            }
-        }
-
         public override List<EstateInfo> All
         {
             get

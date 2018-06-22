@@ -28,7 +28,7 @@ using System.Data.SQLite;
 
 namespace SilverSim.Database.SQLite.Profile
 {
-    public sealed partial class SQLiteProfileService : ProfileServiceInterface.IClassifiedsInterface
+    public sealed partial class SQLiteProfileService : IClassifiedsInterface
     {
         Dictionary<UUID, string> IClassifiedsInterface.GetClassifieds(UGUI user)
         {
@@ -108,19 +108,6 @@ namespace SilverSim.Database.SQLite.Profile
                 }
             }
             return false;
-        }
-
-        ProfileClassified IClassifiedsInterface.this[UGUI user, UUID id]
-        {
-            get
-            {
-                ProfileClassified classified;
-                if (!Classifieds.TryGetValue(user, id, out classified))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return classified;
-            }
         }
 
         void IClassifiedsInterface.Update(ProfileClassified c)

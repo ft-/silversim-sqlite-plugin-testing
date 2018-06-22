@@ -27,7 +27,7 @@ using System.Data.SQLite;
 
 namespace SilverSim.Database.SQLite.Profile
 {
-    public sealed partial class SQLiteProfileService : ProfileServiceInterface.IUserPreferencesInterface
+    public sealed partial class SQLiteProfileService : IUserPreferencesInterface
     {
         bool IUserPreferencesInterface.ContainsKey(UGUI user)
         {

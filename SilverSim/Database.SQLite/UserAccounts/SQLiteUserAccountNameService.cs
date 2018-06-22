@@ -46,38 +46,12 @@ namespace SilverSim.Database.SQLite.UserAccounts
             m_ConnectionString = SQLiteUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
-        public override UGUIWithName this[UUID key]
-        {
-            get
-            {
-                UGUIWithName uui;
-                if (!TryGetValue(key, out uui))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return uui;
-            }
-        }
-
         public override void Store(UGUIWithName uui)
         {
             /* intentionally ignored */
         }
 
         public override bool Remove(UUID key) => false;
-
-        public override UGUIWithName this[string firstName, string lastName]
-        {
-            get
-            {
-                UGUIWithName uui;
-                if (!TryGetValue(firstName, lastName, out uui))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return uui;
-            }
-        }
 
         public void ProcessMigrations()
         {

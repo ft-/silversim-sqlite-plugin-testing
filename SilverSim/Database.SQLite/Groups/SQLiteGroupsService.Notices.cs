@@ -27,21 +27,8 @@ using System.Data.SQLite;
 
 namespace SilverSim.Database.SQLite.Groups
 {
-    public sealed partial class SQLiteGroupsService : GroupsServiceInterface.IGroupNoticesInterface
+    public sealed partial class SQLiteGroupsService : IGroupNoticesInterface
     {
-        GroupNotice IGroupNoticesInterface.this[UGUI requestingAgent, UUID groupNoticeID]
-        {
-            get
-            {
-                var notice = new GroupNotice();
-                if (!Notices.TryGetValue(requestingAgent, groupNoticeID, out notice))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return notice;
-            }
-        }
-
         void IGroupNoticesInterface.Add(UGUI requestingAgent, GroupNotice notice)
         {
             var vals = new Dictionary<string, object>
