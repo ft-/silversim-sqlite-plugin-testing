@@ -26,7 +26,7 @@ using System.Data.SQLite;
 
 namespace SilverSim.Database.SQLite.ExperienceService
 {
-    public sealed partial class SQLiteExperienceService : ExperienceServiceInterface.IExperiencePermissionsInterface
+    public sealed partial class SQLiteExperienceService : IExperiencePermissionsInterface
     {
         Dictionary<UUID, bool> IExperiencePermissionsInterface.this[UGUI agent]
         {

@@ -71,19 +71,6 @@ namespace SilverSim.Database.SQLite.ExperienceService
             /* intentionally left empty */
         }
 
-        public override ExperienceInfo this[UUID experienceID]
-        {
-            get
-            {
-                ExperienceInfo info;
-                if (!TryGetValue(experienceID, out info))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return info;
-            }
-        }
-
         public override IExperiencePermissionsInterface Permissions => this;
 
         public override IExperienceAdminInterface Admins => this;
