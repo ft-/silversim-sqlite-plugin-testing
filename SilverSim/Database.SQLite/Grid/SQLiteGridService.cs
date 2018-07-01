@@ -512,8 +512,8 @@ namespace SilverSim.Database.SQLite.Grid
         public override List<RegionInfo> GetFallbackRegions(UUID scopeID) =>
             GetRegionsByFlag(scopeID, RegionFlags.FallbackRegion);
 
-        public override List<RegionInfo> GetDefaultHypergridRegions(UUID scopeID) =>
-            GetRegionsByFlag(scopeID, RegionFlags.DefaultHGRegion);
+        public override List<RegionInfo> GetDefaultIntergridRegions(UUID scopeID) =>
+            GetRegionsByFlag(scopeID, RegionFlags.DefaultIntergridRegion);
 
         public override List<RegionInfo> GetRegionsByRange(UUID scopeID, GridVector min, GridVector max)
         {
