@@ -79,6 +79,8 @@ namespace SilverSim.Database.SQLite.SimulationData
             new DropColumn("IsRotateZEnabled"),
             new TableRevision(9),
             new AddColumn<UUID>("RezzingObjectID") {IsNullAllowed = false, Default = UUID.Zero },
+            new TableRevision(10),
+            new ChangeColumn<bool>("IsTemporary") { OldName = "IsTempOnRez", IsNullAllowed = false, Default = false },
             #endregion
 
             #region Table prims

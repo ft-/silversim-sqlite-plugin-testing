@@ -398,7 +398,7 @@ namespace SilverSim.Database.SQLite.SimulationData
             {
                 ["ID"] = objgroup.ID,
                 ["RegionID"] = objgroup.Scene.ID,
-                ["IsTempOnRez"] = objgroup.IsTempOnRez,
+                ["IsTemporary"] = objgroup.IsTemporary,
                 ["Owner"] = objgroup.Owner,
                 ["LastOwner"] = objgroup.LastOwner,
                 ["Group"] = objgroup.Group,
