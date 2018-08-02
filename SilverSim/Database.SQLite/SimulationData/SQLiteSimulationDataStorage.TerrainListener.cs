@@ -79,45 +79,66 @@ namespace SilverSim.Database.SQLite.SimulationData
                             continue;
                         }
 
-                        uint serialNumber = req.Serial;
-
-                        if (!knownSerialNumbers.Contains(req.ExtendedPatchID) || knownSerialNumbers[req.ExtendedPatchID] != req.Serial)
+                        if (req == null)
                         {
-                            updateRequestData.Add("PatchID" + updateRequestCount, req.ExtendedPatchID);
-                            updateRequestData.Add("TerrainData" + updateRequestCount, req.Serialization);
-                            ++updateRequestCount;
-                            knownSerialNumbers[req.ExtendedPatchID] = serialNumber;
-                        }
-
-                        if ((m_StorageTerrainRequestQueue.Count == 0 && updateRequestCount > 0) || updateRequestCount >= 256)
-                        {
-                            StringBuilder updateCmd = new StringBuilder();
-                            try
+                            using (var connection = new SQLiteConnection(m_ConnectionString))
                             {
-                                using (var conn = new SQLiteConnection(m_ConnectionString))
+                                connection.Open();
+                                connection.InsideTransaction((transaction) =>
                                 {
-                                    conn.Open();
-                                    for (int i = 0; i < updateRequestCount; ++i)
+                                    using (var cmd = new SQLiteCommand("REPLACE INTO defaultterrains (RegionID, PatchID, TerrainData) SELECT RegionID, PatchID, TerrainData FROM terrains WHERE RegionID=@regionid", connection)
                                     {
-                                        updateCmd.AppendFormat("REPLACE INTO terrains (RegionID, PatchID, TerrainData) VALUES (@regionid, @patchid{0}, @terraindata{0});", i);
-                                    }
-                                    using (var cmd = new SQLiteCommand(updateCmd.ToString(), conn))
+                                        Transaction = transaction
+                                    })
                                     {
-                                        cmd.Parameters.AddParameter("@regionid", RegionID);
-                                        foreach (KeyValuePair<string, object> kvp in updateRequestData)
-                                        {
-                                            cmd.Parameters.AddParameter(kvp.Key, kvp.Value);
-                                        }
+                                        cmd.Parameters.AddParameter("@RegionID", RegionID);
                                         cmd.ExecuteNonQuery();
                                     }
-                                }
-                                updateRequestData.Clear();
-                                updateRequestCount = 0;
-                                Interlocked.Increment(ref m_ProcessedPatches);
+                                });
                             }
-                            catch (Exception e)
+                        }
+                        else
+                        {
+                            uint serialNumber = req.Serial;
+
+                            if (!knownSerialNumbers.Contains(req.ExtendedPatchID) || knownSerialNumbers[req.ExtendedPatchID] != req.Serial)
                             {
-                                m_Log.Error("Terrain store failed", e);
+                                updateRequestData.Add("PatchID" + updateRequestCount, req.ExtendedPatchID);
+                                updateRequestData.Add("TerrainData" + updateRequestCount, req.Serialization);
+                                ++updateRequestCount;
+                                knownSerialNumbers[req.ExtendedPatchID] = serialNumber;
+                            }
+
+                            if ((m_StorageTerrainRequestQueue.Count == 0 && updateRequestCount > 0) || updateRequestCount >= 256)
+                            {
+                                StringBuilder updateCmd = new StringBuilder();
+                                try
+                                {
+                                    using (var conn = new SQLiteConnection(m_ConnectionString))
+                                    {
+                                        conn.Open();
+                                        for (int i = 0; i < updateRequestCount; ++i)
+                                        {
+                                            updateCmd.AppendFormat("REPLACE INTO terrains (RegionID, PatchID, TerrainData) VALUES (@regionid, @patchid{0}, @terraindata{0});", i);
+                                        }
+                                        using (var cmd = new SQLiteCommand(updateCmd.ToString(), conn))
+                                        {
+                                            cmd.Parameters.AddParameter("@regionid", RegionID);
+                                            foreach (KeyValuePair<string, object> kvp in updateRequestData)
+                                            {
+                                                cmd.Parameters.AddParameter(kvp.Key, kvp.Value);
+                                            }
+                                            cmd.ExecuteNonQuery();
+                                        }
+                                    }
+                                    updateRequestData.Clear();
+                                    updateRequestCount = 0;
+                                    Interlocked.Increment(ref m_ProcessedPatches);
+                                }
+                                catch (Exception e)
+                                {
+                                    m_Log.Error("Terrain store failed", e);
+                                }
                             }
                         }
                     }

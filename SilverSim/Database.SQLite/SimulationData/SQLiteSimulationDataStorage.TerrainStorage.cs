@@ -59,26 +59,6 @@ namespace SilverSim.Database.SQLite.SimulationData
             }
         }
 
-
-        void ISimulationDataTerrainStorageInterface.SaveAsDefault(UUID regionID)
-        {
-            using (var connection = new SQLiteConnection(m_ConnectionString))
-            {
-                connection.Open();
-                connection.InsideTransaction((transaction) =>
-                {
-                    using (var cmd = new SQLiteCommand("REPLACE INTO defaultterrains (RegionID, PatchID, TerrainData) SELECT RegionID, PatchID, TerrainData FROM terrains WHERE RegionID=@regionid", connection)
-                    {
-                        Transaction = transaction
-                    })
-                    {
-                        cmd.Parameters.AddParameter("@RegionID", regionID);
-                        cmd.ExecuteNonQuery();
-                    }
-                });
-            }
-        }
-
         bool ISimulationDataTerrainStorageInterface.TryGetDefault(UUID regionID, List<LayerPatch> list)
         {
             using (var connection = new SQLiteConnection(m_ConnectionString))
