@@ -207,6 +207,8 @@ namespace SilverSim.Database.SQLite.SimulationData
             new AddColumn<byte[]>("VehicleData"),
             new TableRevision(24),
             new AddColumn<CharacterType>("PathfindingCharacterType") { IsNullAllowed = false, Default = CharacterType.None },
+            new TableRevision(25),
+            new AddColumn<double>("Damage") { IsNullAllowed = false, Default = 0.0 },
             #endregion
 
             #region Table primitems
