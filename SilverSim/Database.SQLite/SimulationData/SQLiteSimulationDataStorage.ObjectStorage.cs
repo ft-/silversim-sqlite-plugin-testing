@@ -102,6 +102,7 @@ namespace SilverSim.Database.SQLite.SimulationData
             PayPrice3 = (int)(long)dbReader["PayPrice3"],
             PayPrice4 = (int)(long)dbReader["PayPrice4"],
             AttachedPos = dbReader.GetVector3("AttachedPos"),
+            AttachedRot = dbReader.GetQuaternion("AttachedRot"),
             AttachPoint = dbReader.GetEnum<AttachmentPoint>("AttachPoint"),
             IsIncludedInSearch = dbReader.GetBool("IsIncludedInSearch"),
             RezzingObjectID = dbReader.GetUUID("RezzingObjectID")

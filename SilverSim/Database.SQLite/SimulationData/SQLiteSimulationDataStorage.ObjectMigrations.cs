@@ -81,6 +81,8 @@ namespace SilverSim.Database.SQLite.SimulationData
             new AddColumn<UUID>("RezzingObjectID") {IsNullAllowed = false, Default = UUID.Zero },
             new TableRevision(10),
             new ChangeColumn<bool>("IsTemporary") { OldName = "IsTempOnRez", IsNullAllowed = false, Default = false },
+            new TableRevision(11),
+            new AddColumn<Quaternion>("AttachedRot") { IsNullAllowed = false, Default = Quaternion.Identity },
             #endregion
 
             #region Table prims
