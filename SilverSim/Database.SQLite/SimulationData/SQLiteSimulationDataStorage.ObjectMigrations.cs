@@ -264,6 +264,8 @@ namespace SilverSim.Database.SQLite.SimulationData
             new DropColumn("ParentFolderID"),
             new TableRevision(10),
             new AddColumn<byte[]>("CollisionFilterData") { Cardinality = 255 },
+            new TableRevision(11),
+            new AddColumn<UUID>("DebitPermissionKey") { IsNullAllowed = false, Default = UUID.Zero },
             #endregion
         };
     }
