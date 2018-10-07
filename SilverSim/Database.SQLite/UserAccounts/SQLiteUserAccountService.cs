@@ -123,11 +123,11 @@ namespace SilverSim.Database.SQLite.UserAccounts
             new AddColumn<UUID>("LastRegionID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<Vector3>("LastPosition") { IsNullAllowed = false, Default = Vector3.Zero },
             new AddColumn<Vector3>("LastLookAt") { IsNullAllowed = false, Default = Vector3.Zero },
-            new AddColumn<string>("LastGatekeeperURI") { IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<string>("LastGatekeeperURI") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
             new AddColumn<UUID>("HomeRegionID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<Vector3>("HomePosition") { IsNullAllowed = false, Default = Vector3.Zero },
             new AddColumn<Vector3>("HomeLookAt") { IsNullAllowed = false, Default = Vector3.Zero },
-            new AddColumn<string>("HomeGatekeeperURI") { IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<string>("HomeGatekeeperURI") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
 
             new SqlTable("useraccounts_serial"),
             new AddColumn<ulong>("SerialNumber") { IsNullAllowed = false, Default = (ulong)0 }
