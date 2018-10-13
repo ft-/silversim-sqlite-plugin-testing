@@ -161,6 +161,16 @@ namespace SilverSim.Database.SQLite.UserAccounts
             return false;
         }
 
+        public override bool ContainsKey(UGUI input)
+        {
+            UGUI data;
+            if (TryGetValue(input.ID, out data))
+            {
+                return data.EqualsGrid(input);
+            }
+            return false;
+        }
+
         public void VerifyConnection()
         {
             using (var connection = new SQLiteConnection(m_ConnectionString))
