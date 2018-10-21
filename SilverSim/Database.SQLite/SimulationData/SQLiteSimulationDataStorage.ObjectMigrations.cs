@@ -213,6 +213,8 @@ namespace SilverSim.Database.SQLite.SimulationData
             new AddColumn<double>("Damage") { IsNullAllowed = false, Default = 0.0 },
             new TableRevision(26),
             new DropColumn("Slice"),
+            new TableRevision(27),
+            new PrimaryKeyInfo("RegionID", "ID"),
             #endregion
 
             #region Table primitems
