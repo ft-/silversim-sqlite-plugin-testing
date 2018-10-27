@@ -248,7 +248,7 @@ namespace SilverSim.Database.SQLite.Inventory
             /* intentionally left empty */
         }
 
-        public override void Remove(UUID scopeID, UUID userAccount)
+        public override void Remove(UUID userAccount)
         {
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {

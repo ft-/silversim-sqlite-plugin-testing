@@ -50,7 +50,7 @@ namespace SilverSim.Database.SQLite.Profile
             /* intentionally left empty */
         }
 
-        public override void Remove(UUID scopeID, UUID userAccount)
+        public override void Remove(UUID userAccount)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {

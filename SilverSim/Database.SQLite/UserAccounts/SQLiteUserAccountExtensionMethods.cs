@@ -40,7 +40,6 @@ namespace SilverSim.Database.SQLite.UserAccounts
             info.Principal.LastName = (string)reader["LastName"];
             info.Principal.HomeURI = homeURI;
             info.Principal.IsAuthoritative = true;
-            info.ScopeID = reader.GetUUID("ScopeID");
             info.Email = (string)reader["Email"];
             info.Created = reader.GetDate("Created");
             info.UserLevel = (int)(long)reader["UserLevel"];
