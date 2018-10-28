@@ -56,6 +56,15 @@ namespace SilverSim.Database.SQLite._Migration
             FieldNames = fieldNames;
         }
 
+        public PrimaryKeyInfo(PrimaryKeyInfo src)
+        {
+            FieldNames = new string[src.FieldNames.Length];
+            for (int i = 0; i < src.FieldNames.Length; ++i)
+            {
+                FieldNames[i] = src.FieldNames[i];
+            }
+        }
+
         public string FieldSql()
         {
             var b = new SQLiteCommandBuilder();
@@ -87,6 +96,16 @@ namespace SilverSim.Database.SQLite._Migration
             FieldNames = fieldNames;
         }
 
+        public NamedKeyInfo(NamedKeyInfo src)
+        {
+            IsUnique = src.IsUnique;
+            Name = src.Name;
+            FieldNames = new string[src.FieldNames.Length];
+            for (int i = 0; i < src.FieldNames.Length; ++i)
+            {
+                FieldNames[i] = src.FieldNames[i];
+            }
+        }
         private string FieldSql()
         {
             var b = new SQLiteCommandBuilder();
@@ -510,9 +529,9 @@ namespace SilverSim.Database.SQLite._Migration
             SQLiteCommandBuilder b = new SQLiteCommandBuilder();
             for (int i = 0; i < fieldNames.Length; ++i)
             {
-                fieldNames[i] = string.Format("DROP COLUMN ", b.QuoteIdentifier(fieldNames[i]));
+                fieldNames[i] = $"DROP COLUMN {b.QuoteIdentifier(fieldNames[i])}";
             }
-            return string.Format("ALTER TABLE {0} {1};", b.QuoteIdentifier(tableName), string.Join(",", fieldNames));
+            return $"ALTER TABLE {b.QuoteIdentifier(tableName)} {string.Join(",", fieldNames)};";
         }
     }
 

@@ -29,7 +29,7 @@ using SQLiteMigrationException = SilverSim.Database.SQLite.SQLiteUtilities.SQLit
 
 namespace SilverSim.Database.SQLite._Migration
 {
-    public static class Migrator
+    public static partial class Migrator
     {
         static void ExecuteStatement(SQLiteConnection conn, string command, ILog log)
         {
@@ -89,6 +89,7 @@ namespace SilverSim.Database.SQLite._Migration
             uint processingTableRevision = 0;
             uint currentAtRevision = 0;
             SQLiteTransaction insideTransaction = null;
+            m_MaxAvailableMigrationRevision = 1;
 
             if (processTable.Length == 0)
             {
@@ -99,6 +100,7 @@ namespace SilverSim.Database.SQLite._Migration
             {
                 throw new SQLiteMigrationException("First entry must be table name");
             }
+            bool skipToNext = false;
 
             foreach (IMigrationElement migration in processTable)
             {
@@ -106,6 +108,7 @@ namespace SilverSim.Database.SQLite._Migration
 
                 if (typeof(SqlTable) == migrationType)
                 {
+                    skipToNext = false;
                     if (insideTransaction != null)
                     {
                         ExecuteStatement(conn, string.Format("REPLACE INTO migrations (tablename, revision) VALUES ('{0}',{1});", table.Name, processingTableRevision), log);
@@ -132,6 +135,21 @@ namespace SilverSim.Database.SQLite._Migration
                     table = (SqlTable)migration;
                     currentAtRevision = conn.GetTableRevision(table.Name);
                     processingTableRevision = 1;
+                    if (currentAtRevision != 0 && m_DeleteTablesBefore)
+                    {
+                        log.Info($"Dropping table {table.Name}");
+                        ExecuteStatement(conn, $"DROP TABLE {table.Name}", log);
+                        ExecuteStatement(conn, $"DELETE FROM migrations WHERE tablename = '{table.Name}'", log);
+                        currentAtRevision = 0;
+                    }
+                }
+                else if (skipToNext)
+                {
+                    /* skip processing */
+                    if (typeof(TableRevision) == migrationType)
+                    {
+                        m_MaxAvailableMigrationRevision = Math.Max(m_MaxAvailableMigrationRevision, ((TableRevision)migration).Revision);
+                    }
                 }
                 else if (typeof(TableRevision) == migrationType)
                 {
@@ -147,6 +165,14 @@ namespace SilverSim.Database.SQLite._Migration
                     }
 
                     var rev = (TableRevision)migration;
+                    m_MaxAvailableMigrationRevision = Math.Max(m_MaxAvailableMigrationRevision, rev.Revision);
+                    if (processingTableRevision == m_StopAtMigrationRevision)
+                    {
+                        /* advance to next table for testing */
+                        skipToNext = true;
+                        continue;
+                    }
+
                     if (rev.Revision != processingTableRevision + 1)
                     {
                         throw new SQLiteMigrationException(string.Format("Invalid TableRevision entry. Expected {0}. Got {1}", processingTableRevision + 1, rev.Revision));
@@ -252,7 +278,7 @@ namespace SilverSim.Database.SQLite._Migration
                         {
                             ExecuteStatement(conn, "ALTER TABLE " + b.QuoteIdentifier(table.Name) + " DROP PRIMARY KEY;", log);
                         }
-                        primaryKey = (PrimaryKeyInfo)migration;
+                        primaryKey = new PrimaryKeyInfo((PrimaryKeyInfo)migration);
                         if (insideTransaction != null)
                         {
                             ExecuteStatement(conn, primaryKey.Sql(table.Name), log);
@@ -268,7 +294,7 @@ namespace SilverSim.Database.SQLite._Migration
                     }
                     else if (migrationType == typeof(NamedKeyInfo))
                     {
-                        var namedKey = (NamedKeyInfo)migration;
+                        var namedKey = new NamedKeyInfo((NamedKeyInfo)migration);
                         tableKeys.Add(namedKey.Name, namedKey);
                         if (insideTransaction != null)
                         {
