@@ -258,11 +258,26 @@ namespace SilverSim.Database.MySQL.UserSession
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("DELETE FROM usersessions WHERE sessionid=@sessionid", conn))
+                return conn.InsideTransaction((transaction) =>
                 {
-                    cmd.Parameters.AddParameter("@sessionid", sessionID);
-                    return cmd.ExecuteNonQuery() > 0;
-                }
+                    using (var cmd = new SQLiteCommand("DELETE FROM usersessiondata WHERE sessionid=@sessionid", conn)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        cmd.Parameters.AddParameter("@sessionid", sessionID);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    using (var cmd = new SQLiteCommand("DELETE FROM usersessions WHERE sessionid=@sessionid", conn)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        cmd.Parameters.AddParameter("@sessionid", sessionID);
+                        return cmd.ExecuteNonQuery() > 0;
+                    }
+                });
             }
         }
 
@@ -487,6 +502,7 @@ namespace SilverSim.Database.MySQL.UserSession
                         cmd.Parameters.AddParameter("@sessionid", sessionID);
                         cmd.Parameters.AddParameter("@assoc", assoc);
                         cmd.Parameters.AddParameter("@varname", varname);
+                        cmd.Parameters.AddParameter("@now", Date.Now);
                         using (var reader = cmd.ExecuteReader())
                         {
                             if (!reader.Read())
