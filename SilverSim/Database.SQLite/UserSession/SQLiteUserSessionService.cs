@@ -215,11 +215,12 @@ namespace SilverSim.Database.MySQL.UserSession
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT NULL FROM usersessiondata WHERE sessionid=@sessionid AND assoc=@assoc AND varname=@varname", conn))
+                using (var cmd = new SQLiteCommand("SELECT NULL FROM usersessiondata WHERE sessionid=@sessionid AND assoc=@assoc AND varname=@varname AND (NOT isexpiring OR expirydate >= @now)", conn))
                 {
                     cmd.Parameters.AddParameter("@sessionid", sessionID);
                     cmd.Parameters.AddParameter("@assoc", assoc);
                     cmd.Parameters.AddParameter("@varname", varname);
+                    cmd.Parameters.AddParameter("@now", Date.Now);
                     using (var reader = cmd.ExecuteReader())
                     {
                         return reader.Read();
@@ -314,11 +315,12 @@ namespace SilverSim.Database.MySQL.UserSession
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("DELETE FROM usersessiondata WHERE sessionid=@sessionid AND assoc=@assoc AND varname=@varname", conn))
+                using (var cmd = new SQLiteCommand("DELETE FROM usersessiondata WHERE sessionid=@sessionid AND assoc=@assoc AND varname=@varname AND (NOT isexpiring OR expirydate >= @now)", conn))
                 {
                     cmd.Parameters.AddParameter("@sessionid", sessionID);
                     cmd.Parameters.AddParameter("@assoc", assoc);
                     cmd.Parameters.AddParameter("@varname", varname);
+                    cmd.Parameters.AddParameter("@now", Date.Now);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
@@ -353,7 +355,7 @@ namespace SilverSim.Database.MySQL.UserSession
                         ["varname"] = varname,
                         ["value"] = value,
                         ["isexpiring"] = true,
-                        ["expirydata"] = Date.Now.Add(span)
+                        ["expirydate"] = Date.Now.Add(span)
                     };
                     conn.ReplaceInto("usersessiondata", vals, transaction);
                 });
@@ -455,7 +457,7 @@ namespace SilverSim.Database.MySQL.UserSession
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT * FROM usersessiondata WHERE sessionid=@sessionid AND assoc=@assoc AND varname=@varname AND (NOT isexpiring OR expirydate > @now)", conn))
+                using (var cmd = new SQLiteCommand("SELECT * FROM usersessiondata WHERE sessionid=@sessionid AND assoc=@assoc AND varname=@varname AND (NOT isexpiring OR expirydate >= @now)", conn))
                 {
                     cmd.Parameters.AddParameter("@sessionid", sessionID);
                     cmd.Parameters.AddParameter("@assoc", assoc);
@@ -523,14 +525,17 @@ namespace SilverSim.Database.MySQL.UserSession
 
                     if (val.ExpiryDate != null)
                     {
+                        val.ExpiryDate = val.ExpiryDate.Add(span);
                         using (var cmd = new SQLiteCommand("UPDATE usersessiondata SET expirydate = @expirydate WHERE sessionid = @sessionid AND assoc = @assoc AND varname = @varname", conn)
                         {
                             Transaction = transaction
                         })
                         {
-                            cmd.Parameters.AddParameter("@expirydate", val.ExpiryDate.Add(span));
+                            cmd.Parameters.AddParameter("@expirydate", val.ExpiryDate);
+                            cmd.Parameters.AddParameter("@sessionid", sessionID);
                             cmd.Parameters.AddParameter("@assoc", assoc);
                             cmd.Parameters.AddParameter("@varname", varname);
+                            return cmd.ExecuteNonQuery() > 0;
                         }
                     }
                     return true;
