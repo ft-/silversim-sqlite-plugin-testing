@@ -535,7 +535,7 @@ namespace SilverSim.Database.MySQL.UserSession
                             cmd.Parameters.AddParameter("@sessionid", sessionID);
                             cmd.Parameters.AddParameter("@assoc", assoc);
                             cmd.Parameters.AddParameter("@varname", varname);
-                            return cmd.ExecuteNonQuery() > 0;
+                            cmd.ExecuteNonQuery();
                         }
                     }
                     return true;
