@@ -106,7 +106,11 @@ ${sonar.moduledeclarations}
 			</exec>
 		</if>
 		<if test="${platform::is-unix()}">
-			<exec program="xbuild" workingdir=".">
+            <property name="builder" value="xbuild"/>
+            <foreach item="String" in="${environment::get-variable('PATH')}" delim=";:" property="path">
+                <property name="builder" value="msbuild" if="${file::exists(path::combine(path,'msbuild'))}"/>
+            </foreach>
+			<exec program="${builder}" workingdir=".">
 				<arg value="/p:Configuration=Debug" if="${property::exists('debug-build')}"/>
 				<arg value="/p:Configuration=DebugRel" if="${property::exists('debugrel-build')}"/>
 				<arg value="/p:Configuration=Release" if="${property::exists('release-build')}"/>
