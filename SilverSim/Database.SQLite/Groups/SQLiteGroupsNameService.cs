@@ -76,7 +76,10 @@ namespace SilverSim.Database.SQLite.Groups
         }
 
         private static UGI ToUGI(SQLiteDataReader dbReader) =>
-            new UGI(dbReader.GetUUID("GroupID"), (string)dbReader["GroupName"], dbReader.GetUri("HomeURI"));
+            new UGI(dbReader.GetUUID("GroupID"), (string)dbReader["GroupName"], dbReader.GetUri("HomeURI"))
+            {
+                AuthorizationToken = dbReader.GetBytesOrNull("AuthorizationData")
+            };
 
         public override List<UGI> GetGroupsByName(string groupName, int limit)
         {
@@ -113,6 +116,10 @@ namespace SilverSim.Database.SQLite.Groups
                     { "HomeURI", group.HomeURI },
                     { "GroupName", group.GroupName }
                 };
+                if(group.AuthorizationToken != null)
+                {
+                    vars.Add("AuthorizationData", group.AuthorizationToken);
+                }
                 connection.ReplaceInto("groupnames", vars);
             }
         }
@@ -142,6 +149,8 @@ namespace SilverSim.Database.SQLite.Groups
             new AddColumn<string>("HomeURI") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
             new AddColumn<string>("GroupName") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
             new PrimaryKeyInfo("GroupID", "HomeURI"),
+            new TableRevision(2),
+            new AddColumn<byte[]>("AuthorizationData"),
         };
     }
 }

@@ -681,6 +681,17 @@ namespace SilverSim.Database.SQLite
             return (byte[])o;
         }
 
+        public static byte[] GetBytesOrNull(this SQLiteDataReader dbReader, string prefix)
+        {
+            object o = dbReader[prefix];
+            var t = o?.GetType();
+            if (t == typeof(DBNull))
+            {
+                return null;
+            }
+            return (byte[])o;
+        }
+
         public static Uri GetUri(this SQLiteDataReader dbReader, string prefix)
         {
             object o = dbReader[prefix];
