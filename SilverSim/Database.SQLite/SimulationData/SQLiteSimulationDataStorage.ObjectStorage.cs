@@ -247,7 +247,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                 Owner = dbReader.GetUGUI("Owner"),
                 ParentFolderID = dbReader.GetUUID("PrimID"),
                 NextOwnerAssetID = dbReader.GetUUID("NextOwnerAssetID"),
-                ExperienceID = dbReader.GetUUID("ExperienceID"),
+                ExperienceID = dbReader.GetUEI("ExperienceID"),
                 CollisionFilter = new ObjectPartInventoryItem.CollisionFilterParam
                 {
                     DbSerialization = dbReader.GetBytes("CollisionFilterData")

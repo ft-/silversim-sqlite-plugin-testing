@@ -262,7 +262,7 @@ namespace SilverSim.Database.SQLite
             {
                 mysqlparam.AddWithValue(key, (bool)value ? 1 : 0);
             }
-            else if (t == typeof(UUID) || t == typeof(UGUI) || t == typeof(UGUIWithName) || t == typeof(UGI) || t == typeof(Uri))
+            else if (t == typeof(UUID) || t == typeof(UGUI) || t == typeof(UGUIWithName) || t == typeof(UGI) || t == typeof(Uri) || t == typeof(UEI))
             {
                 mysqlparam.AddWithValue(key, value.ToString());
             }
@@ -601,6 +601,23 @@ namespace SilverSim.Database.SQLite
             }
 
             throw new InvalidCastException("GetUGUIWithName could not convert value for " + prefix);
+        }
+
+        public static UEI GetUEI(this SQLiteDataReader dbReader, string prefix)
+        {
+            object v = dbReader[prefix];
+            var t = v?.GetType();
+            if (t == typeof(Guid))
+            {
+                return new UEI((Guid)v);
+            }
+
+            if (t == typeof(string))
+            {
+                return new UEI((string)v);
+            }
+
+            throw new InvalidCastException("GetUEI could not convert value for " + prefix);
         }
 
         public static UGI GetUGI(this SQLiteDataReader dbReader, string prefix)

@@ -28,11 +28,11 @@ namespace SilverSim.Database.SQLite.ExperienceService
 {
     public sealed partial class SQLiteExperienceService : IExperienceAdminInterface
     {
-        List<UUID> IExperienceAdminInterface.this[UGUI agent]
+        List<UEI> IExperienceAdminInterface.this[UGUI agent]
         {
             get
             {
-                var result = new List<UUID>();
+                var result = new List<UEI>();
                 using (var conn = new SQLiteConnection(m_ConnectionString))
                 {
                     conn.Open();
@@ -45,7 +45,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                             {
                                 if (reader.GetUGUI("Admin").EqualsGrid(agent))
                                 {
-                                    result.Add(reader.GetUUID("ExperienceID"));
+                                    result.Add(new UEI(reader.GetUUID("ExperienceID")));
                                 }
                             }
                         }
@@ -55,7 +55,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
             }
         }
 
-        bool IExperienceAdminInterface.this[UUID experienceID, UGUI agent]
+        bool IExperienceAdminInterface.this[UEI experienceID, UGUI agent]
         {
             get
             {
@@ -69,7 +69,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                 {
                     var vals = new Dictionary<string, object>
                     {
-                        ["ExperienceID"] = experienceID,
+                        ["ExperienceID"] = experienceID.ID,
                         ["Admin"] = agent,
                     };
                     using (var conn = new SQLiteConnection(m_ConnectionString))
@@ -85,7 +85,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                         conn.Open();
                         using (var cmd = new SQLiteCommand("DELETE FROM experienceadmins WHERE ExperienceID = @experienceid AND Admin LIKE @admin", conn))
                         {
-                            cmd.Parameters.AddParameter("@experienceid", experienceID);
+                            cmd.Parameters.AddParameter("@experienceid", experienceID.ID);
                             cmd.Parameters.AddParameter("@admin", agent.ID.ToString() + "%");
                             cmd.ExecuteNonQuery();
                         }
@@ -94,14 +94,14 @@ namespace SilverSim.Database.SQLite.ExperienceService
             }
         }
 
-        bool IExperienceAdminInterface.TryGetValue(UUID experienceID, UGUI agent, out bool allowed)
+        bool IExperienceAdminInterface.TryGetValue(UEI experienceID, UGUI agent, out bool allowed)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
                 using (var cmd = new SQLiteCommand("SELECT Admin FROM experienceadmins WHERE ExperienceID = @experienceid AND Admin LIKE @admin", conn))
                 {
-                    cmd.Parameters.AddParameter("@experienceid", experienceID);
+                    cmd.Parameters.AddParameter("@experienceid", experienceID.ID);
                     cmd.Parameters.AddParameter("@admin", agent.ID.ToString() + "%");
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
                     {

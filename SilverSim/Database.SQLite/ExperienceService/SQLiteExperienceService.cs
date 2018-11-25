@@ -40,8 +40,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
     {
         public static ExperienceInfo ToExperienceInfo(this SQLiteDataReader reader) => new ExperienceInfo
         {
-            ID = reader.GetUUID("ID"),
-            Name = (string)reader["Name"],
+            ID = new UEI(reader.GetUUID("ID"), (string)reader["Name"], reader.GetUri("HomeURI")),
             Description = (string)reader["Description"],
             Properties = reader.GetEnum<ExperiencePropertyFlags>("Properties"),
             Owner = reader.GetUGUI("Owner"),
@@ -81,8 +80,9 @@ namespace SilverSim.Database.SQLite.ExperienceService
         {
             var vals = new Dictionary<string, object>
             {
-                { "ID", info.ID },
-                { "Name", info.Name },
+                { "ID", info.ID.ID },
+                { "Name", info.ID.ExperienceName },
+                { "HomeURI", info.ID.HomeURI },
                 { "Description", info.Description },
                 { "Properties", info.Properties },
                 { "Owner", info.Owner },
@@ -101,20 +101,20 @@ namespace SilverSim.Database.SQLite.ExperienceService
             }
         }
 
-        public override List<UUID> FindExperienceByName(string query)
+        public override List<UEI> FindExperienceByName(string query)
         {
-            var result = new List<UUID>();
+            var result = new List<UEI>();
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT ID FROM experiences WHERE Name LIKE @name", conn))
+                using (var cmd = new SQLiteCommand("SELECT ID, Name, HomeURI FROM experiences WHERE Name LIKE @name", conn))
                 {
                     cmd.Parameters.AddParameter("@name", "%" + query + "%");
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            result.Add(reader.GetUUID("ID"));
+                            result.Add(new UEI(reader.GetUUID("ID"), (string)reader["Name"], reader.GetUri("HomeURI")));
                         }
                     }
                 }
@@ -143,13 +143,13 @@ namespace SilverSim.Database.SQLite.ExperienceService
             return result;
         }
 
-        public override List<UUID> GetCreatorExperiences(UGUI creator)
+        public override List<UEI> GetCreatorExperiences(UGUI creator)
         {
-            var result = new List<UUID>();
+            var result = new List<UEI>();
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT Creator, ID FROM experiences WHERE Creator LIKE @creator", conn))
+                using (var cmd = new SQLiteCommand("SELECT Creator, ID, Name, HomeURI FROM experiences WHERE Creator LIKE @creator", conn))
                 {
                     cmd.Parameters.AddParameter("@creator", creator.ID.ToString() + "%");
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -158,7 +158,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                         {
                             if (reader.GetUGUI("Creator").EqualsGrid(creator))
                             {
-                                result.Add(reader.GetUUID("ID"));
+                                result.Add(new UEI(reader.GetUUID("ID"), (string)reader["Name"], reader.GetUri("HomeURI")));
                             }
                         }
                     }
@@ -167,13 +167,13 @@ namespace SilverSim.Database.SQLite.ExperienceService
             return result;
         }
 
-        public override List<UUID> GetGroupExperiences(UGI group)
+        public override List<UEI> GetGroupExperiences(UGI group)
         {
-            var result = new List<UUID>();
+            var result = new List<UEI>();
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT Group, ID FROM experiences WHERE Group LIKE @group", conn))
+                using (var cmd = new SQLiteCommand("SELECT Group, ID, Name, HomeURI FROM experiences WHERE Group LIKE @group", conn))
                 {
                     cmd.Parameters.AddParameter("@group", group.ID.ToString() + "%");
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -182,7 +182,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                         {
                             if (reader.GetUGI("Group").Equals(group))
                             {
-                                result.Add(reader.GetUUID("ID"));
+                                result.Add(new UEI(reader.GetUUID("ID"), (string)reader["Name"], reader.GetUri("HomeURI")));
                             }
                         }
                     }
@@ -191,13 +191,13 @@ namespace SilverSim.Database.SQLite.ExperienceService
             return result;
         }
 
-        public override List<UUID> GetOwnerExperiences(UGUI owner)
+        public override List<UEI> GetOwnerExperiences(UGUI owner)
         {
-            var result = new List<UUID>();
+            var result = new List<UEI>();
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new SQLiteCommand("SELECT Owner, ID FROM experiences WHERE Owner LIKE @owner", conn))
+                using (var cmd = new SQLiteCommand("SELECT Owner, ID, Name, HomeURI FROM experiences WHERE Owner LIKE @owner", conn))
                 {
                     cmd.Parameters.AddParameter("@owner", owner.ID.ToString() + "%");
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -206,7 +206,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                         {
                             if (reader.GetUGUI("Owner").EqualsGrid(owner))
                             {
-                                result.Add(reader.GetUUID("ID"));
+                                result.Add(new UEI(reader.GetUUID("ID"), (string)reader["Name"], reader.GetUri("HomeURI")));
                             }
                         }
                     }
@@ -216,7 +216,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
         }
 
         private static readonly string[] m_RemoveFromTables = new string[] { "experiencekeyvalues", "experienceadmins", "experienceusers" };
-        public override bool Remove(UGUI requestingAgent, UUID id)
+        public override bool Remove(UGUI requestingAgent, UEI id)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -228,7 +228,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                         Transaction = transaction
                     })
                     {
-                        cmd.Parameters.AddParameter("@experienceid", id);
+                        cmd.Parameters.AddParameter("@experienceid", id.ID);
                         using (SQLiteDataReader reader = cmd.ExecuteReader())
                         {
                             if (!reader.Read())
@@ -247,14 +247,14 @@ namespace SilverSim.Database.SQLite.ExperienceService
                     {
                         using (var cmd = new SQLiteCommand("DELETE FROM " + table + " WHERE ExperienceID = @experienceid", conn))
                         {
-                            cmd.Parameters.AddParameter("@experienceid", id);
+                            cmd.Parameters.AddParameter("@experienceid", id.ID);
                             cmd.ExecuteNonQuery();
                         }
                     }
 
                     using (var cmd = new SQLiteCommand("DELETE FROM experiences WHERE ID = @experienceid", conn))
                     {
-                        cmd.Parameters.AddParameter("@experienceid", id);
+                        cmd.Parameters.AddParameter("@experienceid", id.ID);
                         return cmd.ExecuteNonQuery() > 0;
                     }
                 });
@@ -279,7 +279,29 @@ namespace SilverSim.Database.SQLite.ExperienceService
             }
         }
 
-        public override bool TryGetValue(UUID experienceID, out ExperienceInfo experienceInfo)
+        public override bool TryGetValue(UUID experienceID, out UEI uei)
+        {
+            using (var conn = new SQLiteConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (var cmd = new SQLiteCommand("SELECT * FROM experiences WHERE ID = @id LIMIT 1", conn))
+                {
+                    cmd.Parameters.AddParameter("@id", experienceID);
+                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            uei = new UEI(reader.GetUUID("ID"), (string)reader["Name"], reader.GetUri("HomeURI"));
+                            return true;
+                        }
+                    }
+                }
+            }
+            uei = default(UEI);
+            return false;
+        }
+
+        public override bool TryGetValue(UEI experienceID, out ExperienceInfo experienceInfo)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -305,7 +327,8 @@ namespace SilverSim.Database.SQLite.ExperienceService
         {
             var vals = new Dictionary<string, object>
             {
-                { "Name", info.Name },
+                { "Name", info.ID.ExperienceName },
+                { "HomeURI", info.ID.HomeURI },
                 { "Description", info.Description },
                 { "Properties", info.Properties },
                 { "Owner", info.Owner },
@@ -326,7 +349,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                         Transaction = transaction
                     })
                     {
-                        cmd.Parameters.AddParameter("@experienceid", info.ID);
+                        cmd.Parameters.AddParameter("@experienceid", info.ID.ID);
                         cmd.Parameters.AddParameter("@admin", requestingAgent.ID.ToString() + "%");
                         using (SQLiteDataReader reader = cmd.ExecuteReader())
                         {
@@ -346,7 +369,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                             Transaction = transaction
                         })
                         {
-                            cmd.Parameters.AddParameter("@id", info.ID);
+                            cmd.Parameters.AddParameter("@id", info.ID.ID);
                             using (SQLiteDataReader reader = cmd.ExecuteReader())
                             {
                                 if (reader.Read())
@@ -360,7 +383,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                     {
                         throw new InvalidOperationException("requesting agent is not allowed to edit experience");
                     }
-                    conn.UpdateSet("experiences", vals, "ID = \"" + info.ID.ToString() + "\"", transaction);
+                    conn.UpdateSet("experiences", vals, "ID = \"" + info.ID.ID.ToString() + "\"", transaction);
                 });
             }
         }
@@ -398,6 +421,8 @@ namespace SilverSim.Database.SQLite.ExperienceService
             new AddColumn<string>("SlUrl") {IsNullAllowed = false, Cardinality = 255, Default = string.Empty },
             new PrimaryKeyInfo("ID"),
             new NamedKeyInfo("NameKey", "Name"),
+            new TableRevision(2),
+            new AddColumn<Uri>("HomeURI"),
 
             new SqlTable("experienceadmins"),
             new AddColumn<UUID>("ExperienceID") { IsNullAllowed = false },

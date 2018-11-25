@@ -166,7 +166,7 @@ namespace SilverSim.Database.SQLite._Migration
             {
                 typeSql = "text";
             }
-            else if (f == typeof(UGUI) || f == typeof(UGUIWithName) || f == typeof(UGI))
+            else if (f == typeof(UGUI) || f == typeof(UGUIWithName) || f == typeof(UGI) || f == typeof(Uri) || f == typeof(UEI))
             {
                 typeSql = "text";
             }
@@ -395,7 +395,9 @@ namespace SilverSim.Database.SQLite._Migration
                     !(colInfo.Default.GetType() == typeof(UUID) &&
                     colInfo.FieldType == typeof(UGUIWithName)) &&
                     !(colInfo.Default.GetType() == typeof(UUID) &&
-                    colInfo.FieldType == typeof(UGI)))
+                    colInfo.FieldType == typeof(UGI)) &&
+                    !(colInfo.Default.GetType() == typeof(UUID) &&
+                    colInfo.FieldType == typeof(UEI)))
                 {
                     throw new ArgumentOutOfRangeException("Default does not match expected type in field " + colInfo.Name + " target type=" + colInfo.FieldType.FullName + " defaultType=" + colInfo.Default.GetType().FullName);
                 }
@@ -468,7 +470,7 @@ namespace SilverSim.Database.SQLite._Migration
 
     public class DropColumn : IMigrationElement
     {
-        public string Name { get; private set; }
+        public string Name { get; }
         public DropColumn(string name)
         {
             Name = name;
