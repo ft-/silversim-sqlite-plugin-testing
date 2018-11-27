@@ -47,7 +47,7 @@ namespace SilverSim.Database.SQLite.Estate
                                 result.Add(new EstateExperienceInfo
                                 {
                                     EstateID = (uint)(long)reader["EstateID"],
-                                    ExperienceID = reader.GetUUID("ExperienceID"),
+                                    ExperienceID = new UEI(reader.GetUUID("ExperienceID")),
                                     IsAllowed = reader.GetBool("IsAllowed")
                                 });
                             }
@@ -58,7 +58,7 @@ namespace SilverSim.Database.SQLite.Estate
             }
         }
 
-        bool IEstateExperienceServiceInterface.Remove(uint estateID, UUID experienceID)
+        bool IEstateExperienceServiceInterface.Remove(uint estateID, UEI experienceID)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -66,7 +66,7 @@ namespace SilverSim.Database.SQLite.Estate
                 using (var cmd = new SQLiteCommand("DELETE FROM estateexperiences WHERE EstateID = @estateid AND ExperienceID = @experienceid", conn))
                 {
                     cmd.Parameters.AddParameter("@estateid", estateID);
-                    cmd.Parameters.AddParameter("@experienceid", experienceID);
+                    cmd.Parameters.AddParameter("@experienceid", experienceID.ID);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
@@ -77,7 +77,7 @@ namespace SilverSim.Database.SQLite.Estate
             var vals = new Dictionary<string, object>
             {
                 ["EstateID"] = info.EstateID,
-                ["ExperienceID"] = info.ExperienceID,
+                ["ExperienceID"] = info.ExperienceID.ID,
                 ["IsAllowed"] = info.IsAllowed
             };
             using (var conn = new SQLiteConnection(m_ConnectionString))
@@ -87,7 +87,7 @@ namespace SilverSim.Database.SQLite.Estate
             }
         }
 
-        bool IEstateExperienceServiceInterface.TryGetValue(uint estateID, UUID experienceID, out EstateExperienceInfo info)
+        bool IEstateExperienceServiceInterface.TryGetValue(uint estateID, UEI experienceID, out EstateExperienceInfo info)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -95,7 +95,7 @@ namespace SilverSim.Database.SQLite.Estate
                 using (var cmd = new SQLiteCommand("SELECT * FROM estateexperiences WHERE EstateID = @estateid AND ExperienceID = @experienceid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@estateid", estateID);
-                    cmd.Parameters.AddParameter("@experienceid", experienceID);
+                    cmd.Parameters.AddParameter("@experienceid", experienceID.ID);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -103,7 +103,7 @@ namespace SilverSim.Database.SQLite.Estate
                             info = new EstateExperienceInfo
                             {
                                 EstateID = estateID,
-                                ExperienceID = experienceID,
+                                ExperienceID = new UEI(experienceID),
                                 IsAllowed = reader.GetBool("IsAllowed")
                             };
                             return true;

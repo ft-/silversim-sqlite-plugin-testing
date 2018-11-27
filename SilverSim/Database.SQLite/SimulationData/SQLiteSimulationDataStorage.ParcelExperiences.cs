@@ -50,7 +50,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                                 {
                                     RegionID = reader.GetUUID("RegionID"),
                                     ParcelID = reader.GetUUID("ParcelID"),
-                                    ExperienceID = reader.GetUUID("ExperienceID"),
+                                    ExperienceID = new UEI(reader.GetUUID("ExperienceID")),
                                     IsAllowed = reader.GetBool("IsAllowed")
                                 };
                                 result.Add(entry);
@@ -62,7 +62,7 @@ namespace SilverSim.Database.SQLite.SimulationData
             }
         }
 
-        ParcelExperienceEntry IParcelExperienceList.this[UUID regionID, UUID parcelID, UUID experienceID]
+        ParcelExperienceEntry IParcelExperienceList.this[UUID regionID, UUID parcelID, UEI experienceID]
         {
             get
             {
@@ -89,7 +89,7 @@ namespace SilverSim.Database.SQLite.SimulationData
             }
         }
 
-        bool IParcelExperienceList.Remove(UUID regionID, UUID parcelID, UUID experienceID)
+        bool IParcelExperienceList.Remove(UUID regionID, UUID parcelID, UEI experienceID)
         {
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
@@ -98,7 +98,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     cmd.Parameters.AddParameter("@parcelid", parcelID);
-                    cmd.Parameters.AddParameter("@experienceid", experienceID);
+                    cmd.Parameters.AddParameter("@experienceid", experienceID.ID);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
@@ -126,14 +126,14 @@ namespace SilverSim.Database.SQLite.SimulationData
                 {
                     ["RegionID"] = entry.RegionID,
                     ["ParcelID"] = entry.ParcelID,
-                    ["ExperienceID"] = entry.ExperienceID,
+                    ["ExperienceID"] = entry.ExperienceID.ID,
                     ["IsAllowed"] = entry.IsAllowed
                 };
                 connection.ReplaceInto("parcelexperiences", data);
             }
         }
 
-        bool IParcelExperienceList.TryGetValue(UUID regionID, UUID parcelID, UUID experienceID, out ParcelExperienceEntry entry)
+        bool IParcelExperienceList.TryGetValue(UUID regionID, UUID parcelID, UEI experienceID, out ParcelExperienceEntry entry)
         {
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
@@ -143,7 +143,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     cmd.Parameters.AddParameter("@parcelid", parcelID);
-                    cmd.Parameters.AddParameter("@experienceid", experienceID);
+                    cmd.Parameters.AddParameter("@experienceid", experienceID.ID);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -152,7 +152,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                             {
                                 RegionID = regionID,
                                 ParcelID = parcelID,
-                                ExperienceID = experienceID,
+                                ExperienceID = new UEI(experienceID),
                                 IsAllowed = reader.GetBool("IsAllowed")
                             };
                             return true;

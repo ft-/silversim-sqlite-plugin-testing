@@ -47,7 +47,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                             {
                                 result.Add(new RegionExperienceInfo
                                 {
-                                    ExperienceID = reader.GetUUID("ExperienceID"),
+                                    ExperienceID = new UEI(reader.GetUUID("ExperienceID")),
                                     RegionID = reader.GetUUID("RegionID"),
                                     IsAllowed = reader.GetBool("IsAllowed")
                                 });
@@ -59,7 +59,7 @@ namespace SilverSim.Database.SQLite.SimulationData
             }
         }
 
-        RegionExperienceInfo IRegionExperienceList.this[UUID regionID, UUID experienceID]
+        RegionExperienceInfo IRegionExperienceList.this[UUID regionID, UEI experienceID]
         {
             get
             {
@@ -72,7 +72,7 @@ namespace SilverSim.Database.SQLite.SimulationData
             }
         }
 
-        bool IRegionExperienceList.Remove(UUID regionID, UUID experienceID)
+        bool IRegionExperienceList.Remove(UUID regionID, UEI experienceID)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -80,7 +80,7 @@ namespace SilverSim.Database.SQLite.SimulationData
                 using (var cmd = new SQLiteCommand("DELETE FROM regionexperiences WHERE RegionID = @regionid AND ExperienceID = @experienceid", conn))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
-                    cmd.Parameters.AddParameter("@experienceid", experienceID);
+                    cmd.Parameters.AddParameter("@experienceid", experienceID.ID);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
@@ -104,7 +104,7 @@ namespace SilverSim.Database.SQLite.SimulationData
             var vals = new Dictionary<string, object>
             {
                 ["RegionID"] = info.RegionID,
-                ["ExperienceID"] = info.ExperienceID,
+                ["ExperienceID"] = info.ExperienceID.ID,
                 ["IsAllowed"] = info.IsAllowed
             };
             using (var conn = new SQLiteConnection(m_ConnectionString))
@@ -114,7 +114,7 @@ namespace SilverSim.Database.SQLite.SimulationData
             }
         }
 
-        bool IRegionExperienceList.TryGetValue(UUID regionID, UUID experienceID, out RegionExperienceInfo info)
+        bool IRegionExperienceList.TryGetValue(UUID regionID, UEI experienceID, out RegionExperienceInfo info)
         {
             using (var conn = new SQLiteConnection(m_ConnectionString))
             {
@@ -122,14 +122,14 @@ namespace SilverSim.Database.SQLite.SimulationData
                 using (var cmd = new SQLiteCommand("SELECT * FROM regionexperiences WHERE RegionID = @regionid AND ExperienceID = @experienceid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
-                    cmd.Parameters.AddParameter("@experienceid", experienceID);
+                    cmd.Parameters.AddParameter("@experienceid", experienceID.ID);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
                         {
                             info = new RegionExperienceInfo
                             {
-                                ExperienceID = reader.GetUUID("ExperienceID"),
+                                ExperienceID = new UEI(reader.GetUUID("ExperienceID")),
                                 RegionID = reader.GetUUID("RegionID"),
                                 IsAllowed = reader.GetBool("IsAllowed"),
                             };
