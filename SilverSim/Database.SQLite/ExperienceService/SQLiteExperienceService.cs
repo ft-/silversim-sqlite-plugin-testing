@@ -308,7 +308,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
                 conn.Open();
                 using (var cmd = new SQLiteCommand("SELECT * FROM experiences WHERE ID = @id LIMIT 1", conn))
                 {
-                    cmd.Parameters.AddParameter("@id", experienceID);
+                    cmd.Parameters.AddParameter("@id", experienceID.ID);
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
