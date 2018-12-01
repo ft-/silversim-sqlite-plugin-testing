@@ -59,6 +59,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
     {
         private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL EXPERIENCE");
+        private string m_HomeURI;
 
         public SQLiteExperienceService(IConfig ownSection)
         {
@@ -67,7 +68,7 @@ namespace SilverSim.Database.SQLite.ExperienceService
 
         public void Startup(ConfigurationLoader loader)
         {
-            /* intentionally left empty */
+            m_HomeURI = loader.HomeURI;
         }
 
         public override IExperiencePermissionsInterface Permissions => this;
@@ -78,6 +79,10 @@ namespace SilverSim.Database.SQLite.ExperienceService
 
         public override void Add(ExperienceInfo info)
         {
+            if (info.ID.HomeURI == null)
+            {
+                info.ID.HomeURI = new Uri(m_HomeURI);
+            }
             var vals = new Dictionary<string, object>
             {
                 { "ID", info.ID.ID },
