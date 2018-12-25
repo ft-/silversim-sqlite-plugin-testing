@@ -120,6 +120,19 @@ ${sonar.moduledeclarations}
 	
 	<target name="nls" description="Process language files">
 		<mkdir dir="bin/languages"/>
+		<property name="resgen" value="resgen"/>
+		<if test="${platform::is-windows()}">
+			<property name="sdkpath" value=""/>
+			<foreach item="String" in="4.7.2,4.7.1,4.7,4.6.1" delim="," property="sdkversion">
+				<property name="key" value="SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\NETFXSDK\${sdkversion}\WinSDK-NetFx40Tools\InstallationFolder"/>
+				<readregistry key="${key}" property="sdkpath" failonerror="false" if="${sdkpath==''}"/>
+			</foreach>
+			<foreach item="String" in="4.7.2,4.7.1,4.7,4.6.1" delim="," property="sdkversion">
+				<property name="key" value="SOFTWARE\Microsoft\Microsoft SDKs\NETFXSDK\${sdkversion}\WinSDK-NetFx40Tools\InstallationFolder"/>
+				<readregistry key="${key}" property="sdkpath" failonerror="false" if="${sdkpath==''}"/>
+			</foreach>
+			<property name="resgen" value="${sdkpath}resgen.exe"/>
+		</if>
 		<foreach item="Folder" property="longfoldername">
 			<in>
 				<items basedir="nls">
@@ -132,7 +145,7 @@ ${sonar.moduledeclarations}
 				<mkdir dir="bin/languages/${foldername}" failonerror="false"/>
 				<foreach item="File" property="longfilename" in="nls/${foldername}.src">
 					<property name="filename" value="${path::get-file-name-without-extension(longfilename)}"/>
-					<exec program="resgen">
+					<exec program="${resgen}">
 						<arg path="nls/${foldername}.src/${filename}.txt"/>
 						<arg path="bin/languages/${foldername}/${filename}.resources"/>
 					</exec>
