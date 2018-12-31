@@ -215,6 +215,8 @@ namespace SilverSim.Database.SQLite.SimulationData
             new DropColumn("Slice"),
             new TableRevision(27),
             new PrimaryKeyInfo("RegionID", "ID"),
+            new TableRevision(28),
+            new AddColumn<byte[]>("AnimationData"),
             #endregion
 
             #region Table primitems
