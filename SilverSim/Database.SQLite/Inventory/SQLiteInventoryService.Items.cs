@@ -21,6 +21,7 @@
 
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
@@ -178,21 +179,51 @@ namespace SilverSim.Database.SQLite.Inventory
             using (var connection = new SQLiteConnection(m_ConnectionString))
             {
                 connection.Open();
-                var newVals = new Dictionary<string, object>
+                InventoryFlags flags;
+                AssetType assetType;
+                UUID assetID;
+                connection.InsideTransaction((transaction) =>
                 {
-                    ["AssetID"] = item.AssetID,
-                    ["Name"] = item.Name,
-                    ["Description"] = item.Description,
-                    ["BasePermissionsMask"] = item.Permissions.Base,
-                    ["CurrentPermissionsMask"] = item.Permissions.Current,
-                    ["EveryOnePermissionsMask"] = item.Permissions.EveryOne,
-                    ["NextOwnerPermissionsMask"] = item.Permissions.NextOwner,
-                    ["GroupPermissionsMask"] = item.Permissions.Group,
-                    ["SalePrice"] = item.SaleInfo.Price,
-                    ["SaleType"] = item.SaleInfo.Type,
-                    ["Flags"] = item.Flags
-                };
-                connection.UpdateSet(m_InventoryItemTable, newVals, string.Format("OwnerID = '{0}' AND ID = '{1}'", item.Owner.ID, item.ID));
+                    using (var cmd = new SQLiteCommand("SELECT AssetID, Flags, AssetType FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ID = @itemid LIMIT 1", connection)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        cmd.Parameters.AddParameter("@ownerid", item.Owner.ID);
+                        cmd.Parameters.AddParameter("@itemid", item.ID);
+                        using (SQLiteDataReader dbReader = cmd.ExecuteReader())
+                        {
+                            if (!dbReader.Read())
+                            {
+                                throw new InventoryItemNotFoundException(item.ID);
+                            }
+                            assetID = dbReader.GetUUID("AssetID");
+                            flags = dbReader.GetEnum<InventoryFlags>("Flags") & InventoryFlags.PermOverwriteMask;
+                            assetType = dbReader.GetEnum<AssetType>("AssetType");
+                        }
+                    }
+
+                    if (assetType != AssetType.Object || assetID != item.AssetID)
+                    {
+                        flags = InventoryFlags.None;
+                    }
+
+                    var newVals = new Dictionary<string, object>
+                    {
+                        ["AssetID"] = item.AssetID,
+                        ["Name"] = item.Name,
+                        ["Description"] = item.Description,
+                        ["BasePermissionsMask"] = item.Permissions.Base,
+                        ["CurrentPermissionsMask"] = item.Permissions.Current,
+                        ["EveryOnePermissionsMask"] = item.Permissions.EveryOne,
+                        ["NextOwnerPermissionsMask"] = item.Permissions.NextOwner,
+                        ["GroupPermissionsMask"] = item.Permissions.Group,
+                        ["SalePrice"] = item.SaleInfo.Price,
+                        ["SaleType"] = item.SaleInfo.Type,
+                        ["Flags"] = item.Flags | flags
+                    };
+                    connection.UpdateSet(m_InventoryItemTable, newVals, string.Format("OwnerID = '{0}' AND ID = '{1}'", item.Owner.ID, item.ID), transaction);
+                });
             }
             IncrementVersion(item.Owner.ID, item.ParentFolderID);
         }
